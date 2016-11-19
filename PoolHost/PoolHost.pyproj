@@ -57,6 +57,9 @@
     <Compile Include="poolgroup\urls.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="poolgroup\viewmodels.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="poolgroup\views.py">
       <SubType>Code</SubType>
     </Compile>
@@ -121,10 +124,10 @@
     <Content Include="groupowner\templates\groupowner\descriptive_list.html" />
     <Content Include="groupowner\templates\groupowner\groupowner_form.html" />
     <Content Include="groupowner\templates\groupowner\index_table.html" />
-    <Content Include="poolgroup\templates\poolgroup\groupowner_filter.html" />
+    <Content Include="poolgroup\templates\poolgroup\groupowner_pagination.html" />
     <Content Include="poolgroup\templates\poolgroup\index.html" />
     <Content Include="poolgroup\templates\poolgroup\index_table.html" />
-    <Content Include="poolgroup\templates\poolgroup\superuser_filter.html" />
+    <Content Include="poolgroup\templates\poolgroup\superuser_pagination.html" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="app\static\app\content\bootstrap.css" />
