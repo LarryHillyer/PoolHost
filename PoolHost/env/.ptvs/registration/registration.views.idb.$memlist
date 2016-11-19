@@ -1,0 +1,8 @@
+signals
+RegistrationForm
+settings
+FormView
+TemplateView
+ActivationView
+redirect
+RegistrationView

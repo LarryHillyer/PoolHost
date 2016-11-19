@@ -1,0 +1,17 @@
+models
+RegistrationModelTests
+get_user_model
+RegistrationProfile
+SHA1_RE
+override_settings
+datetime
+management
+settings
+User
+RegistrationForm
+text_type
+get_current_site
+TestCase
+hashlib
+mail
+RequestFactory

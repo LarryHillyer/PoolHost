@@ -1,0 +1,6 @@
+include
+RegistrationView
+TemplateView
+ActivateWithSimpleRedirect
+urlpatterns
+url

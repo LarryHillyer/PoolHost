@@ -1,0 +1,7 @@
+signals
+RegistrationProfile
+get_current_site
+BaseRegistrationView
+BaseActivationView
+ActivationView
+RegistrationView

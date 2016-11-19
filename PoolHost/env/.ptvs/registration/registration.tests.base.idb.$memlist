@@ -1,0 +1,15 @@
+mail
+User
+override_settings
+contextmanager
+ActivationTestCase
+TestCase
+RegistrationForm
+HttpRequest
+WorkflowTestCase
+signals
+get_user_model
+RegistrationTestCase
+_AssertSignalSentContext
+reverse
+_AssertSignalNotSentContext

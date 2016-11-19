@@ -1,0 +1,7 @@
+signals
+User
+login
+BaseRegistrationView
+authenticate
+get_user_model
+RegistrationView

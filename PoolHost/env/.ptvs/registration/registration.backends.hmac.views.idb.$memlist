@@ -1,0 +1,11 @@
+REGISTRATION_SALT
+signals
+signing
+BaseActivationView
+get_current_site
+render_to_string
+BaseRegistrationView
+get_user_model
+ActivationView
+RegistrationView
+settings

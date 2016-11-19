@@ -1,0 +1,15 @@
+tests
+management
+signals
+runtests
+validators
+urls
+backends
+auth_urls
+get_version
+VERSION
+views
+models
+migrations
+admin
+forms

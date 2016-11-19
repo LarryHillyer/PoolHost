@@ -1,0 +1,12 @@
+datetime
+HMACViewTests
+override_settings
+signing
+time
+modify_settings
+HttpRequest
+signals
+REGISTRATION_SALT
+ActivationTestCase
+reverse
+settings
