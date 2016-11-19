@@ -1,0 +1,64 @@
+﻿{% extends "app/layout.html" %}
+
+{% block content %}
+
+<h2>{{ title }}</h2>
+<div class="row">
+    <div class="col-md-8">
+        <section id="registration-form">
+            <form action="{% url 'register' %}" method="post" class="form-horizontal">
+                {% csrf_token %}
+                <hr />
+
+                <div class="form-group">
+                    <label for="id_username" class="col-md-3 control-label">User name</label>
+                    <div class="col-md-9">
+                        {{ form.username }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_email" class="col-md-3 control-label">Email</label>
+                    <div class="col-md-9">
+                        {{ form.email }}
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="id_password1" class="col-md-3 control-label">Password</label>
+                    <div class="col-md-9">
+                        {{ form.password1 }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_password2" class="col-md-3 control-label">Password Validation</label>
+                    <div class="col-md-9">
+                        {{ form.password2 }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-md-9">
+                        <input type="hidden" name="next" value="/" />
+                        <input type="submit" value="Register" class="btn btn-success" />
+                    </div>
+                </div>
+
+                {% if form.errors %}
+                {% for key, value in form.errors.items %}
+                {% for error in value %}
+                <ul class="error-list">
+                    <li class="validation-summary-errors">{{ error }}</li>
+                </ul>
+                {% endfor %}
+                {% endfor %}
+                {% endif %}
+
+            </form>
+        </section>
+    </div>
+</div>
+
+{% endblock %}

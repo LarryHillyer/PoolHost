@@ -1,0 +1,15 @@
+﻿<ul class="pagination pagination-sm custom-page">
+    {% if model_groupowner_id != None %}
+        {% for groupowner in model_groupowners %}
+            {% if groupowner.id == model_groupowner_id %}
+                <li class="active">
+                    <a href="{% url index_url groupowner.id filter %}">{{groupowner.name}}</a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{% url index_url groupowner.id filter %}">{{groupowner.name}}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</ul>

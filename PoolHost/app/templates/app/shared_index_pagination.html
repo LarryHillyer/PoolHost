@@ -1,0 +1,52 @@
+﻿{% extends "app/layout.html" %}
+
+{% block content %}
+<div id="{{ partial_view_id }}" class="row">
+
+    <div class="row">
+        <div class="col-lg-3">
+            <h2 class="partial-view-title">{{title}}</h2>
+        </div>
+        <div class="col-lg-9">
+            {% include navigation %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            {% include 'app/modelstatus.html' %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            {% if model_groupowner_id and filter %}
+            <a href="{% url create_item_url model_groupowner_id filter %}" class="user-option">{{create_item_name}}</a>
+            {% elif model_groupowner_id%}
+            <a href="{% url create_item_url model_groupowner_id %}" class="user-option">{{create_item_name}}</a>
+            {% elif filter %}
+            <a href="{% url create_item_url filter %}" class="user-option">{{create_item_name}}</a>
+            {% else %}
+            <a href="{% url create_item_url %}" class="user-option">{{create_item_name}}</a>
+            {% endif %}
+            {% include index_table %}
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <a href="{% url 'home' %}">Home</a>
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% load staticfiles %}
+{% for script in scripts %}
+<script src="{% static script %}"></script>
+{% endfor %}
+{% endblock %}
