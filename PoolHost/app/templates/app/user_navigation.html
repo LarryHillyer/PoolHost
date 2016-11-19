@@ -1,20 +1,20 @@
 ﻿<nav aria-label="User Navigation">
 
     {% if site_user.is_superuser %}
-        {% include superuser_filter %}
+        {% include superuser_pagination %}
     {% else %}
-        {% include groupowner_filter %}
+        {% include groupowner_pagination %}
     {% endif %}
 
     {% if filter == none %}
     {% else %}
         {% if filter == 0 %}
         {% elif filter == 1 %}
-            {% include groupowner_pagination %}
+            {% include shared_groupowner_pagination %}
         {% elif filter == 2 or filter == 3 %}
-            {% include poolgroup_pagination %}
+            {% include shared_poolgroup_pagination %}
         {% elif filter == 4 or filter == 5 or filter == 6 or filter == 7 %}
-            {% include poolowner_pagination %}
+            {% include shared_poolowner_pagination %}
         {% endif %}
     {% endif%}
 

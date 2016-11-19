@@ -8,7 +8,9 @@
             <h2 class="partial-view-title">{{title}}</h2>
         </div>
         <div class="col-lg-9">
-            {% include navigation %}
+            {% if use_pagination %}
+                {% include pagination %}
+            {% endif %}
         </div>
     </div>
 
@@ -21,13 +23,13 @@
     <div class="row">
         <div class="col-lg-12">
             {% if model_groupowner_id and filter %}
-            <a href="{% url create_item_url model_groupowner_id filter %}" class="user-option">{{create_item_name}}</a>
+            <a href="{% url create_url groupowner_id filter %}" class="user-option">{{create_name}}</a>
             {% elif model_groupowner_id%}
-            <a href="{% url create_item_url model_groupowner_id %}" class="user-option">{{create_item_name}}</a>
+            <a href="{% url create_url groupowner_id %}" class="user-option">{{create_name}}</a>
             {% elif filter %}
-            <a href="{% url create_item_url filter %}" class="user-option">{{create_item_name}}</a>
+            <a href="{% url create_url filter %}" class="user-option">{{create_name}}</a>
             {% else %}
-            <a href="{% url create_item_url %}" class="user-option">{{create_item_name}}</a>
+            <a href="{% url create_url %}" class="user-option">{{create_name}}</a>
             {% endif %}
             {% include index_table %}
         </div>

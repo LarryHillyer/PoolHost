@@ -11,11 +11,11 @@ from django.urls import reverse
 
 from poolgroup.forms import PoolGroupForm
 from app.models import PoolGroup, GroupOwner, SiteUser
+from poolgroup.viewmodels import SuperUser_Index, GroupOwner_Index
 
 class index(View):
 
     template_name = 'app/shared_index_pagination.html'
-    #template_name = 'app/shared_index.html'
 
     def get(self, request, groupowner_id = None, filter = None, modelstate = None ):
 
@@ -29,9 +29,9 @@ class index(View):
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         if site_user.is_superuser == True:
-            view_model = PoolGroup.get_superuser_index_view_model(site_user, modelstate, filter, groupowner_id)
+            view_model = SuperUser_Index.get_index_viewmodel(site_user, modelstate, groupowner_id, filter)
         else:
-            view_model = PoolGroup.get_groupowner_index_view_model(site_user, modelstate, poolgroups)
+            view_model = GroupOwner_Index.get_index_viewmodel(site_user, modelstate, groupowner_id, filter)
         
         return render(request, self.template_name, view_model)
 
