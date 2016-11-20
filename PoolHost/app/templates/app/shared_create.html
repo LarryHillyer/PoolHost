@@ -16,10 +16,10 @@
     </div>
 
     <div class="row">
-        <form action="{% url create_item_url %}" method="post">
+        <form action="{% url create_url %}" method="post">
             {% csrf_token %}
             <div class="col-lg-12">
-                {% include create_form_html %}
+                {% include create_form %}
             </div>
         </form>
     </div>

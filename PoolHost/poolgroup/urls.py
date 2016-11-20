@@ -4,7 +4,7 @@ from . import views
 
 app_name = 'poolgroup'
 urlpatterns = [
-    url(r'^create/(?P<groupowner_id>[0-9]+)/(?P<filter>[0-9]+)/(?P<modelstate>.*)/$', views.create.as_view(), name = 'poolgroup_create'),
+    url(r'^create/(?P<groupowner_id>[0-9]+)/(?P<filter>[0-9]+)/(?P<modelstate>.*)/$', views.create.as_view(), name = 'create'),
 
     url(r'^create/(?P<groupowner_id>[0-9]+)/(?P<filter>[0-9]+)/$', views.create.as_view(), name = 'create'),
     url(r'^create/(?P<groupowner_id>[0-9]+)(?P<modelstate>.*)/$', views.create.as_view(), name = 'create'),

@@ -10,11 +10,13 @@ from django.views import View
 from django.urls import reverse
 
 from superuser.forms import SuperUserForm
+from superuser.viewmodels import Index_ViewModel, Create_ViewModel, Details_Delete_ViewModel
 from app.models import SuperUser, SiteUser
 
 class index(View):
 
     template_name = 'app/shared_index.html'
+    title = 'Super User - Index'
     
     def get(self, request, modelstate = None):
 
@@ -27,8 +29,7 @@ class index(View):
         if site_user.is_superuser != True:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
         
-        superusers = SuperUser.get_all_items(SuperUser)
-        view_model = SuperUser.get_index_view_model(site_user, modelstate, superusers)
+        view_model = Index_ViewModel.get_index_viewmodel(site_user,self.title, modelstate)
         
         return render(request, self.template_name, view_model)
         
@@ -36,6 +37,7 @@ class create(View):
 
     form_class = SuperUserForm
     template_name = 'app/shared_create.html'
+    title = 'Super User - Create'
 
     def get(self, request, modelstate = None):
         
@@ -50,7 +52,7 @@ class create(View):
 
         form = self.form_class()
 
-        view_model = SuperUser.get_create_view_model(site_user, form, modelstate)
+        view_model = Create_ViewModel.get_create_viewmodel(site_user, self.title, form, modelstate)
 
         return render(request, self.template_name, view_model)
     
@@ -82,7 +84,7 @@ class create(View):
                 superuser.user_id = site_user.user.id
                 modelstate = SuperUser.add_item(SuperUser, superuser)
 
-                return HttpResponseRedirect(reverse('superuser:superuser_index', args=(),
+                return HttpResponseRedirect(reverse('superuser:index', args=(),
                                                     kwargs = {'modelstate':modelstate}))
             else:
                 modelstate = 'Error: Superuser, ' + superuser.name + ' is not in database!'
@@ -110,8 +112,7 @@ class details(View):
         if superuser_id == None:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        superuser = SuperUser.get_item_by_id(SuperUser, superuser_id)
-        view_model = SuperUser.get_details_and_delete_view_model(site_user, self.title, superuser)
+        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, superuser_id)
 
         return render(request, self.template_name, view_model)
 
@@ -133,9 +134,7 @@ class delete(View):
         if superuser_id == None:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        superuser = SuperUser.get_item_by_id(SuperUser, superuser_id)
-
-        view_model = SuperUser.get_details_and_delete_view_model(site_user, self.title, superuser)
+        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, superuser_id)
 
         return render(request, self.template_name, view_model)
 
