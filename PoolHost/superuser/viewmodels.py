@@ -5,7 +5,7 @@ from django.db import models
 from app.models import SiteUser, SuperUser
 from app.mixins import HelperMixins
 
-class BaseViewModel(SuperUser):
+class BaseViewModel(object):
 
     def __init__(self, site_user, title):
 

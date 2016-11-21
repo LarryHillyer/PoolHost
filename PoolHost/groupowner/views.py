@@ -11,10 +11,10 @@ from django.urls import reverse
 
 from groupowner.forms import GroupOwnerForm
 from app.models import GroupOwner, SiteUser
-
+from groupowner.viewmodels import Index_ViewModel, Create_ViewModel, Details_Delete_ViewModel
 
 class index(View):
-
+    title = 'Group Owner - Index'
     template_name = 'app/shared_index.html'
     def get(self, request, modelstate = None):
 
@@ -27,14 +27,13 @@ class index(View):
         if site_user.is_superuser != True:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        groupowners = GroupOwner.get_all_items(GroupOwner)
-        view_model = GroupOwner.get_index_view_model(site_user, modelstate, groupowners)
+        view_model = Index_ViewModel.get_index_viewmodel(site_user, self.title, modelstate)
         
         return render(request, self.template_name, view_model)
 
 
 class create(View):
-
+    title = 'Group Owner - Create'
     form_class = GroupOwnerForm
     template_name = 'app/shared_create.html'
 
@@ -51,11 +50,11 @@ class create(View):
 
         form = self.form_class()
 
-        view_model = GroupOwner.get_create_view_model(site_user, form, modelstate)
+        view_model = Create_ViewModel.get_create_viewmodel(site_user, self.title, form, modelstate)
 
         return render(request, self.template_name, view_model)
     
-    def post(self, request, modelstate = None, **kwargs):
+    def post(self, request, modelstate = None):
 
         site_user = None
         if request.user.is_authenticated():
@@ -73,7 +72,7 @@ class create(View):
             same_groupowner = GroupOwner.get_items_by_name(GroupOwner, groupowner.name)
             if same_groupowner.count() > 0:
                 modelstate = 'Error: groupowner, ' + groupowner.name + ' is already a groupowner!'
-                view_model = GroupOwner.get_create_view_model(site_user, form, modelstate)
+                view_model = Create_ViewModel.get_create_viewmodel(site_user, self.title, form, modelstate)
                 return render(request, self.template_name, view_model)
                                 
             site_user = SiteUser.get_item_by_name(SiteUser, groupowner.name)          
@@ -83,19 +82,19 @@ class create(View):
                 groupowner.user_id = site_user.user.id
                 modelstate = GroupOwner.add_item(GroupOwner, groupowner)
 
-                return HttpResponseRedirect(reverse('groupowner:groupowner_index', args=(),
+                return HttpResponseRedirect(reverse('groupowner:index', args=(),
                                                     kwargs = {'modelstate':modelstate}))
             else:
                 modelstate = 'Error: groupowner, ' + groupowner.name + ' is not in database!'
-                view_model = GroupOwner.get_create_view_model(site_user, form, modelstate)
+                view_model = Create_ViewModel.get_create_viewmodel(site_user, self.title, form, modelstate)
                 return render(request, self.template_name, view_model)
         else:
-            view_model = GroupOwner.get_create_view_model(site_user, form, modelstate)
+            view_model = Create_ViewModel.get_create_viewmodel(site_user, self.title, form, modelstate)
             return render(request, self.template_name, view_model)
 
 class details(View):
 
-    title = 'Group Owner - Delete'
+    title = 'Group Owner - Details'
     template_name = 'app/shared_details.html'
 
     def get(self, request, groupowner_id = None):
@@ -111,9 +110,7 @@ class details(View):
         if groupowner_id == None:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        groupowner = GroupOwner.get_item_by_id(GroupOwner, groupowner_id)
-
-        view_model = GroupOwner.get_details_and_delete_view_model(site_user, self.title, groupowner)
+        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, groupowner_id)
 
         return render(request, self.template_name, view_model)
 
@@ -135,9 +132,7 @@ class delete(View):
         if groupowner_id == None:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        groupowner = GroupOwner.get_item_by_id(GroupOwner, groupowner_id)
-
-        view_model = GroupOwner.get_details_and_delete_view_model(site_user, self.title, groupowner)
+        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, groupowner_id)
 
         return render(request, self.template_name, view_model)
 
@@ -156,8 +151,8 @@ class delete(View):
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         groupowner = GroupOwner.get_item_by_id(GroupOwner, groupowner_id)
-
+        
         modelstate = GroupOwner.delete_item(groupowner)
-
-        return HttpResponseRedirect(reverse('groupowner:groupowner_index', args=(),
+        #groupowner.delete()
+        return HttpResponseRedirect(reverse('groupowner:index', args=(),
                                     kwargs = {'modelstate':modelstate}))

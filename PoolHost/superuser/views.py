@@ -156,5 +156,5 @@ class delete(View):
 
         modelstate = SuperUser.delete_item(superuser)
 
-        return HttpResponseRedirect(reverse('superuser:superuser_index', args=(),
+        return HttpResponseRedirect(reverse('superuser:index', args=(),
                                     kwargs = {'modelstate':modelstate}))

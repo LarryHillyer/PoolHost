@@ -1,11 +1,15 @@
-﻿<ul class="pagination pagination-sm custom-page">
+﻿{% load tags %}
+<ul class="pagination pagination-sm custom-page">
+
     {% if filter == None or filter == 0 %}
-        <li class="active"><a href="/poolgroup?filter=0&groupowner_id={{groupowner_id}}">No Filter</a></li>
-        <li><a href="/poolgroup?filter=1&groupowner_id={{groupowner_id}}">Grp. Own</a></li>
-    {% endif %}
-    {% if filter == 1 %}
-        <li><a href="/poolgroup?filter=0&groupowner_id={{groupowner_id}}">No Filter</a></li>
-        <li class="active"><a href="/poolgroup?filter=0&groupowner_id={{groupowner_id}}">Grp. Own</a></li>
+        <li class="active"><a href="{% url index_url groupowner_id filter %}">No Filter</a></li>
+        {% filter_1 filter as filter %}
+        <li><a href="{% url index_url groupowner_id filter %}">Grp. Own</a></li>
+    {% elif filter == 1 %}
+        {% filter_0 filter as filter%}   
+        <li><a href="{% url index_url groupowner_id filter %}">No Filter</a></li>
+        {% filter_1 filter as filter %}
+        <li class="active"><a href="{% url index_url groupowner_id filter %}">Grp. Own</a></li>
     {% endif %}
 
 </ul>

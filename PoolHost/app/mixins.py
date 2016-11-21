@@ -39,6 +39,15 @@ class HelperMixins(object):
         return model
 
     @classmethod
+    def get_item_by_userid(cls, model_cls, model_user_id):
+        model = None
+        try:
+            model = model_cls.objects.get(user_id = model_user_id)
+        except:
+            pass
+        return model
+
+    @classmethod
     def add_item(cls, model_cls, model):
         try:
             model_cls.save(model)

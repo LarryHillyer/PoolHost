@@ -31,10 +31,25 @@
                     {% if site_user.is_superuser %}
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" role="button" 
-                                   aria-haspopup="true" aria-expanded="false">SU Options <span class="caret"></span></a>
-                                {% include 'app/superuser.html' %}
+                                   aria-haspopup="true" aria-expanded="false">Super User <span class="caret"></span></a>
+                                {% include 'app/superuser_options.html' %}
                             </li>
                     {% endif %}
+                    {% if site_user.is_superuser or site_user.is_groupowner %}
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" role="button" 
+                                   aria-haspopup="true" aria-expanded="false">Group Owner <span class="caret"></span></a>
+                                {% include 'app/groupowner_options.html' %}
+                            </li>
+                    {% endif %}
+                    {% if site_user.is_superuser or site_user.is_groupowner or site_user.is_poolowner %}
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" role="button" 
+                                   aria-haspopup="true" aria-expanded="false">Pool Owner <span class="caret"></span></a>
+                                {% include 'app/poolowner_options.html' %}
+                            </li>
+                    {% endif %}
+
                 {% endif %}
 
                 </ul>

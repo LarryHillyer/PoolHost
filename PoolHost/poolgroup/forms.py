@@ -1,14 +1,14 @@
 from django import forms
 from django.forms import ModelForm
 from django.db import models
-from app.models import GroupOwner, PoolGroup
+from app.models import GroupOwner, PoolGroup, GroupOwner_Choices
 
 class PoolGroupForm(ModelForm):
-    groupowners = GroupOwner.get_all_items(GroupOwner)
+
+    groupowner_choices_1 = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
     groupowner_choices = []
-    for groupowner in groupowners:
-        groupowner_choice = (groupowner.id, groupowner.name)
-        groupowner_choices.append(groupowner_choice)
+    for groupowner_choice in groupowner_choices_1:
+        groupowner_choices.append((groupowner_choice.groupowner_id, groupowner_choice.name))
     
     name = forms.CharField(max_length = 100,
                             widget = forms.TextInput({
