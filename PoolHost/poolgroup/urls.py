@@ -70,6 +70,7 @@ urlpatterns = [
     url(r'^(?P<filter>[0-9]+)/$', views.index.as_view(), name = 'index'), 
     url(r'^(?P<modelstate>.*)/$', views.index.as_view(), name = 'index'),
 
-    url(r'^(?P<modelstate>.*)$', views.index.as_view(), name ='index'),
     url(r'^$', views.index.as_view(), name ='index'),
 ]
+
+    #url(r'^(?P<modelstate>.*)$', views.index.as_view(), name ='index'),

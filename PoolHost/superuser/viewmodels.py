@@ -52,8 +52,8 @@ class Create_ViewModel(BaseViewModel):
         self.viewmodel['partial_view_id'] = 'superuser-id' # shared_create params
         self.viewmodel['modelstate'] = modelstate
         self.viewmodel['modelstate_bool'] = modelstate_bool
-        self.viewmodel['create_url'] = 'superuser:create'
-        self.viewmodel['create_form'] = 'superuser/superuser_form.html'
+        self.viewmodel['form_url'] = 'superuser:create'
+        self.viewmodel['form_html'] = 'superuser/superuser_form.html'
         self.viewmodel['index_url'] = 'superuser:index'
         self.viewmodel['scripts'] = ['app/scripts/jqueryvalidate.js']
 

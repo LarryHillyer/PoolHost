@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 
 from app.mixins import HelperMixins
 
-
 class CronJobType (models.Model, HelperMixins):
     name = models.CharField(max_length = 50)
 
@@ -96,10 +95,15 @@ class GroupOwner_Choices(models.Model, HelperMixins):
     groupowner_id = models.IntegerField()
 
     @classmethod
-    def get_groupowner_choices(cls, groupowner_id):
+    def get_groupowner_choices(cls, groupowner_id = 0):
 
         try:
-            groupowners = GroupOwner.get_all_items(GroupOwner)
+
+            if groupowner_id == 0:
+                groupowners = GroupOwner.get_all_items(GroupOwner)
+            else:
+                groupowners = GroupOwner.get_items_by_id(GroupOwner, groupowner_id)
+
             groupowner_choices = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
             if groupowner_choices.count() > 0:               
                 groupowner_choices.delete()
@@ -109,6 +113,13 @@ class GroupOwner_Choices(models.Model, HelperMixins):
         except:
             pass
 
+    @classmethod
+    def make_groupowner_choices(cls):
+        groupowner_choices_1 = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
+        groupowner_choices = []
+        for groupowner_choice in groupowner_choices_1:
+            groupowner_choices.append((groupowner_choice.groupowner_id, groupowner_choice.name))
+        return groupowner_choices
 
 class SuperUser(models.Model, HelperMixins):
     

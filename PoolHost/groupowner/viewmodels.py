@@ -28,7 +28,8 @@ class Index_ViewModel(BaseViewModel):
         self.viewmodel['index_table'] = 'groupowner/index_table.html'
 
         self.viewmodel['items'] = groupowners # super_user/index_table.html params
-        self.viewmodel['header_label_item'] = 'Super User Name' 
+        self.viewmodel['header_label_item'] = 'Super User Name'
+        self.viewmodel['item_url'] = 'poolgroup:index' 
         self.viewmodel['details_url'] = 'groupowner:details' 
         self.viewmodel['delete_url'] = 'groupowner:delete'
  
@@ -52,8 +53,8 @@ class Create_ViewModel(BaseViewModel):
         self.viewmodel['partial_view_id'] = 'groupowner-id' # shared_create params
         self.viewmodel['modelstate'] = modelstate
         self.viewmodel['modelstate_bool'] = modelstate_bool
-        self.viewmodel['create_url'] = 'groupowner:create'
-        self.viewmodel['create_form'] = 'groupowner/groupowner_form.html'
+        self.viewmodel['form_url'] = 'groupowner:create'
+        self.viewmodel['form_html'] = 'groupowner/groupowner_form.html'
         self.viewmodel['index_url'] = 'groupowner:index'
         self.viewmodel['scripts'] = ['app/scripts/jqueryvalidate.js']
 

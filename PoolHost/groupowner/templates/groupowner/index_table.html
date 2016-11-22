@@ -1,4 +1,6 @@
-﻿<table class="table">
+﻿{% load tags_groupowner%}
+
+<table class="table">
     <tr>
         <th>
             {{ header_label_item }}
@@ -10,13 +12,14 @@
     {% for  item in items %}
     <tr>
         <td>
-            {{item.user.username}}
+            {% change_name item.id as groupowner_id %}
+            <a href="{% url item_url  groupowner_id %}">{{item.name}}</a>
         </td>
 
         <td>
-            <a href="{% url details_url item.id %}">Details</a>
+            <a href="{% url details_url groupowner_id %}">Details</a>
             <span>  |  </span>
-            <a href="{% url delete_url item.id %}">Delete</a>
+            <a href="{% url delete_url groupowner_id %}">Delete</a>
 
         </td>
     </tr>
