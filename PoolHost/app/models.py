@@ -135,6 +135,26 @@ class PoolGroup (models.Model, HelperMixins):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def get_exactly_same_poolgroup(cls, poolgroup_id, poolgroup_name, poolgroup_groupowner_id):
+        exactly_same_poolgroup = None
+        try:
+            exactly_same_poolgroup = PoolGroup.objects.filter(id = poolgroup_id, name=poolgroup_name, 
+                groupowner_id = poolgroup_groupowner_id)
+        except:
+            pass
+        return exactly_same_poolgroup
+
+
+    @classmethod
+    def get_same_poolgroup_in_database(cls, poolgroup_name, poolgroup_groupowner_id):
+        same_poolgroup = None
+        try:
+            same_poolgroup = PoolGroup.objects.filter(name=poolgroup_name, groupowner_id = poolgroup_groupowner_id)
+        except:
+            pass
+        return same_poolgroup
+
 class PoolOwner (models.Model, HelperMixins):
     name = models.CharField(max_length = 50)
     poolgroup = models.ForeignKey(PoolGroup, on_delete=models.CASCADE)

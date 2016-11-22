@@ -57,6 +57,15 @@ class HelperMixins(object):
         return modelstate
 
     @classmethod
+    def edit_item(cls, model_cls, model):
+        try:
+            model_cls.save(model)
+            modelstate = 'Success: ' + model.name + ' has been edited!'
+        except:
+            modelstate = 'Error: Database Error!!! ' + model.name + ' was not edited!'
+        return modelstate
+
+    @classmethod
     def delete_item(cls, model_cls, model):
         try:
             model_cls.delete(model)
