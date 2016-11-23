@@ -41,6 +41,12 @@
     <Compile Include="groupowner\forms.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="groupowner\templatetags\tags_groupowner.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="groupowner\templatetags\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="groupowner\urls.py">
       <SubType>Code</SubType>
     </Compile>
@@ -77,7 +83,19 @@
     <Compile Include="PoolHost\settings.py" />
     <Compile Include="PoolHost\urls.py" />
     <Compile Include="PoolHost\wsgi.py" />
+    <Compile Include="poolowner\forms.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="poolowner\templatetags\poolowner_tags.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="poolowner\templatetags\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="poolowner\urls.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="poolowner\viewmodels.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="poolowner\views.py">
@@ -114,12 +132,16 @@
     <Folder Include="groupowner\" />
     <Folder Include="groupowner\templates\" />
     <Folder Include="groupowner\templates\groupowner\" />
+    <Folder Include="groupowner\templatetags\" />
     <Folder Include="poolgroup\" />
     <Folder Include="poolgroup\templates\" />
     <Folder Include="poolgroup\templates\poolgroup\" />
     <Folder Include="poolgroup\templatetags\" />
     <Folder Include="PoolHost\" />
     <Folder Include="poolowner\" />
+    <Folder Include="poolowner\templates\" />
+    <Folder Include="poolowner\templates\poolowner\" />
+    <Folder Include="poolowner\templatetags\" />
     <Folder Include="superuser\" />
     <Folder Include="superuser\templates\" />
     <Folder Include="superuser\templates\superuser\" />
@@ -135,6 +157,7 @@
     <Content Include="app\templates\app\poolowner_options.html" />
     <Content Include="app\templates\app\poolowner_pagination.html" />
     <Content Include="app\templates\app\registration.html" />
+    <Content Include="app\templates\app\scratch_pad1.html" />
     <Content Include="app\templates\app\shared_create.html" />
     <Content Include="app\templates\app\shared_delete.html" />
     <Content Include="app\templates\app\shared_details.html" />
@@ -145,10 +168,23 @@
     <Content Include="groupowner\templates\groupowner\descriptive_list.html" />
     <Content Include="groupowner\templates\groupowner\groupowner_form.html" />
     <Content Include="groupowner\templates\groupowner\index_table.html" />
+    <Content Include="poolgroup\templates\poolgroup\create.html" />
+    <Content Include="poolgroup\templates\poolgroup\create_url.html" />
+    <Content Include="poolgroup\templates\poolgroup\delete.html" />
+    <Content Include="poolgroup\templates\poolgroup\descriptive_list.html" />
+    <Content Include="poolgroup\templates\poolgroup\details.html" />
     <Content Include="poolgroup\templates\poolgroup\groupowner_pagination.html" />
     <Content Include="poolgroup\templates\poolgroup\index_table.html" />
     <Content Include="poolgroup\templates\poolgroup\poolgroup_form.html" />
     <Content Include="poolgroup\templates\poolgroup\superuser_pagination.html" />
+    <Content Include="poolowner\templates\poolowner\create.html" />
+    <Content Include="poolowner\templates\poolowner\delete.html" />
+    <Content Include="poolowner\templates\poolowner\descriptive_list.html" />
+    <Content Include="poolowner\templates\poolowner\details.html" />
+    <Content Include="poolowner\templates\poolowner\groupowner_pagination.html" />
+    <Content Include="poolowner\templates\poolowner\index_table.html" />
+    <Content Include="poolowner\templates\poolowner\poolowner_form.html" />
+    <Content Include="poolowner\templates\poolowner\superuser_pagination.html" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="app\static\app\content\bootstrap.css" />

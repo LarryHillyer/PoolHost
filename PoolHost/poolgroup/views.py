@@ -11,8 +11,9 @@ from django.urls import reverse
 
 from app.models import PoolGroup, GroupOwner, SiteUser
 
-from poolgroup.viewmodels import SuperUser_Index,  SuperUser_Create, SuperUser_Edit, SuperUser_Details, SuperUser_Delete
-from poolgroup.viewmodels import GroupOwner_Index, GroupOwner_Create, GroupOwner_Edit, GroupOwner_Details, GroupOwner_Delete
+from poolgroup.viewmodels import SuperUser_Index,  SuperUser_Create, SuperUser_Edit, SuperUser_Details
+from poolgroup.viewmodels import GroupOwner_Index, GroupOwner_Create, GroupOwner_Edit, GroupOwner_Details
+from poolgroup.viewmodels import User_Delete
 
 from poolgroup.forms import PoolGroupForm_SuperUser_Create, PoolGroupForm_SuperUser_Edit
 from poolgroup.forms import PoolGroupForm_GroupOwner_Create, PoolGroupForm_GroupOwner_Edit
@@ -46,7 +47,7 @@ class index(View):
 class create(View):
 
     title = 'Pool Group - Create'
-    template_name = 'app/shared_create.html'
+    template_name = 'poolgroup/create.html'
 
     def get(self,request, groupowner_id = 0, filter = 0, modelstate = None):
 
@@ -122,7 +123,7 @@ class create(View):
 
 class edit(View):
     title = 'Pool Group - Edit'
-    template_name = 'app/shared_create.html'
+    template_name = 'poolgroup/create.html'
 
     def get(self, request, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
 
@@ -216,7 +217,7 @@ class edit(View):
 class details(View):
 
     title = 'Pool Group - Details'
-    template_name = 'app/shared_details.html'
+    template_name = 'poolgroup/details.html'
 
     def get(self,request, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
 
@@ -248,7 +249,7 @@ class details(View):
 class delete(View):
 
     title = 'Pool Group - Delete'
-    template_name = 'app/shared_delete.html'
+    template_name = 'poolgroup/delete.html'
 
     def get(self,request, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
         site_user = None
@@ -267,12 +268,8 @@ class delete(View):
         groupowner_id = int(groupowner_id)
         filter = int(filter)
 
-        if site_user.is_superuser == True:
-            viewmodel = SuperUser_Delete.get_delete_viewmodel(site_user, self.title, 
-                modelstate, poolgroup_id, filter, groupowner_id)
-        else:
-            viewmodel = GroupOwner_Delete.get_delete_viewmodel(site_user,self.title, 
-                modelstate, poolgroup_id, filter, groupowner_id)
+        viewmodel = User_Delete.get_delete_viewmodel(site_user, self.title, 
+               modelstate, poolgroup_id, filter, groupowner_id)
         
         return render(request, self.template_name, viewmodel)
 

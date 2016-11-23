@@ -30,7 +30,8 @@ class Index_ViewModel(BaseViewModel):
         self.viewmodel['filter' ] = filter
         self.viewmodel['modelstate'] = modelstate 
         self.viewmodel['modelstate_bool'] = modelstate_bool 
-        self.viewmodel['create_url'] = 'poolgroup:create' 
+        self.viewmodel['create_url'] = 'poolgroup:create'
+        self.viewmodel['create_url_html'] =  'poolgroup/create_url.html' 
         self.viewmodel['create_name'] = 'Create Pool Group' 
         self.viewmodel['index_table'] = 'poolgroup/index_table.html' 
         self.viewmodel['scripts'] = ['app/scripts/Client/TableStripping.js']
@@ -82,7 +83,6 @@ class Create_Edit_ViewModel(BaseViewModel):
         self.viewmodel['index_url'] = 'poolgroup:index'
         self.viewmodel['groupowner_id'] = groupowner_id
         self.viewmodel['filter'] = filter
-
         self.viewmodel['scripts'] = ['app/scripts/jquery.validate.js']
 
         self.viewmodel['form'] = form # poolgroup/poolgroup_form.html
@@ -102,10 +102,10 @@ class Details_Delete_ViewModel(BaseViewModel):
         self.viewmodel['index_url'] = 'poolgroup:index'
         self.viewmodel['edit_url'] = 'poolgroup:edit'
         self.viewmodel['groupowner_id'] = groupowner_id
-        self.viewmodel['poolgroup_id'] = poolgroup[0].id
+        self.viewmodel['poolgroup_id'] = poolgroup.id
         self.viewmodel['filter'] = filter
 
-        self.viewmodel['item'] = poolgroup[0] # poolgroup/descriptive_list.html params
+        self.viewmodel['item'] = poolgroup # poolgroup/descriptive_list.html params
         self.viewmodel['item_label_name'] = 'Pool Group'
         self.viewmodel['item_label_groupowner_name'] = 'Group Owner'
 
@@ -275,8 +275,9 @@ class GroupOwner_Edit(Create_Edit_ViewModel):
 
         poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)
         
-        form = PoolGroupForm_GroupOwner_Edit(instance = poolgroup, initial = {'groupowner_id': groupowner_id,
-                                                                                'filter': filter})
+        form = PoolGroupForm_GroupOwner_Edit(instance = poolgroup, 
+                                                initial = {'groupowner_id': groupowner_id,
+                                                            'filter': filter})
 
         submit_label = 'Edit'
         viewmodel = GroupOwner_Edit(site_user, title, modelstate, modelstate_bool, form, filter, 
@@ -297,7 +298,7 @@ class SuperUser_Details(Details_Delete_ViewModel):
         groupowner_id):
 
         modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
-        poolgroup = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
+        poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)
 
         viewmodel = SuperUser_Details(site_user, title, modelstate, modelstate_bool, 
             poolgroup, filter, groupowner_id).viewmodel
@@ -317,35 +318,14 @@ class GroupOwner_Details(Details_Delete_ViewModel):
 
         modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
 
-        poolgroup = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
+        poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)
 
         viewmodel = GroupOwner_Details(site_user, title, modelstate, modelstate_bool, 
             poolgroup, filter, groupowner_id).viewmodel
         
         return viewmodel
 
-class SuperUser_Delete(Details_Delete_ViewModel):
-
-    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroup, filter,
-        groupowner_id):
-
-        super().__init__(site_user, title, modelstate, modelstate_bool, poolgroup, filter,
-            groupowner_id) 
-
-    @classmethod
-    def get_delete_viewmodel(cls, site_user, title, modelstate, poolgroup_id, filter, 
-        groupowner_id):
-
-        modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
-
-        poolgroup = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
-
-        viewmodel = SuperUser_Delete(site_user, title, modelstate, modelstate_bool, poolgroup,
-             filter, groupowner_id).viewmodel
-        
-        return viewmodel
-
-class GroupOwner_Delete(Details_Delete_ViewModel):
+class User_Delete(Details_Delete_ViewModel):
 
     def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroup, filter,
         groupowner_id):
@@ -359,10 +339,9 @@ class GroupOwner_Delete(Details_Delete_ViewModel):
 
         modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
 
-        poolgroup = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
+        poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)
 
-        viewmodel = GroupOwner_Delete(site_user, title, modelstate, modelstate_bool, poolgroup, 
+        viewmodel = User_Delete(site_user, title, modelstate, modelstate_bool, poolgroup, 
             filter, groupowner_id).viewmodel
         
         return viewmodel
-

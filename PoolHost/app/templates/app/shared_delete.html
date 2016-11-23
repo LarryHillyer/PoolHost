@@ -23,14 +23,16 @@
             {% include descriptive_list %}
 
             {% if groupowner_id != None and filter != None %}
-            <form action="{% url delete_url item.id groupowner_id filter %}" method="post">
+            {% url delete_url item.id groupowner_id filter as post_url%}
             {% elif groupowner_id != None %}
-            <form action="{% url delete_url item.id groupowner_id %}" method="post">
+            {% url delete_url item.id groupowner_id as post_url%}
             {% elif filter != None %}
-            <form action="{% url delete_url item.id filter %}" method="post">
+            {% url delete_url item.id filter as post_url%}
             {% else %}
-            <form action="{% url delete_url item.id %}" method="post">
-            {% endif %}          
+            {% url delete_url item.id as post_url%}
+            {% endif %}
+
+            <form action="{{ post_url }}" method="post">                          
                 {% csrf_token %}
                 <div class="form-actions no-color">
                     <input type="submit" value="Delete" class="btn btn-danger" />

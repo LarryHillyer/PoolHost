@@ -1,14 +1,18 @@
 from django import forms
 from django.forms import ModelForm
 from django.db import models
-from app.models import PoolGroup, GroupOwner_Choices
+from app.models import PoolOwner
+from app.models import GroupOwner_Choices, PoolGroup_Choices
 
-class PoolGroupForm_SuperUser_Create(ModelForm):
+class PoolOwnerForm_SuperUser_Create(ModelForm):
     
     name = forms.CharField(max_length = 100,
                             widget = forms.TextInput({
                                     'class':'form-control',
                                     'placeholder': 'Enter Pool Group Name'}))
+
+    poolgroup_id = forms.ChoiceField(choices = PoolGroup_Choices.make_poolgroup_choices,
+                            widget = forms.Select({'class':'form-control'}))
 
     groupowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices,
                             widget = forms.Select({'class':'form-control'}))
@@ -16,10 +20,10 @@ class PoolGroupForm_SuperUser_Create(ModelForm):
     filter = forms.IntegerField(widget = forms.HiddenInput())
 
     class Meta:
-        model = PoolGroup
-        fields = ['name', 'groupowner_id', 'filter']
+        model = PoolOwner
+        fields = ['name', 'poolgroup_id','groupowner_id', 'filter']
 
-class PoolGroupForm_SuperUser_Edit(ModelForm):
+class PoolOwnerForm_SuperUser_Edit(ModelForm):
 
     id = forms.IntegerField(widget = forms.HiddenInput({}))
    
@@ -27,6 +31,9 @@ class PoolGroupForm_SuperUser_Edit(ModelForm):
                             widget = forms.TextInput({
                                     'class':'form-control',
                                     'placeholder': 'Enter Pool Group Name'}))
+
+    poolgroup_id = forms.ChoiceField(choices = PoolGroup_Choices.make_poolgroup_choices,
+                            widget = forms.Select({'class':'form-control'}))
     
     groupowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices,
                             widget = forms.Select({'class':'form-control'}))
@@ -34,26 +41,29 @@ class PoolGroupForm_SuperUser_Edit(ModelForm):
     filter = forms.IntegerField(widget = forms.HiddenInput())
 
     class Meta:
-        model = PoolGroup
-        fields = ['id', 'name', 'groupowner_id', 'filter']
+        model = PoolOwner
+        fields = ['id', 'name', 'poolgroup_id', 'groupowner_id', 'filter']
 
-class PoolGroupForm_GroupOwner_Create(ModelForm):
+class PoolOwnerForm_GroupOwner_Create(ModelForm):
 
    
     name = forms.CharField(max_length = 100,
                             widget = forms.TextInput({
                                     'class':'form-control',
                                     'placeholder': 'Enter Pool Group Name'}))
+
+    poolgroup_id = forms.ChoiceField(choices = PoolGroup_Choices.make_poolgroup_choices,
+                            widget = forms.Select({'class':'form-control'}))    
     
     groupowner_id = forms.IntegerField(widget = forms.HiddenInput())
     
     filter = forms.IntegerField(widget = forms.HiddenInput())
                         
     class Meta:
-        model = PoolGroup
-        fields = [ 'name', 'groupowner_id', 'filter']
+        model = PoolOwner
+        fields = [ 'name', 'poolgroup_id', 'groupowner_id', 'filter']
 
-class PoolGroupForm_GroupOwner_Edit(ModelForm):
+class PoolOwnerForm_GroupOwner_Edit(ModelForm):
 
     id = forms.IntegerField(widget = forms.HiddenInput({}))
    
@@ -61,6 +71,9 @@ class PoolGroupForm_GroupOwner_Edit(ModelForm):
                             widget = forms.TextInput({
                                     'class':'form-control',
                                     'placeholder': 'Enter Pool Group Name'}))
+
+    poolgroup_id = forms.ChoiceField(choices = PoolGroup_Choices.make_poolgroup_choices,
+                            widget = forms.Select({'class':'form-control'}))
     
     groupowner_id = forms.IntegerField(widget = forms.HiddenInput())
 
@@ -68,5 +81,4 @@ class PoolGroupForm_GroupOwner_Edit(ModelForm):
                         
     class Meta:
         model = PoolGroup
-        fields = ['id', 'name', 'groupowner_id', 'filter']
-
+        fields = ['id', 'name', 'poolgroup_id', 'groupowner_id', 'filter']

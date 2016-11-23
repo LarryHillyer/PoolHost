@@ -166,6 +166,39 @@ class PoolGroup (models.Model, HelperMixins):
             pass
         return same_poolgroup
 
+class PoolGroup_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    poolgroup_id = models.IntegerField()
+
+    @classmethod
+    def get_poolgroup_choices(cls, poolgroup_id = 0):
+
+        try:
+
+            if poolgroup_id == 0:
+                poolgroups = PoolGroup.get_all_items(PoolGroup)
+            else:
+                poolgroups = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
+
+            poolgroup_choices = PoolGroup_Choices.get_all_items(PoolGroup_Choices)
+            if poolgroup_choices.count() > 0:               
+                poolgroup_choices.delete()
+            for poolgroup in poolgroups:
+                poolgroup_choice = PoolGroup_Choices(name = poolgroup.name, poolgroup_id = poolgroup.id)
+                PoolGroup_Choices.add_item(PoolGroup_Choices, poolgroup_choice)
+        except:
+            pass
+
+    @classmethod
+    def make_poolgroup_choices(cls):
+        poolgroup_choices_1 = PoolGroup_Choices.get_all_items(PoolGroup_Choices)
+        poolgroup_choices = []
+        for poolgroup_choice in poolgroup_choices_1:
+            poolgroup_choices.append((poolgroup_choice.poolgroup_id, poolgroup_choice.name))
+        return poolgroup_choices
+
+
 class PoolOwner (models.Model, HelperMixins):
     name = models.CharField(max_length = 50)
     poolgroup = models.ForeignKey(PoolGroup, on_delete=models.CASCADE)

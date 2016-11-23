@@ -1,0 +1,9 @@
+﻿            {% if groupowner_id and filter %}
+            <a href="{% url create_url groupowner_id filter %}" class="user-option">{{create_name}}</a>
+            {% elif groupowner_id %}
+            <a href="{% url create_url groupowner_id %}" class="user-option">{{create_name}}</a>
+            {% elif filter %}
+            <a href="{% url create_url filter %}" class="user-option">{{create_name}}</a>
+            {% else %}
+            <a href="{% url create_url %}" class="user-option">{{create_name}}</a>
+            {% endif %}
