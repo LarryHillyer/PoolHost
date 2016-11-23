@@ -12,10 +12,12 @@ class PoolGroupForm_SuperUser_Create(ModelForm):
 
     groupowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices,
                             widget = forms.Select({'class':'form-control'}))
+
+    filter = forms.IntegerField(widget = forms.HiddenInput())
+
     class Meta:
         model = PoolGroup
-        fields = ['name', 'groupowner_id']
-
+        fields = ['name', 'groupowner_id', 'filter']
 
 class PoolGroupForm_SuperUser_Edit(ModelForm):
 
@@ -28,9 +30,12 @@ class PoolGroupForm_SuperUser_Edit(ModelForm):
     
     groupowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices,
                             widget = forms.Select({'class':'form-control'}))
+
+    filter = forms.IntegerField(widget = forms.HiddenInput())
+
     class Meta:
         model = PoolGroup
-        fields = ['id', 'name', 'groupowner_id']
+        fields = ['id', 'name', 'groupowner_id', 'filter']
 
 class PoolGroupForm_GroupOwner_Create(ModelForm):
 
@@ -41,10 +46,12 @@ class PoolGroupForm_GroupOwner_Create(ModelForm):
                                     'placeholder': 'Enter Pool Group Name'}))
     
     groupowner_id = forms.IntegerField(widget = forms.HiddenInput())
-                            
+    
+    filter = forms.IntegerField(widget = forms.HiddenInput())
+                        
     class Meta:
         model = PoolGroup
-        fields = ['id', 'name', 'groupowner_id']
+        fields = [ 'name', 'groupowner_id', 'filter']
 
 class PoolGroupForm_GroupOwner_Edit(ModelForm):
 
@@ -55,9 +62,11 @@ class PoolGroupForm_GroupOwner_Edit(ModelForm):
                                     'class':'form-control',
                                     'placeholder': 'Enter Pool Group Name'}))
     
-    groupowner_id = forms.IntegerField(widget = forms.HiddenInput({}))
-                            
+    groupowner_id = forms.IntegerField(widget = forms.HiddenInput())
+
+    filter = forms.IntegerField(widget = forms.HiddenInput())
+                        
     class Meta:
         model = PoolGroup
-        fields = ['id', 'name', 'groupowner_id']
+        fields = ['id', 'name', 'groupowner_id', 'filter']
 

@@ -17,21 +17,33 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-12">
-            
-            {% include descriptive_list %}
-            
+        <div class="col-lg-12">           
+            {% include descriptive_list %}           
         </div>
 
     </div>
 
     <div class="row">
         <div class="col-lg-12">
+            {% if groupowner_id != None and filter != None%}
+            <a href="{% url edit_url poolgroup_id groupowner_id filter %}">Edit</a>
+            <span>  |  </span>
+            <a href="{% url index_url groupowner_id filter %}">Index</a>
+            {% elif groupowner_id != None %}
+            <a href="{% url edit_url poolgroup_id groupowner_id %}">Edit</a>
+            <span>  |  </span>
+            <a href="{% url index_url groupowner_id %}">Index</a>
+            {% elif filter != None %}
+            <a href="{% url edit_url poolgroup_id filter %}">Edit</a>
+            <span>  |  </span>
+            <a href="{% url index_url filter %}">Index</a>
+            {% else %}
+            <a href="{% url edit_url poolgroup_id %}">Edit</a>
+            <span>  |  </span>
             <a href="{% url index_url %}">Index</a>
+            {% endif %}
         </div>
     </div>
-
-
 </div>
 {% endblock %}
 

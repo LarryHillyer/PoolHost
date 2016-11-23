@@ -70,7 +70,7 @@ class Index_ViewModel(BaseViewModel):
 
 class Create_Edit_ViewModel(BaseViewModel):
     def __init__(self, site_user, title, modelstate, modelstate_bool, form, filter,
-        submit_label):
+        groupowner_id, submit_label):
 
         super().__init__(site_user, title)
         
@@ -80,6 +80,9 @@ class Create_Edit_ViewModel(BaseViewModel):
         self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
         self.viewmodel['form_html'] = 'poolgroup/poolgroup_form.html'
         self.viewmodel['index_url'] = 'poolgroup:index'
+        self.viewmodel['groupowner_id'] = groupowner_id
+        self.viewmodel['filter'] = filter
+
         self.viewmodel['scripts'] = ['app/scripts/jquery.validate.js']
 
         self.viewmodel['form'] = form # poolgroup/poolgroup_form.html
@@ -89,11 +92,22 @@ class Create_Edit_ViewModel(BaseViewModel):
 
 class Details_Delete_ViewModel(BaseViewModel):
 
-    def __init__(self, site_user, title, modelstate, modelstate_bool, form, filter,
-        submit_label):
+    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroup,  
+        filter, groupowner_id):
 
         super().__init__(site_user, title)
 
+        self.viewmodel['descriptive_list'] = 'poolgroup/descriptive_list.html' # app/shared_create.html params
+        self.viewmodel['delete_url'] = 'poolgroup:delete'
+        self.viewmodel['index_url'] = 'poolgroup:index'
+        self.viewmodel['edit_url'] = 'poolgroup:edit'
+        self.viewmodel['groupowner_id'] = groupowner_id
+        self.viewmodel['poolgroup_id'] = poolgroup[0].id
+        self.viewmodel['filter'] = filter
+
+        self.viewmodel['item'] = poolgroup[0] # poolgroup/descriptive_list.html params
+        self.viewmodel['item_label_name'] = 'Pool Group'
+        self.viewmodel['item_label_groupowner_name'] = 'Group Owner'
 
 class SuperUser_Index(Index_ViewModel):
 
@@ -166,14 +180,14 @@ class GroupOwner_Index(Index_ViewModel):
 class SuperUser_Create(Create_Edit_ViewModel):
 
     def __init__(self, site_user, title, modelstate, modelstate_bool, form, filter,
-        submit_label):
+        groupowner_id, submit_label):
 
         super().__init__(site_user, title, modelstate, modelstate_bool, form, filter,
-            submit_label)
+            groupowner_id, submit_label)
         self.viewmodel['form_url'] = 'poolgroup:create'
         
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, modelstate, groupowner_id, filter):
+    def get_create_viewmodel(cls, site_user, title, modelstate, filter, groupowner_id):
 
         modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
         groupowners = GroupOwner.get_all_items(GroupOwner)
@@ -184,23 +198,25 @@ class SuperUser_Create(Create_Edit_ViewModel):
         groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
         GroupOwner_Choices.get_groupowner_choices()
 
-        form = PoolGroupForm_SuperUser_Create(initial={'groupowner_id' : groupowner_id})
+        form = PoolGroupForm_SuperUser_Create(initial={'groupowner_id' : groupowner_id,
+                                                        'filter' : filter})
 
         submit_label = 'Create'
-        viewmodel = SuperUser_Create(site_user, title, modelstate, modelstate_bool, form, filter, submit_label).viewmodel
+        viewmodel = SuperUser_Create(site_user, title, modelstate, modelstate_bool, form, filter, 
+            groupowner_id, submit_label).viewmodel
         
         return viewmodel
 
 class SuperUser_Edit(Create_Edit_ViewModel):
     def __init__(self, site_user, title, modelstate, modelstate_bool, form, filter,
-        submit_label):
+        groupowner_id, submit_label):
 
         super().__init__(site_user, title, modelstate, modelstate_bool, form, filter,
-            submit_label)
+            groupowner_id, submit_label)
         self.viewmodel['form_url'] = 'poolgroup:edit'
 
     @classmethod
-    def get_edit_viewmodel(cls, site_user, title, modelstate, poolgroup_id, groupowner_id, filter = None):
+    def get_edit_viewmodel(cls, site_user, title, modelstate, poolgroup_id, filter, groupowner_id):
 
         modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
 
@@ -210,112 +226,143 @@ class SuperUser_Edit(Create_Edit_ViewModel):
         groupowner_id = poolgroup.groupowner_id
         GroupOwner_Choices.get_groupowner_choices(groupowner_id)
         
-        form = PoolGroupForm_SuperUser_Edit(instance = poolgroup)
+        form = PoolGroupForm_SuperUser_Edit(instance = poolgroup, initial = {'filter':filter})
 
         submit_label = 'Edit'
-        viewmodel = SuperUser_Edit(site_user, title, modelstate, modelstate_bool, form, filter, submit_label).viewmodel
+        viewmodel = SuperUser_Edit(site_user, title, modelstate, modelstate_bool, form, filter, 
+            groupowner_id, submit_label).viewmodel
         
         return viewmodel
        
 class GroupOwner_Create(Create_Edit_ViewModel):
 
     def __init__(self, site_user, title, modelstate, modelstate_bool, form, filter,
-        groupowner_id):
+        groupowner_id, submit_label):
 
         super().__init__(site_user, title, modelstate, modelstate_bool, form, filter,
-            groupowner_id) 
+            groupowner_id, submit_label) 
 
         self.viewmodel['form_url'] = 'poolgroup:create'
 
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, modelstate, groupowner_id, filter):
+    def get_create_viewmodel(cls, site_user, title, modelstate, filter, groupowner_id):
 
         modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
 
-        form = PoolGroupForm_GroupOwner_Create(initial = {'groupowner_id' : groupowner_id})
+        form = PoolGroupForm_GroupOwner_Create(initial = {'groupowner_id' : groupowner_id,
+                                                           'filter': filter})
 
         submit_label = 'Create'
-        viewmodel = GroupOwner_Create(site_user, title, modelstate, modelstate_bool, form, filter, submit_label).viewmodel
+        viewmodel = GroupOwner_Create(site_user, title, modelstate, modelstate_bool, form, filter, 
+            groupowner_id, submit_label).viewmodel
         
         return viewmodel
 
 class GroupOwner_Edit(Create_Edit_ViewModel):
 
-    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroups, filter,
-        groupowner_id):
+    def __init__(self, site_user, title, modelstate, modelstate_bool, form, filter,
+        groupowner_id, submit_label):
 
-        super().__init__(site_user, title, modelstate, modelstate_bool, poolgroups, filter,
-            groupowner_id)
+        super().__init__(site_user, title, modelstate, modelstate_bool, form, filter,
+            groupowner_id, submit_label)
 
         self.viewmodel['form_url'] = 'poolgroup:edit'
 
-class SuperUser_Details(Details_Delete_ViewModel):
-
-    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroups, filter,
-        groupowner_id, groupowners):
-
-        super().__init__(site_user, title, modelstate, modelstate_bool, poolgroups, filter,
-            groupowner_id) 
-
     @classmethod
-    def get_details_viewmodel(cls, site_user, title, modelstate, filter = None):
+    def get_edit_viewmodel(cls, site_user, title, modelstate, poolgroup_id, filter, groupowner_id):
 
         modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
 
+        poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)
+        
+        form = PoolGroupForm_GroupOwner_Edit(instance = poolgroup, initial = {'groupowner_id': groupowner_id,
+                                                                                'filter': filter})
 
-        viewmodel = SuperUser_Details(site_user, title, modelstate, modelstate_bool, poolgroups, filter, groupowner_id).viewmodel
+        submit_label = 'Edit'
+        viewmodel = GroupOwner_Edit(site_user, title, modelstate, modelstate_bool, form, filter, 
+            groupowner_id, submit_label).viewmodel
+        
+        return viewmodel
+
+class SuperUser_Details(Details_Delete_ViewModel):
+
+    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroup, 
+        filter, groupowner_id):
+
+        super().__init__(site_user, title, modelstate, modelstate_bool, poolgroup, 
+            filter, groupowner_id) 
+
+    @classmethod
+    def get_details_viewmodel(cls, site_user, title, modelstate, poolgroup_id, filter, 
+        groupowner_id):
+
+        modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
+        poolgroup = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
+
+        viewmodel = SuperUser_Details(site_user, title, modelstate, modelstate_bool, 
+            poolgroup, filter, groupowner_id).viewmodel
         
         return viewmodel
 
 class GroupOwner_Details(Details_Delete_ViewModel):
 
-    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroups, filter,
-        groupowner_id, groupowners):
+    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroup, filter,
+        groupowner_id):
 
-        super().__init__(site_user, title, modelstate, modelstate_bool, poolgroups, filter,
+        super().__init__(site_user, title, modelstate, modelstate_bool, poolgroup, filter,
             groupowner_id) 
 
     @classmethod
-    def get_details_viewmodel(cls, site_user, title, modelstate, filter = None):
+    def get_details_viewmodel(cls, site_user, title, modelstate, poolgroup_id, filter, groupowner_id):
 
         modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
 
-        viewmodel = GroupOwner_Details(site_user, title, modelstate, modelstate_bool, poolgroups, filter, groupowner_id).viewmodel
+        poolgroup = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
+
+        viewmodel = GroupOwner_Details(site_user, title, modelstate, modelstate_bool, 
+            poolgroup, filter, groupowner_id).viewmodel
         
         return viewmodel
 
 class SuperUser_Delete(Details_Delete_ViewModel):
 
-    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroups, filter,
-        groupowner_id, groupowners):
+    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroup, filter,
+        groupowner_id):
 
-        super().__init__(site_user, title, modelstate, modelstate_bool, poolgroups, filter,
+        super().__init__(site_user, title, modelstate, modelstate_bool, poolgroup, filter,
             groupowner_id) 
 
     @classmethod
-    def get_delete_viewmodel(cls, site_user, title, modelstate, filter = None):
+    def get_delete_viewmodel(cls, site_user, title, modelstate, poolgroup_id, filter, 
+        groupowner_id):
 
         modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
 
+        poolgroup = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
 
-        viewmodel = SuperUser_Delete(site_user, title, modelstate, modelstate_bool, poolgroups, filter, groupowner_id).viewmodel
+        viewmodel = SuperUser_Delete(site_user, title, modelstate, modelstate_bool, poolgroup,
+             filter, groupowner_id).viewmodel
         
         return viewmodel
 
 class GroupOwner_Delete(Details_Delete_ViewModel):
 
-    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroups, filter,
-        groupowner_id, groupowners):
+    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroup, filter,
+        groupowner_id):
 
-        super().__init__(site_user, title, modelstate, modelstate_bool, poolgroups, filter,
+        super().__init__(site_user, title, modelstate, modelstate_bool, poolgroup, filter,
             groupowner_id) 
 
     @classmethod
-    def get_delete_viewmodel(cls, site_user, title, modelstate, filter = None):
+    def get_delete_viewmodel(cls, site_user, title, modelstate, poolgroup_id, filter,
+        groupowner_id):
 
         modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
 
-        viewmodel = GroupOwner_Delete(site_user, title, modelstate, modelstate_bool, poolgroups, filter, groupowner_id).viewmodel
+        poolgroup = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
+
+        viewmodel = GroupOwner_Delete(site_user, title, modelstate, modelstate_bool, poolgroup, 
+            filter, groupowner_id).viewmodel
         
         return viewmodel
 

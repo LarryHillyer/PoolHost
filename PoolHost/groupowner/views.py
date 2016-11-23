@@ -153,6 +153,6 @@ class delete(View):
         groupowner = GroupOwner.get_item_by_id(GroupOwner, groupowner_id)
         
         modelstate = GroupOwner.delete_item(groupowner)
-        #groupowner.delete()
+
         return HttpResponseRedirect(reverse('groupowner:index', args=(),
                                     kwargs = {'modelstate':modelstate}))

@@ -6,8 +6,10 @@
         {% filter_1 filter as filter %}
         <li><a href="{% url index_url groupowner_id filter %}">Grp. Own</a></li>
     {% elif filter == 1 %}
-        {% filter_0 filter as filter%}   
-        <li><a href="{% url index_url groupowner_id filter %}">No Filter</a></li>
+        {% filter_0 filter as filter%}
+        {% change_name groupowner_id as new_groupowner_id %}
+        {% groupowner_0 new_groupowner_id as new_groupowner_id%}   
+        <li><a href="{% url index_url new_groupowner_id filter %}">No Filter</a></li>
         {% filter_1 filter as filter %}
         <li class="active"><a href="{% url index_url groupowner_id filter %}">Grp. Own</a></li>
     {% endif %}
