@@ -9,6 +9,9 @@ class GroupOwnerForm(ModelForm):
                             widget = forms.TextInput({
                                     'class':'form-control',
                                     'placeholder': 'Enter Group Owner User Name'}))
+
+    filter = forms.IntegerField(widget = forms.HiddenInput())
+
     class Meta:
         model = GroupOwner
         fields = ['name']

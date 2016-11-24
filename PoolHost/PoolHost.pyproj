@@ -165,16 +165,22 @@
     <Content Include="app\templates\app\shared_index_pagination.html" />
     <Content Include="app\templates\app\superuser_options.html" />
     <Content Include="app\templates\app\user_navigation.html" />
+    <Content Include="groupowner\templates\groupowner\create_edit_form.html" />
+    <Content Include="groupowner\templates\groupowner\create_url.html" />
+    <Content Include="groupowner\templates\groupowner\delete_form.html" />
     <Content Include="groupowner\templates\groupowner\descriptive_list.html" />
+    <Content Include="groupowner\templates\groupowner\index_url_2.html" />
     <Content Include="groupowner\templates\groupowner\groupowner_form.html" />
     <Content Include="groupowner\templates\groupowner\index_table.html" />
-    <Content Include="poolgroup\templates\poolgroup\create.html" />
+    <Content Include="groupowner\templates\groupowner\index_url.html" />
+    <Content Include="poolgroup\templates\poolgroup\create_edit_form.html" />
     <Content Include="poolgroup\templates\poolgroup\create_url.html" />
-    <Content Include="poolgroup\templates\poolgroup\delete.html" />
+    <Content Include="poolgroup\templates\poolgroup\delete_form.html" />
     <Content Include="poolgroup\templates\poolgroup\descriptive_list.html" />
-    <Content Include="poolgroup\templates\poolgroup\details.html" />
+    <Content Include="poolgroup\templates\poolgroup\edit_index_url.html" />
     <Content Include="poolgroup\templates\poolgroup\groupowner_pagination.html" />
     <Content Include="poolgroup\templates\poolgroup\index_table.html" />
+    <Content Include="poolgroup\templates\poolgroup\index_url.html" />
     <Content Include="poolgroup\templates\poolgroup\poolgroup_form.html" />
     <Content Include="poolgroup\templates\poolgroup\superuser_pagination.html" />
     <Content Include="poolowner\templates\poolowner\create.html" />
@@ -213,8 +219,13 @@
     <Content Include="app\templates\app\contact.html" />
     <Content Include="app\templates\app\layout.html" />
     <Content Include="app\templates\app\loginpartial.html" />
+    <Content Include="superuser\templates\superuser\create_edit_form.html" />
+    <Content Include="superuser\templates\superuser\create_url.html" />
+    <Content Include="superuser\templates\superuser\delete_form.html" />
     <Content Include="superuser\templates\superuser\descriptive_list.html" />
     <Content Include="superuser\templates\superuser\index_table.html" />
+    <Content Include="superuser\templates\superuser\index_url.html" />
+    <Content Include="superuser\templates\superuser\index_url_2.html" />
     <Content Include="superuser\templates\superuser\superuser_form.html" />
   </ItemGroup>
   <ItemGroup>

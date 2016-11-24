@@ -11,37 +11,18 @@
 
     <div class="row">
         <div class="col-lg-12">          
-            {% include 'app/modelstatus.html'%}
+            {% include modelstate_html %}
         </div>
     </div>
 
     <div class="row">
-        <form action="{% url form_url %}" method="post">
-            {% csrf_token %}
-            <div class="col-lg-12">
-                {% include form_html %}
-            </div>
-        </form>
+        {% include create_edit_form_html %}
     </div>
 
 
     <div class="row">
         <div class="col-lg-12">
-
-            {% if groupowner_id != None and filter != None%}
-            {% url index_url groupowner_id filter as index_url%}
-            {% elif groupowner_id != None %}
-            {% url index_url groupowner_id as index_url%}
-            {% elif filter != None %}
-            {% url index_url filter as index_url%}
-            {% else %}
-            {% url index_url as index_url %}
-            {% endif %}
-
-            <a href="{{ index_url }}">Index</a>
-            <span>  |  </span>
-            <a href="{% url 'home' %}">Home</a>
-
+            {% include index_url_html%}
         </div>
     </div>
 

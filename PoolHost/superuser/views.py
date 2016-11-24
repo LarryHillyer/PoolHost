@@ -99,7 +99,7 @@ class details(View):
     title = 'Super User - Details'
     template_name = 'app/shared_details.html'
 
-    def get(self, request, superuser_id = None):
+    def get(self, request, superuser_id = 0, modelstate = None):
         site_user = None
         if request.user.is_authenticated():
             site_user = SiteUser.get_items_by_userid(SiteUser, request.user.id)[0]
@@ -109,10 +109,11 @@ class details(View):
         if site_user.is_superuser != True:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if superuser_id == None:
+        if superuser_id == 0:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, superuser_id)
+        superuser_id = int(superuser_id)
+        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, superuser_id, modelstate)
 
         return render(request, self.template_name, view_model)
 
@@ -121,7 +122,7 @@ class delete(View):
     title = 'Super User - Delete'
     template_name = 'app/shared_delete.html'
 
-    def get(self, request, superuser_id = None):
+    def get(self, request, superuser_id = 0, modelstate = None):
         site_user = None
         if request.user.is_authenticated():
             site_user = SiteUser.get_items_by_userid(SiteUser, request.user.id)[0]
@@ -134,7 +135,9 @@ class delete(View):
         if superuser_id == None:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, superuser_id)
+        superuser_id = int(superuser_id)
+
+        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, superuser_id, modelstate)
 
         return render(request, self.template_name, view_model)
 

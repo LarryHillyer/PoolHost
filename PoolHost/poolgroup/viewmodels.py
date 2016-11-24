@@ -29,7 +29,8 @@ class Index_ViewModel(BaseViewModel):
         self.viewmodel['groupowner_id'] = groupowner_id
         self.viewmodel['filter' ] = filter
         self.viewmodel['modelstate'] = modelstate 
-        self.viewmodel['modelstate_bool'] = modelstate_bool 
+        self.viewmodel['modelstate_bool'] = modelstate_bool
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html' 
         self.viewmodel['create_url'] = 'poolgroup:create'
         self.viewmodel['create_url_html'] =  'poolgroup/create_url.html' 
         self.viewmodel['create_name'] = 'Create Pool Group' 
@@ -45,7 +46,7 @@ class Index_ViewModel(BaseViewModel):
                         
 
     @classmethod
-    def get_groupowner_id_poolgroups(cls, filter, groupowners, groupowner_id):
+    def get_groupowner_id_poolgroups(cls, groupowners, filter, groupowner_id):
 
         if filter == None or filter == 0:
             filter = 0
@@ -79,8 +80,11 @@ class Create_Edit_ViewModel(BaseViewModel):
         self.viewmodel['modelstate'] = modelstate
         self.viewmodel['modelstate_bool'] = modelstate_bool
         self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
+        self.viewmodel['create_edit_form_html'] = 'poolgroup/create_edit_form.html'
         self.viewmodel['form_html'] = 'poolgroup/poolgroup_form.html'
+        self.viewmodel['form_url'] = 'poolgroup:create'
         self.viewmodel['index_url'] = 'poolgroup:index'
+        self.viewmodel['index_url_html'] = 'poolgroup/index_url.html'
         self.viewmodel['groupowner_id'] = groupowner_id
         self.viewmodel['filter'] = filter
         self.viewmodel['scripts'] = ['app/scripts/jquery.validate.js']
@@ -97,10 +101,15 @@ class Details_Delete_ViewModel(BaseViewModel):
 
         super().__init__(site_user, title)
 
+        self.viewmodel['modelstate'] = modelstate
+        self.viewmodel['modelstate_bool'] = modelstate_bool
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
         self.viewmodel['descriptive_list'] = 'poolgroup/descriptive_list.html' # app/shared_create.html params
         self.viewmodel['delete_url'] = 'poolgroup:delete'
+        self.viewmodel['delete_form'] = 'poolgroup/delete_form.html'
         self.viewmodel['index_url'] = 'poolgroup:index'
         self.viewmodel['edit_url'] = 'poolgroup:edit'
+        self.viewmodel['edit_index_url_html'] = 'poolgroup/edit_index_url.html'
         self.viewmodel['groupowner_id'] = groupowner_id
         self.viewmodel['poolgroup_id'] = poolgroup.id
         self.viewmodel['filter'] = filter
@@ -111,8 +120,8 @@ class Details_Delete_ViewModel(BaseViewModel):
 
 class SuperUser_Index(Index_ViewModel):
 
-    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroups, filter,
-        groupowner_id, groupowners):
+    def __init__(self, site_user, title, modelstate, modelstate_bool, poolgroups, groupowners, filter,
+        groupowner_id):
 
         super().__init__(site_user, title, modelstate, modelstate_bool, poolgroups, filter,
             groupowner_id) 
@@ -134,7 +143,7 @@ class SuperUser_Index(Index_ViewModel):
         self.viewmodel['header_label_groupowner'] = 'Group Owner Name' # poolgroup/index_table.html 
 
     @classmethod
-    def get_index_viewmodel(cls, site_user, title, modelstate, groupowner_id = None, filter = None):
+    def get_index_viewmodel(cls, site_user, title, modelstate, filter, groupowner_id):
 
         modelstate, modelstate_bool = PoolGroup.get_modelstate(modelstate)
 
@@ -146,11 +155,11 @@ class SuperUser_Index(Index_ViewModel):
         else:
             groupowners = GroupOwner.get_all_items(GroupOwner)
 
-        groupowner_id, poolgroups = Index_ViewModel.get_groupowner_id_poolgroups(filter, groupowners, groupowner_id)
+        groupowner_id, poolgroups = Index_ViewModel.get_groupowner_id_poolgroups(groupowners, filter, groupowner_id)
         
         groupowners = GroupOwner.get_all_items(GroupOwner) 
 
-        viewmodel = SuperUser_Index(site_user, title, modelstate, modelstate_bool, poolgroups, filter, groupowner_id, groupowners).viewmodel
+        viewmodel = SuperUser_Index(site_user, title, modelstate, modelstate_bool, poolgroups, groupowners, filter, groupowner_id).viewmodel
         
         return viewmodel
 

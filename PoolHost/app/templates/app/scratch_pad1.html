@@ -7,3 +7,41 @@
             {% else %}
             <a href="{% url create_url %}" class="user-option">{{create_name}}</a>
             {% endif %}
+
+            {% if groupowner_id and filter %}
+                <a href="{% url item_url groupowner_id filter %}">{{item.name}}</a>
+            {% elif groupowner_id %}
+                <a href="{% url item_url groupowner_id %}">{{item.name}}</a>               
+            {% elif filter %}
+                <a href="{% url item_url filter %}">{{item.name}}</a>
+            {% else %}
+                <a href="{% url item_url %}">{{item.name}}</a>
+            {% endif %}
+
+            {% change_name item.id as poolgroup_id%}
+            {% if groupowner_id and filter %}
+                <a href="{% url edit_url poolgroup_id groupowner_id filter %}">Edit</a>
+                <span>  |  </span>
+                <a href="{% url details_url poolgroup_id groupowner_id filter %}">Details</a>
+                <span>  |  </span>
+                <a href="{% url delete_url poolgroup_id groupowner_id filter %}">Delete</a>
+
+            {% elif groupowner_id %}
+                <a href="{% url edit_url poolgroup_id groupowner_id %}">Edit</a>
+                <span>  |  </span>
+                <a href="{% url details_url poolgroup_id groupowner_id %}">Details</a>
+                <span>  |  </span>
+                <a href="{% url delete_url poolgroup_id groupowner_id %}">Delete</a>
+            {% elif filter %}
+                <a href="{% url edit_url poolgroup_id filter %}">Edit</a>
+                <span>  |  </span>
+                <a href="{% url details_url poolgroup_id filter %}">Details</a>
+                <span>  |  </span>
+                <a href="{% url delete_url poolgroup_id filter %}">Delete</a>
+            {% else %}
+                <a href="{% url edit_url poolgroup_id %}">Edit</a>
+                <span>  |  </span>
+                <a href="{% url details_url poolgroup_id %}">Details</a>
+                <span>  |  </span>
+                <a href="{% url delete_url poolgroup_id %}">Delete</a>
+            {% endif %}

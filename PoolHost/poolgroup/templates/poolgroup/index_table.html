@@ -18,15 +18,7 @@
     {% for item in items %}
     <tr>
         <td>
-            {% if groupowner_id and filter %}
-                <a href="{% url item_url groupowner_id filter %}">{{item.name}}</a>
-            {% elif groupowner_id %}
-                <a href="{% url item_url groupowner_id %}">{{item.name}}</a>               
-            {% elif filter %}
-                <a href="{% url item_url filter %}">{{item.name}}</a>
-            {% else %}
-                <a href="{% url item_url %}">{{item.name}}</a>
-            {% endif %}
+            <a href="{% url item_url groupowner_id filter %}">{{item.name}}</a>
         </td>
 
         {% if site_user.is_superuser %}
@@ -36,33 +28,12 @@
         {% endif %}
 
         <td>
-            {% change_name item.id as poolgroup_id%}
-            {% if groupowner_id and filter %}
-                <a href="{% url edit_url poolgroup_id groupowner_id filter %}">Edit</a>
+                <a href="{% url edit_url item.id groupowner_id filter %}">Edit</a>
                 <span>  |  </span>
-                <a href="{% url details_url poolgroup_id groupowner_id filter %}">Details</a>
+                <a href="{% url details_url item.id groupowner_id filter %}">Details</a>
                 <span>  |  </span>
-                <a href="{% url delete_url poolgroup_id groupowner_id filter %}">Delete</a>
+                <a href="{% url delete_url item.id groupowner_id filter %}">Delete</a>
 
-            {% elif groupowner_id %}
-                <a href="{% url edit_url poolgroup_id groupowner_id %}">Edit</a>
-                <span>  |  </span>
-                <a href="{% url details_url poolgroup_id groupowner_id %}">Details</a>
-                <span>  |  </span>
-                <a href="{% url delete_url poolgroup_id groupowner_id %}">Delete</a>
-            {% elif filter %}
-                <a href="{% url edit_url poolgroup_id filter %}">Edit</a>
-                <span>  |  </span>
-                <a href="{% url details_url poolgroup_id filter %}">Details</a>
-                <span>  |  </span>
-                <a href="{% url delete_url poolgroup_id filter %}">Delete</a>
-            {% else %}
-                <a href="{% url edit_url poolgroup_id %}">Edit</a>
-                <span>  |  </span>
-                <a href="{% url details_url poolgroup_id %}">Details</a>
-                <span>  |  </span>
-                <a href="{% url delete_url poolgroup_id %}">Delete</a>
-            {% endif %}
         </td>
     </tr>
     {% endfor %}

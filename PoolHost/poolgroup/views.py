@@ -23,7 +23,7 @@ class index(View):
     title = 'Pool Group - Index'
     template_name = 'app/shared_index_pagination.html'
 
-    def get(self, request, groupowner_id = 0, filter = 0, modelstate = None ):
+    def get(self, request, filter = 0, groupowner_id = 0, modelstate = None ):
 
         site_user = None
         if request.user.is_authenticated():
@@ -38,7 +38,7 @@ class index(View):
         filter = int(filter)
 
         if site_user.is_superuser == True:
-            viewmodel = SuperUser_Index.get_index_viewmodel(site_user, self.title, modelstate, groupowner_id, filter)
+            viewmodel = SuperUser_Index.get_index_viewmodel(site_user, self.title, modelstate, filter, groupowner_id)
         else:
             viewmodel = GroupOwner_Index.get_index_viewmodel(site_user,self.title, modelstate, filter)
         
@@ -47,7 +47,7 @@ class index(View):
 class create(View):
 
     title = 'Pool Group - Create'
-    template_name = 'poolgroup/create.html'
+    template_name = 'app/shared_create.html'
 
     def get(self,request, groupowner_id = 0, filter = 0, modelstate = None):
 
@@ -123,7 +123,7 @@ class create(View):
 
 class edit(View):
     title = 'Pool Group - Edit'
-    template_name = 'poolgroup/create.html'
+    template_name = 'app/shared_create.html'
 
     def get(self, request, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
 
@@ -217,7 +217,7 @@ class edit(View):
 class details(View):
 
     title = 'Pool Group - Details'
-    template_name = 'poolgroup/details.html'
+    template_name = 'app/shared_details.html'
 
     def get(self,request, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
 
@@ -249,7 +249,7 @@ class details(View):
 class delete(View):
 
     title = 'Pool Group - Delete'
-    template_name = 'poolgroup/delete.html'
+    template_name = 'app/shared_delete.html'
 
     def get(self,request, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
         site_user = None
