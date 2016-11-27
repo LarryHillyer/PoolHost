@@ -13,6 +13,10 @@ class HelperMixins(object):
         return model_cls.objects.filter(groupowner_id = model_groupowner_id)
 
     @classmethod
+    def get_items_by_poolgroup_id(cls, model_cls, model_poolgroup_id):
+        return model_cls.objects.filter(poolgroup_id = model_poolgroup_id)
+
+    @classmethod
     def get_items_by_name(cls, model_cls, model_name):
         return model_cls.objects.filter(name = model_name)
 

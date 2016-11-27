@@ -48,7 +48,8 @@ urlpatterns = [
 
     url(r'^poolgroup/', include('poolgroup.urls')),
     url(r'^poolowner/', include('poolowner.urls')),
-    
+    url(r'^pool/', include('pool.urls')),
+
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

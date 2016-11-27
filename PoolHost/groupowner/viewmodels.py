@@ -2,10 +2,10 @@ from datetime import datetime
 
 from django.db import models
 
-from app.models import SiteUser, GroupOwner
+from app.models import SiteUser, GroupOwner, GroupOwner_Choices
 from app.mixins import HelperMixins
 
-from groupowner.forms import GroupOwnerForm
+from groupowner.forms import GroupOwnerForm_Create, GroupOwnerForm_Transfer
 
 class BaseViewModel(object):
 
@@ -34,7 +34,8 @@ class Index_ViewModel(BaseViewModel):
 
         self.viewmodel['items'] = groupowners # super_user/index_table.html params
         self.viewmodel['header_label_item'] = 'Super User Name'
-        self.viewmodel['item_url'] = 'poolgroup:index' 
+        self.viewmodel['item_url'] = 'poolgroup:index'
+        self.viewmodel['transfer_url'] = 'groupowner:transfer' 
         self.viewmodel['details_url'] = 'groupowner:details' 
         self.viewmodel['delete_url'] = 'groupowner:delete'
  
@@ -76,9 +77,53 @@ class Create_ViewModel(BaseViewModel):
 
         modelstate, modelstate_bool = GroupOwner.get_modelstate(modelstate)
 
-        form = GroupOwnerForm()
+        form = GroupOwnerForm_Create(initial = {'filter':filter})
 
         viewmodel = Create_ViewModel(site_user, title, form, modelstate, modelstate_bool, filter).viewmodel
+
+        return viewmodel
+
+class Transfer_ViewModel(BaseViewModel):
+
+    def __init__(self, site_user, title, form, modelstate, modelstate_bool, groupowner_id, filter):
+        
+        super().__init__(site_user, title)
+
+        self.viewmodel['partial_view_id'] = 'groupowner-id' # shared_create params
+        self.viewmodel['modelstate'] = modelstate
+        self.viewmodel['modelstate_bool'] = modelstate_bool
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
+        self.viewmodel['create_edit_form_html'] = 'groupowner/transfer_form.html' 
+        self.viewmodel['form_url'] = 'groupowner:transfer'
+        self.viewmodel['form_html'] = 'groupowner/transfer_ownership_form.html'
+        self.viewmodel['index_url'] = 'groupowner:index'
+        self.viewmodel['index_url_html'] = 'groupowner/index_url.html'
+        self.viewmodel['groupowner_id'] = groupowner_id
+        self.viewmodel['filter'] = filter
+        self.viewmodel['scripts'] = ['app/scripts/jquery.validate.js']
+
+        self.viewmodel['form'] = form # groupowner_form params
+        self.viewmodel['form_label_name'] = 'Existing Group Owner'
+        self.viewmodel['form_label_new_groupowner'] = 'New Group Owner'
+        self.viewmodel['form_label_submit'] = 'Transfer'
+
+    @classmethod
+    def get_transfer_viewmodel(cls, site_user, title, groupowner_id, filter, modelstate):
+
+        modelstate, modelstate_bool = GroupOwner.get_modelstate(modelstate)
+
+        groupowners = GroupOwner.get_all_items(GroupOwner)
+        if groupowners.count() == 0:
+            viewmodel = {'modelstate':'Error: Create a Group Owner First!'}
+            return viewmodel
+
+        groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
+        groupowner = GroupOwner.get_item_by_id(GroupOwner, groupowner_id)
+        GroupOwner_Choices.get_groupowner_choices()
+
+        form = GroupOwnerForm_Transfer(instance = groupowner, initial = {'filter':filter})
+
+        viewmodel = Transfer_ViewModel(site_user, title, form, modelstate, modelstate_bool, groupowner_id, filter).viewmodel
 
         return viewmodel
 

@@ -86,6 +86,9 @@
     <Compile Include="poolowner\forms.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="poolowner\serializers.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="poolowner\templatetags\poolowner_tags.py">
       <SubType>Code</SubType>
     </Compile>
@@ -102,6 +105,15 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="poolowner\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="pool\urls.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="pool\views.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="pool\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="superuser\forms.py">
@@ -142,11 +154,13 @@
     <Folder Include="poolowner\templates\" />
     <Folder Include="poolowner\templates\poolowner\" />
     <Folder Include="poolowner\templatetags\" />
+    <Folder Include="pool\" />
     <Folder Include="superuser\" />
     <Folder Include="superuser\templates\" />
     <Folder Include="superuser\templates\superuser\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\static\app\scripts\Client\GOwner_PGroup_CDD.js" />
     <Content Include="app\static\app\scripts\Client\TableStripping.js" />
     <Content Include="app\templates\app\groupowner_options.html" />
     <Content Include="app\templates\app\groupowner_pagination.html" />
@@ -173,22 +187,29 @@
     <Content Include="groupowner\templates\groupowner\groupowner_form.html" />
     <Content Include="groupowner\templates\groupowner\index_table.html" />
     <Content Include="groupowner\templates\groupowner\index_url.html" />
+    <Content Include="groupowner\templates\groupowner\transfer_form.html" />
+    <Content Include="groupowner\templates\groupowner\transfer_ownership_form.html" />
     <Content Include="poolgroup\templates\poolgroup\create_edit_form.html" />
     <Content Include="poolgroup\templates\poolgroup\create_url.html" />
     <Content Include="poolgroup\templates\poolgroup\delete_form.html" />
     <Content Include="poolgroup\templates\poolgroup\descriptive_list.html" />
     <Content Include="poolgroup\templates\poolgroup\edit_index_url.html" />
     <Content Include="poolgroup\templates\poolgroup\groupowner_pagination.html" />
+    <Content Include="poolgroup\templates\poolgroup\groupowner_pagination_url.html" />
     <Content Include="poolgroup\templates\poolgroup\index_table.html" />
     <Content Include="poolgroup\templates\poolgroup\index_url.html" />
     <Content Include="poolgroup\templates\poolgroup\poolgroup_form.html" />
     <Content Include="poolgroup\templates\poolgroup\superuser_pagination.html" />
-    <Content Include="poolowner\templates\poolowner\create.html" />
-    <Content Include="poolowner\templates\poolowner\delete.html" />
+    <Content Include="poolgroup\templates\poolgroup\transfer_form.html" />
+    <Content Include="poolgroup\templates\poolgroup\transfer_ownership_form.html" />
+    <Content Include="poolowner\templates\poolowner\create_edit_form.html" />
+    <Content Include="poolowner\templates\poolowner\create_url.html" />
     <Content Include="poolowner\templates\poolowner\descriptive_list.html" />
-    <Content Include="poolowner\templates\poolowner\details.html" />
     <Content Include="poolowner\templates\poolowner\groupowner_pagination.html" />
+    <Content Include="poolowner\templates\poolowner\groupowner_pagination_url.html" />
     <Content Include="poolowner\templates\poolowner\index_table.html" />
+    <Content Include="poolowner\templates\poolowner\index_url.html" />
+    <Content Include="poolowner\templates\poolowner\poolgroup_pagination_url.html" />
     <Content Include="poolowner\templates\poolowner\poolowner_form.html" />
     <Content Include="poolowner\templates\poolowner\superuser_pagination.html" />
     <Content Include="requirements.txt" />

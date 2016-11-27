@@ -1,15 +1,16 @@
-﻿<ul class="pagination pagination-sm custom-page">
-    {% if groupowner_id != 0 %}
-        {% for groupowner in groupowners %}
-            {% if groupowner.id == groupowner_id %}
-                <li class="active">
-                    <a href="{% url index_url groupowner.id filter %}">{{groupowner.name}}</a>
-                </li>
-            {% else %}
-                <li>
-                    <a href="{% url index_url groupowner.id filter %}">{{groupowner.name}}</a>
-                </li>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-</ul>
+﻿
+    <ul class="pagination pagination-sm custom-page-2">
+        {% if groupowner_id != 0 %}
+            {% for groupowner in groupowners %}
+                {% if groupowner.id == groupowner_id %}
+                    <li class="active">
+                        {% include groupowner_pagination_url_html %}
+                    </li>
+                {% else %}
+                    <li>
+                        {% include groupowner_pagination_url_html %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </ul>

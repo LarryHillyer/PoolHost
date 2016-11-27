@@ -7,19 +7,23 @@
         </th>
 
         <th></th>
+        <th></th>
     </tr>
 
     {% for  item in items %}
     <tr>
         <td>
-            {% change_name item.id as groupowner_id %}
-            <a href="{% url item_url  groupowner_id filter %}">{{item.name}}</a>
+            <a href="{% url item_url  item.id filter %}">{{item.name}}</a>
         </td>
 
         <td>
-            <a href="{% url details_url groupowner_id filter %}">Details</a>
+            <a href="{% url transfer_url item.id filter %}">Transfer Group Ownership</a>            
+        </td>
+
+        <td>
+            <a href="{% url details_url item.id filter %}">Details</a>
             <span>  |  </span>
-            <a href="{% url delete_url groupowner_id filter %}">Delete</a>
+            <a href="{% url delete_url item.id filter %}">Delete</a>
 
         </td>
     </tr>

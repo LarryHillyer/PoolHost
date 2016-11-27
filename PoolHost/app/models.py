@@ -1,7 +1,9 @@
 from datetime import datetime
+import json
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.serializers import serialize
 
 from app.mixins import HelperMixins
 
@@ -82,9 +84,11 @@ class GroupOwner(models.Model, HelperMixins):
         if groupowner_id != 0:
             pass
         elif poolowner_id != 0:
-            groupowner_id = PoolOwner.get_item_by_id( PoolOwner, poolowner_id)
+            poolowner = PoolOwner.get_item_by_id( PoolOwner, poolowner_id)
+            groupowner_id = poolowner.poolgroup.groupowner_id
         elif poolgroup_id != 0:
-            groupowner_id = PoolGroup.get_item_by_id( PoolGroup, poolgroup_id)
+            poolgroup = PoolGroup.get_item_by_id( PoolGroup, poolgroup_id)
+            groupowner_id = poolgroup.groupowner_id
         else:
             groupowner_id = groupowners[0].id
         return groupowner_id
@@ -156,7 +160,6 @@ class PoolGroup (models.Model, HelperMixins):
             pass
         return exactly_same_poolgroup
 
-
     @classmethod
     def get_same_poolgroup_in_database(cls, poolgroup_name, poolgroup_groupowner_id):
         same_poolgroup = None
@@ -165,6 +168,43 @@ class PoolGroup (models.Model, HelperMixins):
         except:
             pass
         return same_poolgroup
+
+    @classmethod
+    def transfer_group_ownership(cls, poolgroups, new_groupowner_id, modelstate):
+        error = None
+        for poolgroup in poolgroups:
+            poolgroup.groupowner_id = new_groupowner_id
+            modelstate = PoolGroup.edit_item(PoolGroup, poolgroup)
+            if modelstate.split(':')[0] != 'Success':
+                error = 'Error'
+        if error == None:
+            return 'Success: Group ownership was transfered'
+        else:
+            return 'Error: Database Error must be investigated'
+
+    @classmethod
+    def get_poolgroup_id_if_needed_and_possible(cls, poolgroups, poolgroup_id, 
+        poolowner_id = 0):
+
+        if poolgroup_id != 0:
+            pass
+        elif poolowner_id != 0:
+            poolowner = PoolOwner.get_item_by_id( PoolOwner, poolowner_id)
+            poolgroup_id = poolowner.poolgroup_id 
+        else:
+            poolgroup_id = poolgroups[0].id
+
+        return poolgroup_id
+
+    @classmethod
+    def get_poolgroups_by_groupowner_id(cls, groupowner_id):
+        
+        poolgroups = []
+        poolgroups_set = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
+        for poolgroup in poolgroups_set:
+            poolgroups.append({'id' : poolgroup.id, 'name': poolgroup.name})
+        return json.dumps(poolgroups)
+
 
 class PoolGroup_Choices(models.Model, HelperMixins):
 
@@ -191,12 +231,29 @@ class PoolGroup_Choices(models.Model, HelperMixins):
             pass
 
     @classmethod
+    def get_poolgroup_choices_by_groupowner_id(cls, groupowner_id):
+
+        try:
+
+            poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
+
+            poolgroup_choices = PoolGroup_Choices.get_all_items(PoolGroup_Choices)
+            if poolgroup_choices.count() > 0:               
+                poolgroup_choices.delete()
+            for poolgroup in poolgroups:
+                poolgroup_choice = PoolGroup_Choices(name = poolgroup.name, poolgroup_id = poolgroup.id)
+                PoolGroup_Choices.add_item(PoolGroup_Choices, poolgroup_choice)
+        except:
+            pass
+
+    @classmethod
     def make_poolgroup_choices(cls):
         poolgroup_choices_1 = PoolGroup_Choices.get_all_items(PoolGroup_Choices)
         poolgroup_choices = []
         for poolgroup_choice in poolgroup_choices_1:
             poolgroup_choices.append((poolgroup_choice.poolgroup_id, poolgroup_choice.name))
         return poolgroup_choices
+
 
 
 class PoolOwner (models.Model, HelperMixins):
@@ -206,6 +263,25 @@ class PoolOwner (models.Model, HelperMixins):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def get_items_by_groupowner_id(cls, model_cls, model_groupowner_id):
+        poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, model_groupowner_id)
+        poolowners = []
+        for poolgroup in poolgroups:
+            poolgroup_poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup.id)
+            for poolowner in poolgroup_poolowners:
+                poolowners.append(poolowner)
+        return poolowners
+
+    @classmethod
+    def is_poolowner_siteuser(cls, poolowner_name):
+
+        site_user = SiteUser.get_item_by_name(SiteUser, poolowner_name)
+        if site_user == None:
+            return False
+        else:
+            return True
 
 class PoolType (models.Model, HelperMixins):
 

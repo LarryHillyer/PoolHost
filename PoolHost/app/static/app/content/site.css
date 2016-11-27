@@ -73,3 +73,19 @@ input[type="checkbox"].input-validation-error {
 .darker-background {
     background-color:#f5f5f5;
 }
+
+.custom-page {
+    padding-left: 10px;
+    display: inline;         
+}
+.custom-page-2 {
+    display:inline-block
+}
+
+.custom-page-fix {
+    margin-top:15px;
+}
+
+.pagination {
+    margin: 0px 0px;
+}

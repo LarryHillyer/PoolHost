@@ -11,11 +11,11 @@ from django.urls import reverse
 
 from app.models import PoolGroup, GroupOwner, SiteUser
 
-from poolgroup.viewmodels import SuperUser_Index,  SuperUser_Create, SuperUser_Edit, SuperUser_Details
+from poolgroup.viewmodels import SuperUser_Index,  SuperUser_Create, SuperUser_Edit, SuperUser_Transfer, SuperUser_Details
 from poolgroup.viewmodels import GroupOwner_Index, GroupOwner_Create, GroupOwner_Edit, GroupOwner_Details
 from poolgroup.viewmodels import User_Delete
 
-from poolgroup.forms import PoolGroupForm_SuperUser_Create, PoolGroupForm_SuperUser_Edit
+from poolgroup.forms import PoolGroupForm_SuperUser_Create, PoolGroupForm_SuperUser_Edit, PoolGroupForm_SuperUser_Transfer
 from poolgroup.forms import PoolGroupForm_GroupOwner_Create, PoolGroupForm_GroupOwner_Edit
 
 class index(View):
@@ -78,7 +78,7 @@ class create(View):
 
         return render(request, self.template_name, viewmodel)
 
-    def post(self, request):
+    def post(self, request,  groupowner_id = 0, filter = 0):
 
         site_user = None
         if request.user.is_authenticated():
@@ -151,7 +151,7 @@ class edit(View):
                                         kwargs = {'modelstate':viewmodel['modelstate']}))
         return render(request, self.template_name, viewmodel)
 
-    def post(self, request):
+    def post(self, request, groupowner_id = 0, filter = 0):
 
         site_user = None
         if request.user.is_authenticated():
@@ -213,7 +213,70 @@ class edit(View):
             viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, self.form_class,
                 modelstate, poolgroup_id, filter, groupowner_id)
             render(request, self.template_name, viewmodel)
-        
+ 
+class transfer(View):
+    title = 'Pool Group - Transfer Ownership'
+    form_class = PoolGroupForm_SuperUser_Transfer
+    template_name = 'app/shared_create.html'
+    
+    def get(self, request, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
+        site_user = None
+        if request.user.is_authenticated():
+            site_user = SiteUser.get_items_by_userid(SiteUser, request.user.id)[0]
+        else:
+            return HttpResponseForbidden('<h1> Bad Request </h1>')
+
+        if site_user.is_superuser != True:
+            return HttpResponseForbidden('<h1> Bad Request </h1>')
+
+        if groupowner_id == 0:
+            return HttpResponseForbidden('<h1> Bad Request </h1>')            
+
+        poolgroup_id = int(poolgroup_id)
+        groupowner_id = int(groupowner_id)
+        filter = int(filter)
+
+        view_model = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, poolgroup_id, groupowner_id, filter, modelstate)
+
+        return render(request, self.template_name, view_model)
+
+    def post(self, request, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
+
+        site_user = None
+        if request.user.is_authenticated():
+            site_user = SiteUser.get_items_by_userid(SiteUser, request.user.id)[0]
+        else:
+            return HttpResponseForbidden('<h1> Bad Request </h1>')
+
+        if site_user.is_superuser != True:
+            return HttpResponseForbidden('<h1> Bad Request </h1>')
+
+        if groupowner_id == 0:
+            return HttpResponseForbidden('<h1> Bad Request </h1>')            
+
+        poolgroup_id = int(poolgroup_id)
+        groupowner_id = int(groupowner_id)
+        filter = int(filter)
+
+        form = PoolGroupForm_SuperUser_Transfer(request.POST)
+        if form.is_valid():
+
+            poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)               
+            if poolgroup.groupowner_id == form.data['groupowner_id']:
+                modelstate = 'Error: New groupowner is same as old groupower!'
+                view_model = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
+                return render(request, self.template_name, view_model)
+            poolgroup = PoolGroup.get_items_by_id(PoolGroup, poolgroup.id)
+            modelstate = PoolGroup.transfer_group_ownership(poolgroup, form.data['groupowner_id'], modelstate)
+            return HttpResponseRedirect(reverse('poolgroup:index', args=(),
+                                                    kwargs = {'modelstate':modelstate,
+                                                                'groupowner_id': form.data['groupowner_id'],
+                                                                'filter': filter}))
+
+        else:
+            view_model = Transfer_ViewModel.get_transfer_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
+            return render(request, self.template_name, view_model)
+  
 class details(View):
 
     title = 'Pool Group - Details'
@@ -296,5 +359,6 @@ class delete(View):
         modelstate = PoolGroup.delete_item(PoolGroup, poolgroup)
 
         return HttpResponseRedirect(reverse('poolgroup:index', args=(),
-                                    kwargs = {'modelstate':modelstate,
-                                                'groupowner_id': groupowner_id}))
+                                    kwargs = {'modelstate': modelstate,
+                                                'groupowner_id': groupowner_id,
+                                                'filter': filter}))

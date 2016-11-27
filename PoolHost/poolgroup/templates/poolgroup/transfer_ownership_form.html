@@ -1,0 +1,38 @@
+﻿
+
+<div class="form-horizontal">
+    {{ form.filter}}
+
+    <dl class="dl-horizontal">
+        <dt>
+            {{poolgroup_label_name}}
+        </dt>
+            
+        <dd>
+            {{poolgroup_name}}
+        </dd>
+
+        <dt>
+            {{poolgroup_label_groupowner}}
+        </dt>
+
+        <dd>
+            {{poolgroup_groupowner_name}}
+        </dd>
+    </dl>
+
+    <div class="form-group">
+        <label class="control-label col-md-2" for="id_name">{{form_label_new_groupowner}}</label>
+        <div class="col-md-10">
+            {{form.groupowner_id}}        
+        </div>
+    </div>
+
+        <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value={{ form_label_submit }} class="btn btn-success" />
+        </div>
+    </div>
+
+
+</div>

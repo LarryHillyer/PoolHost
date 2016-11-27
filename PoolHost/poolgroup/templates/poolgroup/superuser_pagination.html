@@ -1,17 +1,12 @@
 ﻿{% load tags %}
 <ul class="pagination pagination-sm custom-page">
 
-    {% if filter == None or filter == 0 %}
-        <li class="active"><a href="{% url index_url groupowner_id filter %}">No Filter</a></li>
-        {% filter_1 filter as filter %}
-        <li><a href="{% url index_url groupowner_id filter %}">Grp. Own</a></li>
+    {% if filter == 0 %}
+        <li class="active"><a href="{% url index_url 0 0 %}">No Filter</a></li>
+        <li><a href="{% url index_url groupowner_id 1 %}">Grp. Own</a></li>
     {% elif filter == 1 %}
-        {% filter_0 filter as filter%}
-        {% change_name groupowner_id as new_groupowner_id %}
-        {% groupowner_0 new_groupowner_id as new_groupowner_id%}   
-        <li><a href="{% url index_url new_groupowner_id filter %}">No Filter</a></li>
-        {% filter_1 filter as filter %}
-        <li class="active"><a href="{% url index_url groupowner_id filter %}">Grp. Own</a></li>
+        <li><a href="{% url index_url 0 0 %}">No Filter</a></li>
+        <li class="active"><a href="{% url index_url 0 0 %}">Grp. Own</a></li>
     {% endif %}
 
 </ul>

@@ -9,7 +9,7 @@ class PoolOwnerForm_SuperUser_Create(ModelForm):
     name = forms.CharField(max_length = 100,
                             widget = forms.TextInput({
                                     'class':'form-control',
-                                    'placeholder': 'Enter Pool Group Name'}))
+                                    'placeholder': 'Enter Pool Owner Name'}))
 
     poolgroup_id = forms.ChoiceField(choices = PoolGroup_Choices.make_poolgroup_choices,
                             widget = forms.Select({'class':'form-control'}))
@@ -21,7 +21,7 @@ class PoolOwnerForm_SuperUser_Create(ModelForm):
 
     class Meta:
         model = PoolOwner
-        fields = ['name', 'poolgroup_id','groupowner_id', 'filter']
+        fields = ['name', 'poolgroup_id']
 
 class PoolOwnerForm_SuperUser_Edit(ModelForm):
 
@@ -42,7 +42,20 @@ class PoolOwnerForm_SuperUser_Edit(ModelForm):
 
     class Meta:
         model = PoolOwner
-        fields = ['id', 'name', 'poolgroup_id', 'groupowner_id', 'filter']
+        fields = ['id', 'name', 'poolgroup_id']
+
+class PoolOwnerForm_SuperUser_Transfer(ModelForm):
+
+    
+    poolowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices,
+                                            widget = forms.Select({'class':'form-control'}))
+
+    filter = forms.IntegerField(widget = forms.HiddenInput())
+
+    class Meta:
+        model = PoolOwner
+        fields = ['poolowner_id']
+
 
 class PoolOwnerForm_GroupOwner_Create(ModelForm):
 
@@ -61,7 +74,7 @@ class PoolOwnerForm_GroupOwner_Create(ModelForm):
                         
     class Meta:
         model = PoolOwner
-        fields = [ 'name', 'poolgroup_id', 'groupowner_id', 'filter']
+        fields = [ 'name', 'poolgroup_id']
 
 class PoolOwnerForm_GroupOwner_Edit(ModelForm):
 
@@ -80,5 +93,5 @@ class PoolOwnerForm_GroupOwner_Edit(ModelForm):
     filter = forms.IntegerField(widget = forms.HiddenInput())
                         
     class Meta:
-        model = PoolGroup
-        fields = ['id', 'name', 'poolgroup_id', 'groupowner_id', 'filter']
+        model = PoolOwner
+        fields = ['id', 'name', 'poolgroup_id']

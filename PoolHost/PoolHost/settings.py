@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'superuser',
     'poolgroup',
     'poolowner',
+    'pool',
+    'rest_framework',
     # Add your apps here to enable them
     'django.contrib.admin',
     'django.contrib.auth',

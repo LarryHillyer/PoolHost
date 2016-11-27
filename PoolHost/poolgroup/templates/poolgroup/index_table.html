@@ -10,6 +10,8 @@
                 <th>
                     {{header_label_groupowner}}
                 </th>
+
+                <th></th>
         {% endif %}
 
         <th></th>
@@ -18,14 +20,18 @@
     {% for item in items %}
     <tr>
         <td>
-            <a href="{% url item_url groupowner_id filter %}">{{item.name}}</a>
+            <a href="{% url item_url item.id groupowner_id filter %}">{{item.name}}</a>
         </td>
 
         {% if site_user.is_superuser %}
             <td>
                 {{item.groupowner.name}}
             </td>
+            <td>
+                <a href="{% url transfer_url item.id groupowner_id filter %}">Transfer Pool Group Ownership</a>            
+            </td>
         {% endif %}
+
 
         <td>
                 <a href="{% url edit_url item.id groupowner_id filter %}">Edit</a>
