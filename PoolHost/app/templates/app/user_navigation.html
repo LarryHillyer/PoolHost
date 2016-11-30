@@ -1,25 +1,25 @@
 ﻿<nav aria-label="User Navigation">
 
     {% if site_user.is_superuser %}
-        {% include superuser_pagination %}
-    {% else %}
-        {% include groupowner_pagination %}
+        {% include superuser_pagination_html %}
+    {% elif site_user.is_groupowner and not site_user.is_superuser %}
+        {% include groupowner_pagination_html %}
     {% endif %}
 
-    {% if filter == none %}
-    {% else %}
-        {% if filter == 0 %}
+    
+    {% if filter == 0 %}
 
-        {% elif filter == 1 %}
-            <span>    </span>     
-            {% include shared_groupowner_pagination %}
-        {% elif filter == 2 or filter == 3 %}
-            <span>    </span>
-            {% include shared_poolgroup_pagination %}
-        {% elif filter == 4 or filter == 5 or filter == 6 or filter == 7 %}
-            <span>    </span>
-            {% include shared_poolowner_pagination %}
-        {% endif %}
-    {% endif%}
+    {% elif filter == 1 and site_user.is_superuser %}             
+        {% include shared_groupowner_pagination_html %}
+    {% elif filter == 1 and site_user.is_groupowner and not site_user.is_superuser %}
+        {% include shared_poolgroup_pagination_html %}
+    {% elif filter == 2 or filter == 3 %}
+        <span>    </span>
+        {% include shared_poolgroup_pagination_html %}
+    {% elif filter == 4 or filter == 5 or filter == 6 or filter == 7 %}
+        <span>    </span>
+        {% include shared_poolowner_pagination_html %}
+    {% endif %}
+    
 
 </nav>

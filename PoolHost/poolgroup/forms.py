@@ -39,15 +39,24 @@ class PoolGroupForm_SuperUser_Edit(ModelForm):
 
 class PoolGroupForm_SuperUser_Transfer(ModelForm):
 
-    
-    groupowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices,
+    name = forms.CharField(max_length = 100, required = False,
+                        widget = forms.TextInput({
+                                'class':'form-control',
+                                'disabled': 'disabled'}))
+
+    groupowner_name=forms.CharField(max_length = 100, required = False,
+                        widget = forms.TextInput({
+                                'class': 'form-control',
+                                'disabled': 'disabled',}))
+
+    new_groupowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices,
                                             widget = forms.Select({'class':'form-control'}))
 
     filter = forms.IntegerField(widget = forms.HiddenInput())
 
     class Meta:
         model = PoolGroup
-        fields = ['groupowner_id']
+        fields = ['name']
 
 class PoolGroupForm_GroupOwner_Create(ModelForm):
 

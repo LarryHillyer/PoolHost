@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from django.db import models
 from app.models import PoolOwner
-from app.models import GroupOwner_Choices, PoolGroup_Choices
+from app.models import GroupOwner_Choices, PoolGroup_Choices, PoolOwner_Choices
 
 class PoolOwnerForm_SuperUser_Create(ModelForm):
     
@@ -23,75 +23,47 @@ class PoolOwnerForm_SuperUser_Create(ModelForm):
         model = PoolOwner
         fields = ['name', 'poolgroup_id']
 
-class PoolOwnerForm_SuperUser_Edit(ModelForm):
+class PoolOwnerForm_Transfer(ModelForm):
 
-    id = forms.IntegerField(widget = forms.HiddenInput({}))
-   
-    name = forms.CharField(max_length = 100,
-                            widget = forms.TextInput({
-                                    'class':'form-control',
-                                    'placeholder': 'Enter Pool Group Name'}))
-
-    poolgroup_id = forms.ChoiceField(choices = PoolGroup_Choices.make_poolgroup_choices,
-                            widget = forms.Select({'class':'form-control'}))
-    
-    groupowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices,
-                            widget = forms.Select({'class':'form-control'}))
-
-    filter = forms.IntegerField(widget = forms.HiddenInput())
-
-    class Meta:
-        model = PoolOwner
-        fields = ['id', 'name', 'poolgroup_id']
-
-class PoolOwnerForm_SuperUser_Transfer(ModelForm):
 
     
-    poolowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices,
+    name = forms.CharField(max_length = 100, required = False,
+                        widget = forms.TextInput({
+                                'class':'form-control',
+                                'disabled': 'disabled'}))
+
+    poolgroup_name=forms.CharField(max_length = 100, required = False,
+                        widget = forms.TextInput({
+                                'class': 'form-control',
+                                'disabled': 'disabled',}))
+
+    new_poolowner_id = forms.ChoiceField(choices = PoolOwner_Choices.make_poolowner_choices,
                                             widget = forms.Select({'class':'form-control'}))
 
     filter = forms.IntegerField(widget = forms.HiddenInput())
 
     class Meta:
         model = PoolOwner
-        fields = ['poolowner_id']
+        fields = ['name']
 
 
 class PoolOwnerForm_GroupOwner_Create(ModelForm):
 
-   
     name = forms.CharField(max_length = 100,
                             widget = forms.TextInput({
                                     'class':'form-control',
-                                    'placeholder': 'Enter Pool Group Name'}))
+                                    'placeholder': 'Enter Pool Owner Name'}))
 
     poolgroup_id = forms.ChoiceField(choices = PoolGroup_Choices.make_poolgroup_choices,
                             widget = forms.Select({'class':'form-control'}))    
     
-    groupowner_id = forms.IntegerField(widget = forms.HiddenInput())
+    groupowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices, required = False,
+                            widget = forms.Select({'class':'form-control',
+                                                    'disabled': 'disabled'}))
     
     filter = forms.IntegerField(widget = forms.HiddenInput())
                         
     class Meta:
         model = PoolOwner
-        fields = [ 'name', 'poolgroup_id']
+        fields = [ 'name', 'poolgroup_id', 'groupowner_id']
 
-class PoolOwnerForm_GroupOwner_Edit(ModelForm):
-
-    id = forms.IntegerField(widget = forms.HiddenInput({}))
-   
-    name = forms.CharField(max_length = 100,
-                            widget = forms.TextInput({
-                                    'class':'form-control',
-                                    'placeholder': 'Enter Pool Group Name'}))
-
-    poolgroup_id = forms.ChoiceField(choices = PoolGroup_Choices.make_poolgroup_choices,
-                            widget = forms.Select({'class':'form-control'}))
-    
-    groupowner_id = forms.IntegerField(widget = forms.HiddenInput())
-
-    filter = forms.IntegerField(widget = forms.HiddenInput())
-                        
-    class Meta:
-        model = PoolOwner
-        fields = ['id', 'name', 'poolgroup_id']

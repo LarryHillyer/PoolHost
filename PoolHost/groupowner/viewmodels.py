@@ -9,108 +9,184 @@ from groupowner.forms import GroupOwnerForm_Create, GroupOwnerForm_Transfer
 
 class BaseViewModel(object):
 
-    def __init__(self, site_user, title):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool):
 
         self.viewmodel = {'site_user':site_user, # app/layout.html params
                             'title': title,
-                            'year': datetime.now().year,}
+                            'year': datetime.now().year,
+                            'modelsuccess_bool': modelsuccess_bool,
+                            'modelstate': modelstate,
+                            'modelstate_html': 'app/modelstatus.html' }
 
 class Index_ViewModel(BaseViewModel):
 
-    def __init__(self, site_user, title, modelstate, modelstate_bool, groupowners, filter):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, groupowners, filter):
         
-        super().__init__(site_user, title)
+        super().__init__(site_user, title, modelstate, modelsuccess_bool)
 
-        self.viewmodel['partial_view_id'] = 'groupowner-id' # app/shared_index.html params
-        self.viewmodel['modelstate_bool'] = modelstate_bool
-        self.viewmodel['modelstate'] =  modelstate
-        self.viewmodel['modelstate_html'] = 'app/modelstatus.html' 
-        self.viewmodel['scripts'] = ['app/scripts/Client/TableStripping.js']
-        self.viewmodel['create_url'] = 'groupowner:create'
-        self.viewmodel['create_url_html'] = 'groupowner/create_url.html'
-        self.viewmodel['create_name'] = 'Create Group Owner'
-        self.viewmodel['index_table'] = 'groupowner/index_table.html'
+        self.viewmodel['partial_view_id'] = 'groupowner-id'
+
         self.viewmodel['filter'] = filter
 
-        self.viewmodel['items'] = groupowners # super_user/index_table.html params
-        self.viewmodel['header_label_item'] = 'Super User Name'
+        self.viewmodel['create_url'] = 'groupowner:create'
+        self.viewmodel['create_link_name'] = 'Create Group Owner'
+        self.viewmodel['create_link_html'] = 'groupowner/create_link.html'
+
+        self.viewmodel['index_table_html'] = 'groupowner/index_table.html'
+
+        self.viewmodel['items'] = groupowners
+        self.viewmodel['header_label_item'] = 'Group Owner Name'
         self.viewmodel['item_url'] = 'poolgroup:index'
         self.viewmodel['transfer_url'] = 'groupowner:transfer' 
         self.viewmodel['details_url'] = 'groupowner:details' 
         self.viewmodel['delete_url'] = 'groupowner:delete'
+
+        self.viewmodel['scripts'] = ['app/scripts/Client/TableStripping.js']
+
+class Form_ViewModel(BaseViewModel):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
+        form, filter, submit_label):
+
+        super().__init__(site_user, title, modelstate, modelsuccess_bool)
+        
+        self.viewmodel['partial_view_id'] = 'groupowner-id' 
+
+        self.viewmodel['filter'] = filter
+
+        self.viewmodel['form'] = form 
+        self.viewmodel['form_label_submit'] = submit_label
+
+        self.viewmodel['index_url'] = 'groupowner:index'
+        self.viewmodel['index_link_html'] = 'groupowner/index_link.html'
+
+        self.viewmodel['scripts'] = ['app/scripts/jquery.validate.js']
+
+class DescriptiveList_ViewModel(BaseViewModel):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, groupowner,  
+        filter):
+
+        super().__init__(site_user, title, modelstate, modelsuccess_bool)
+
+        self.viewmodel['partial_view_id'] = 'superuser-id' # shared_create params
+
+        self.viewmodel['groupowner_id'] = groupowner.id
+        self.viewmodel['filter'] = filter
+
+        self.viewmodel['descriptive_list'] = 'groupowner/descriptive_list.html' # app/shared_create.html params
+
+        self.viewmodel['item'] = groupowner 
+        self.viewmodel['item_label_name'] = 'Group Owner'
+        self.viewmodel['item_label_email'] = 'E-mail'
+
+        self.viewmodel['index_url'] = 'groupowner:index'
+
+ 
+class Create_ViewModel(Form_ViewModel):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
+            form, filter, submit_label):
+        
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, 
+            form, filter, submit_label)
+
+
+        self.viewmodel['form_template_html'] = 'groupowner/create_form.html' 
+        self.viewmodel['form_url'] = 'groupowner:create'
+        self.viewmodel['form_html'] = 'groupowner/groupowner_form.html'
+
+        self.viewmodel['form_label_name'] = 'Group Owner Name'
+        self.viewmodel['form_label_email'] = 'Group Owner E-Mail'
+
+class Transfer_ViewModel(Form_ViewModel):
+
+    def __init__(self,site_user, title, modelstate, modelsuccess_bool, form, filter, groupowner, submit_label):
+        
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter, submit_label)
+
+        self.viewmodel['groupowner_id'] = groupowner.id        
+
+        self.viewmodel['form_template_html'] = 'groupowner/transfer_form.html' 
+        self.viewmodel['form_url'] = 'groupowner:transfer'
+        self.viewmodel['form_html'] = 'groupowner/transfer_ownership_form.html'
+
+        self.viewmodel['form_name'] = groupowner.name
+        self.viewmodel['form_label_name'] = 'Existing Group Owner'
+        self.viewmodel['form_label_new_groupowner'] = 'New Group Owner'
+
+class Details_ViewModel(DescriptiveList_ViewModel):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, groupowner,  
+        filter):
+        
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, groupowner,  
+            filter)
+
+        self.viewmodel['details_links_html'] = 'groupowner/details_links.html'
+        
+class Delete_ViewModel(DescriptiveList_ViewModel):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, groupowner,  
+        filter):
+        
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, groupowner,  
+            filter)
+
+        self.viewmodel['delete_url'] = 'groupowner:delete'
+        self.viewmodel['delete_form'] = 'groupowner/delete_form.html'
+
+
+class SuperUser_Index(Index_ViewModel):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, groupowners, filter):
+        
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, groupowners, filter)
+
  
 
     @classmethod
-    def get_index_viewmodel(cls, site_user, title, filter, modelstate):
+    def get_index_viewmodel(cls, site_user, title, modelstate, filter):
 
-        modelstate, modelstate_bool = GroupOwner.get_modelstate(modelstate)
+        modelstate, modelsuccess_bool = GroupOwner.get_modelstate(modelstate)
+
         groupowners = GroupOwner.get_all_items(GroupOwner)
 
-        viewmodel = Index_ViewModel(site_user, title, modelstate, modelstate_bool, groupowners, filter).viewmodel
+        viewmodel = SuperUser_Index(site_user, title, modelstate, modelsuccess_bool, groupowners, filter).viewmodel
 
         return viewmodel
 
-class Create_ViewModel(BaseViewModel):
+class SuperUser_Create(Create_ViewModel):
 
-    def __init__(self, site_user, title, form, modelstate, modelstate_bool, filter):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
+        form, filter, submit_label):
         
-        super().__init__(site_user, title)
-
-        self.viewmodel['partial_view_id'] = 'groupowner-id' # shared_create params
-        self.viewmodel['modelstate'] = modelstate
-        self.viewmodel['modelstate_bool'] = modelstate_bool
-        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
-        self.viewmodel['create_edit_form_html'] = 'groupowner/create_edit_form.html' 
-        self.viewmodel['form_url'] = 'groupowner:create'
-        self.viewmodel['form_html'] = 'groupowner/groupowner_form.html'
-        self.viewmodel['index_url'] = 'groupowner:index'
-        self.viewmodel['index_url_html'] = 'groupowner/index_url.html'
-        self.viewmodel['filter'] = filter
-        self.viewmodel['scripts'] = ['app/scripts/jquery.validate.js']
-
-        self.viewmodel['form'] = form # groupowner_form params
-        self.viewmodel['form_label_name'] = 'Group Owner Name'
-        self.viewmodel['form_label_email'] = 'Group Owner E-Mail'
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, 
+            form, filter, submit_label)
 
     @classmethod
     def get_create_viewmodel(cls, site_user, title, filter, modelstate):
 
-        modelstate, modelstate_bool = GroupOwner.get_modelstate(modelstate)
+        modelstate, modelsuccess_bool = GroupOwner.get_modelstate(modelstate)
 
         form = GroupOwnerForm_Create(initial = {'filter':filter})
 
-        viewmodel = Create_ViewModel(site_user, title, form, modelstate, modelstate_bool, filter).viewmodel
+        submit_label = 'Create'
+
+        viewmodel = SuperUser_Create(site_user, title, modelstate, modelsuccess_bool, 
+            form, filter, submit_label).viewmodel
+
 
         return viewmodel
 
-class Transfer_ViewModel(BaseViewModel):
+class SuperUser_Transfer(Transfer_ViewModel):
 
-    def __init__(self, site_user, title, form, modelstate, modelstate_bool, groupowner_id, filter):
+    def __init__(self,site_user, title, modelstate, modelsuccess_bool, form, filter, groupowner, submit_label):
         
-        super().__init__(site_user, title)
-
-        self.viewmodel['partial_view_id'] = 'groupowner-id' # shared_create params
-        self.viewmodel['modelstate'] = modelstate
-        self.viewmodel['modelstate_bool'] = modelstate_bool
-        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
-        self.viewmodel['create_edit_form_html'] = 'groupowner/transfer_form.html' 
-        self.viewmodel['form_url'] = 'groupowner:transfer'
-        self.viewmodel['form_html'] = 'groupowner/transfer_ownership_form.html'
-        self.viewmodel['index_url'] = 'groupowner:index'
-        self.viewmodel['index_url_html'] = 'groupowner/index_url.html'
-        self.viewmodel['groupowner_id'] = groupowner_id
-        self.viewmodel['filter'] = filter
-        self.viewmodel['scripts'] = ['app/scripts/jquery.validate.js']
-
-        self.viewmodel['form'] = form # groupowner_form params
-        self.viewmodel['form_label_name'] = 'Existing Group Owner'
-        self.viewmodel['form_label_new_groupowner'] = 'New Group Owner'
-        self.viewmodel['form_label_submit'] = 'Transfer'
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter, groupowner, submit_label)
 
     @classmethod
     def get_transfer_viewmodel(cls, site_user, title, groupowner_id, filter, modelstate):
 
-        modelstate, modelstate_bool = GroupOwner.get_modelstate(modelstate)
+        modelstate, modelsuccess_bool = GroupOwner.get_modelstate(modelstate)
 
         groupowners = GroupOwner.get_all_items(GroupOwner)
         if groupowners.count() == 0:
@@ -119,41 +195,53 @@ class Transfer_ViewModel(BaseViewModel):
 
         groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
         groupowner = GroupOwner.get_item_by_id(GroupOwner, groupowner_id)
-        GroupOwner_Choices.get_groupowner_choices()
+        GroupOwner_Choices.get_groupowner_choices_2(groupowner_id)
+        groupowner_choices = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
 
-        form = GroupOwnerForm_Transfer(instance = groupowner, initial = {'filter':filter})
+        form = GroupOwnerForm_Transfer(initial = {'filter':filter,
+                                                    'name': groupowner.name,
+                                                    'new_groupowner_id': groupowner_choices[0].groupowner_id})
 
-        viewmodel = Transfer_ViewModel(site_user, title, form, modelstate, modelstate_bool, groupowner_id, filter).viewmodel
+        submit_label = 'Transfer'
+
+        viewmodel = SuperUser_Transfer(site_user, title, modelstate, modelsuccess_bool, form, filter, groupowner, submit_label).viewmodel
 
         return viewmodel
 
-class Details_Delete_ViewModel(BaseViewModel):
-    def __init__(self, site_user, title, groupowner, filter, modelstate, modelstate_bool):
+class SuperUser_Details(Details_ViewModel):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, groupowner,  
+        filter):
         
-        super().__init__(site_user, title)
-
-        self.viewmodel['modelstate_bool'] = modelstate_bool
-        self.viewmodel['modelstate'] =  modelstate
-        self.viewmodel['modelstate_html'] = 'app/modelstatus.html' 
-        self.viewmodel['descriptive_list'] = 'groupowner/descriptive_list.html' # app/shared_create.html params
-        self.viewmodel['delete_url'] = 'groupowner:delete'
-        self.viewmodel['delete_form'] = 'groupowner/delete_form.html'
-        self.viewmodel['index_url'] = 'groupowner:index'
-        self.viewmodel['edit_index_url_html'] = 'groupowner/index_url_2.html'
-        self.viewmodel['groupowner_id'] = groupowner.id
-        self.viewmodel['filter'] = filter
-
-        self.viewmodel['item'] = groupowner # groupowner/descriptive_list.html params
-        self.viewmodel['form_label_name'] = 'Group Owner Name'
-        self.viewmodel['form_label_email'] = 'E-mail'
-
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, groupowner,  
+            filter)
+        
     @classmethod
-    def get_details_and_delete_viewmodel(cls, site_user, title, groupowner_id, filter, modelstate):
+    def get_details_viewmodel(cls, site_user, title, groupowner_id, filter, modelstate):
 
-        modelstate, modelstate_bool = GroupOwner.get_modelstate(modelstate)
+        modelstate, modelsuccess_bool = GroupOwner.get_modelstate(modelstate)
 
         groupowner = GroupOwner.get_item_by_id(GroupOwner, groupowner_id)
 
-        viewmodel = Details_Delete_ViewModel(site_user, title, groupowner, filter, modelstate, modelstate_bool).viewmodel
+        viewmodel = Details_ViewModel(site_user, title, modelstate, modelsuccess_bool, groupowner,  
+            filter).viewmodel
+
+        return viewmodel
+
+class SuperUser_Delete(Delete_ViewModel):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, groupowner,  
+        filter):
+        
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, groupowner,  
+            filter)
+
+    @classmethod
+    def get_delete_viewmodel(cls, site_user, title, groupowner_id, filter, modelstate):
+
+        modelstate, modelsuccess_bool = GroupOwner.get_modelstate(modelstate)
+
+        groupowner = GroupOwner.get_item_by_id(GroupOwner, groupowner_id)
+
+        viewmodel = Delete_ViewModel(site_user, title, modelstate, modelsuccess_bool, groupowner,  
+            filter).viewmodel
 
         return viewmodel

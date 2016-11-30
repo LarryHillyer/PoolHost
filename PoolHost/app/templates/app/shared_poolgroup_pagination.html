@@ -3,11 +3,11 @@
         {% for poolgroup in poolgroups %}
             {% if poolgroup.id == poolgroup_id %}
                 <li class="active">
-                    <a href="{% url index_url poolgroup.id  groupowner_id filter %}">{{poolgroup.name}}</a>
+                        {% include poolgroup_pagination_link_html %}
                 </li>
             {% else %}
                 <li>
-                    <a href="{% url index_url poolgroup.id groupowner_id filter %}">{{poolgroup.name}}</a>
+                        {% include poolgroup_pagination_link_html %}
                 </li>
             {% endif %}
         {% endfor %}

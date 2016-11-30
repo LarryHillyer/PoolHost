@@ -1,1 +1,29 @@
-﻿
+﻿<dl class="dl-horizontal">
+
+    <dt>
+        {{item_label_name}}
+    </dt>
+
+    <dd>
+        {{item.name}}
+    </dd>
+
+    <dt>
+        {{item_label_poolgroup_name}}
+    </dt>
+
+    <dd>
+        {{item.poolgroup.name}}
+    </dd>
+
+    {% if site_user.is_superuser %}
+    <dt>
+        {{item_label_groupowner_name}}
+    </dt>
+
+    <dd>
+        {{ item.poolgroup.groupowner.name }}
+    </dd>
+    {% endif %}
+
+</dl>

@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from django.db import models
 from app.models import SuperUser
 
-class SuperUserForm(ModelForm):
+class SuperUserForm_Create(ModelForm):
     
     name = forms.CharField(max_length = 100, label = 'Super User Name',
                             widget = forms.TextInput({

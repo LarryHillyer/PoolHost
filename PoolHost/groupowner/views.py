@@ -9,9 +9,10 @@ from django.http.response import HttpResponse
 from django.views import View
 from django.urls import reverse
 
-from groupowner.forms import GroupOwnerForm_Create, GroupOwnerForm_Transfer
 from app.models import PoolGroup, GroupOwner_Choices, GroupOwner, SiteUser
-from groupowner.viewmodels import Index_ViewModel, Create_ViewModel, Transfer_ViewModel, Details_Delete_ViewModel
+from groupowner.viewmodels import SuperUser_Index, SuperUser_Create, SuperUser_Transfer, SuperUser_Details, SuperUser_Delete
+from groupowner.forms import GroupOwnerForm_Create, GroupOwnerForm_Transfer
+
 
 class index(View):
     title = 'Group Owner - Index'
@@ -28,7 +29,7 @@ class index(View):
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         filter = int(filter)
-        view_model = Index_ViewModel.get_index_viewmodel(site_user, self.title, filter, modelstate)
+        view_model = SuperUser_Index.get_index_viewmodel(site_user, self.title, modelstate, filter)
         
         return render(request, self.template_name, view_model)
 
@@ -50,7 +51,7 @@ class create(View):
 
         filter = int(filter)
 
-        view_model = Create_ViewModel.get_create_viewmodel(site_user, self.title, filter, modelstate)
+        view_model = SuperUser_Create.get_create_viewmodel(site_user, self.title, filter, modelstate)
 
         return render(request, self.template_name, view_model)
     
@@ -89,7 +90,7 @@ class create(View):
                                                                 'filter': filter}))
             else:
                 modelstate = 'Error: groupowner, ' + groupowner.name + ' is not in database!'
-                view_model = Create_ViewModel.get_create_viewmodel(site_user, self.title, filter, modelstate)
+                view_model = SuperUser_Create.get_create_viewmodel(site_user, self.title, filter, modelstate)
                 return render(request, self.template_name, view_model)
         else:
             view_model = Create_ViewModel.get_create_viewmodel(site_user, self.title, filter, modelstate)
@@ -97,7 +98,6 @@ class create(View):
 
 class transfer(View):
     title = 'Group Owner - Transfer Ownership'
-    form_class = GroupOwnerForm_Transfer
     template_name = 'app/shared_create.html'
 
     def get(self, request, groupowner_id = 0, filter = 0, modelstate = None):
@@ -116,7 +116,7 @@ class transfer(View):
         groupowner_id = int(groupowner_id)
         filter = int(filter)
 
-        view_model = Transfer_ViewModel.get_transfer_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
+        view_model = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
 
         return render(request, self.template_name, view_model)
 
@@ -152,7 +152,7 @@ class transfer(View):
                                                                 'filter': filter}))
 
         else:
-            view_model = Transfer_ViewModel.get_transfer_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
+            view_model = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
             return render(request, self.template_name, view_model)
 
 
@@ -177,7 +177,7 @@ class details(View):
         groupowner_id = int(groupowner_id)
         filter = int(filter)
 
-        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
+        view_model = SuperUser_Details.get_details_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
 
         return render(request, self.template_name, view_model)
 
@@ -202,7 +202,7 @@ class delete(View):
         groupowner_id = int(groupowner_id)
         filter = int(filter)
 
-        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
+        view_model = SuperUser_Delete.get_delete_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
 
         return render(request, self.template_name, view_model)
 

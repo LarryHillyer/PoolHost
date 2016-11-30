@@ -18,12 +18,10 @@ class GroupOwnerForm_Create(ModelForm):
 
 class GroupOwnerForm_Transfer(ModelForm):
     
-    name = forms.CharField(max_length = 100,
-                            widget = forms.TextInput({
-                                    'class':'form-control',
-                                    'placeholder': 'Enter Group Owner User Name'}))
-
-    id = forms.IntegerField(widget = forms.HiddenInput())
+    name = forms.CharField(max_length = 100, required = False,
+                        widget = forms.TextInput({
+                                'class':'form-control',
+                                'disabled': 'disabled'}))
 
     new_groupowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices,
                                             widget = forms.Select({'class':'form-control'}))
@@ -32,4 +30,4 @@ class GroupOwnerForm_Transfer(ModelForm):
 
     class Meta:
         model = GroupOwner
-        fields = ['name', 'id']
+        fields = ['name']

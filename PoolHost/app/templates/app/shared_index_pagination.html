@@ -9,7 +9,7 @@
         </div>
         <div class="col-lg-9 custom-page-fix">
             {% if use_pagination %}
-                {% include pagination %}
+                {% include pagination_html %}
             {% endif %}
         </div>
     </div>
@@ -23,9 +23,9 @@
     <div class="row">
         <div class="col-lg-12">
 
-            {% include create_url_html %}
+            {% include create_link_html %}
 
-            {% include index_table %}
+            {% include index_table_html %}
 
         </div>
 

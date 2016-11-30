@@ -4,11 +4,11 @@
             {% for groupowner in groupowners %}
                 {% if groupowner.id == groupowner_id %}
                     <li class="active">
-                        {% include groupowner_pagination_url_html %}
+                        {% include groupowner_pagination_link_html %}
                     </li>
                 {% else %}
                     <li>
-                        {% include groupowner_pagination_url_html %}
+                        {% include groupowner_pagination_link_html %}
                     </li>
                 {% endif %}
             {% endfor %}

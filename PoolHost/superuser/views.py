@@ -9,9 +9,10 @@ from django.http.response import HttpResponse
 from django.views import View
 from django.urls import reverse
 
-from superuser.forms import SuperUserForm
-from superuser.viewmodels import Index_ViewModel, Create_ViewModel, Details_Delete_ViewModel
 from app.models import SuperUser, SiteUser
+
+from superuser.viewmodels import SuperUser_Index, SuperUser_Create, SuperUser_Details, SuperUser_Delete
+from superuser.forms import SuperUserForm_Create
 
 class index(View):
 
@@ -29,13 +30,12 @@ class index(View):
         if site_user.is_superuser != True:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
         
-        view_model = Index_ViewModel.get_index_viewmodel(site_user,self.title, modelstate)
+        view_model = SuperUser_Index.get_index_viewmodel(site_user,self.title, modelstate)
         
         return render(request, self.template_name, view_model)
         
 class create(View):
 
-    form_class = SuperUserForm
     template_name = 'app/shared_create.html'
     title = 'Super User - Create'
 
@@ -50,9 +50,7 @@ class create(View):
         if site_user.is_superuser != True:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        form = self.form_class()
-
-        view_model = Create_ViewModel.get_create_viewmodel(site_user, self.title, form, modelstate)
+        view_model = SuperUser_Create.get_create_viewmodel(site_user, self.title, modelstate)
 
         return render(request, self.template_name, view_model)
     
@@ -68,7 +66,7 @@ class create(View):
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         superuser = SuperUser(name = request.POST['name'])
-        form = self.form_class(request.POST)
+        form = SuperUserForm_Create(request.POST)
         if form.is_valid():
 
             same_superuser = SuperUser.objects.filter(name = superuser.name)
@@ -113,7 +111,8 @@ class details(View):
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         superuser_id = int(superuser_id)
-        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, superuser_id, modelstate)
+        view_model = SuperUser_Details.get_details_viewmodel(site_user, self.title, 
+            modelstate, superuser_id )
 
         return render(request, self.template_name, view_model)
 
@@ -137,7 +136,8 @@ class delete(View):
 
         superuser_id = int(superuser_id)
 
-        view_model = Details_Delete_ViewModel.get_details_and_delete_viewmodel(site_user, self.title, superuser_id, modelstate)
+        view_model = SuperUser_Delete.get_delete_viewmodel(site_user, self.title, 
+            modelstate, superuser_id, )
 
         return render(request, self.template_name, view_model)
 

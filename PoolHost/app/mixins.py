@@ -80,16 +80,16 @@ class HelperMixins(object):
     
     @classmethod
     def get_modelstate(cls, modelstate):
-        modelstate_bool = False
+        modelsuccess_bool = False
         if modelstate == None:  
             modelstate = ''
         else:
             try:
                 modelstate.split(':')
                 if modelstate.split(':')[0] == "Success":
-                    modelstate_bool = True
+                    modelsuccess_bool = True
                 else:
-                    modelstate_bool = False
+                    modelsuccess_bool = False
             except:
                 pass
-        return modelstate, modelstate_bool
+        return modelstate, modelsuccess_bool
