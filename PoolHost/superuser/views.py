@@ -72,7 +72,7 @@ class create(View):
             same_superuser = SuperUser.objects.filter(name = superuser.name)
             if same_superuser.count() > 0:
                 modelstate = 'Error: Superuser, ' + superuser.name + ' is already a superuser!'
-                view_model = SuperUser.get_create_view_model(site_user, form, modelstate)
+                view_model = SuperUser_Create.get_create_view_model(site_user, form, modelstate)
                 return render(request, self.template_name, view_model)
                                 
             site_user = SiteUser.get_item_by_name(SiteUser, superuser.name)          
@@ -86,10 +86,10 @@ class create(View):
                                                     kwargs = {'modelstate':modelstate}))
             else:
                 modelstate = 'Error: Superuser, ' + superuser.name + ' is not in database!'
-                view_model = SuperUser.get_create_view_model(site_user, form, modelstate)
+                view_model = SuperUser_Create.get_create_view_model(site_user, form, modelstate)
                 return render(request, self.template_name, view_model)
         else:
-            view_model = SuperUser.get_create_view_model(site_user, form, modelstate)
+            view_model = SuperUser_Create.get_create_view_model(site_user, form, modelstate)
             return render(request, self.template_name, view_model)
 
 class details(View):

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'poolowner',
     'pool',
     'rest_framework',
+    'pooltype',
     # Add your apps here to enable them
     'django.contrib.admin',
     'django.contrib.auth',

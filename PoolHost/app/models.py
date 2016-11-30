@@ -369,6 +369,24 @@ class PoolType (models.Model, HelperMixins):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def get_exactly_same_pooltype(cls, pooltype_id, pooltype_name):
+        exactly_same_pooltype = None
+        try:
+            exactly_same_pooltype = PoolType.objects.filter(id = pooltype_id, name=pooltype_name)
+        except:
+            pass
+        return exactly_same_pooltype
+
+    @classmethod
+    def get_same_pooltype_in_database(cls, pooltype_name):
+        same_pooltype = None
+        try:
+            same_pooltype = PoolType.objects.filter(name=pooltype_name)
+        except:
+            pass
+        return same_pooltype
+
 class Pool (models.Model, HelperMixins):
 
     name = models.CharField(max_length = 50)

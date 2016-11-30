@@ -140,12 +140,12 @@ class transfer(View):
         form = GroupOwnerForm_Transfer(request.POST)
         if form.is_valid():
 
-            if form.data['id'] == form.data['new_groupowner_id']:
+            if form.data['new_groupowner_id'] == groupowner_id:
                 modelstate = 'Error: New groupowner is same as old groupower!'
                 view_model = Transfer_ViewModel.get_transfer_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
                 return render(request, self.template_name, view_model)
 
-            groupowner_poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, form.data['id'])               
+            groupowner_poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)               
             modelstate = PoolGroup.transfer_group_ownership(groupowner_poolgroups, form.data['new_groupowner_id'], modelstate)
             return HttpResponseRedirect(reverse('groupowner:index', args=(),
                                                     kwargs = {'modelstate':modelstate,

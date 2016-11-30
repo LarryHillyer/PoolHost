@@ -194,12 +194,6 @@ class SuperUser_Index(Index_Pagination_ViewModel):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
-        """
-        if poolgroup_id != 0:
-            poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)
-            groupowner_id = poolgroup.groupowner_id
-        """
-
         groupowner_id, poolgroup_id, poolowners = SuperUser_Index.get_viewmodel_parameters_by_state(filter, poolgroup_id, groupowner_id)
         
         groupowners = GroupOwner.get_all_items(GroupOwner)
@@ -241,10 +235,8 @@ class SuperUser_Index(Index_Pagination_ViewModel):
 
         elif filter == 3:
 
-            if groupowner_id == 0:     
-                groupowners = GroupOwner.get_all_items(GroupOwner)
-                groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)                       
-
+            if groupowner_id == 0:
+                groupowner_id = PoolGroup.get_item_by_id(PoolGroup,poolgroup_id).groupowner_id
 
             poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
             poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)

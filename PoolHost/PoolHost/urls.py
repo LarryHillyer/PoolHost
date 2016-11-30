@@ -45,6 +45,8 @@ urlpatterns = [
 
     url(r'^superuser/', include('superuser.urls')),
     url(r'^groupowner/', include('groupowner.urls')),
+    url(r'^pooltype/', include('pooltype.urls')),
+
 
     url(r'^poolgroup/', include('poolgroup.urls')),
     url(r'^poolowner/', include('poolowner.urls')),

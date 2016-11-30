@@ -119,7 +119,7 @@ class create(View):
             poolgroup = PoolGroup(name = form.data['name'], groupowner_id = form.data['groupowner_id'])
             modelstate = PoolGroup.add_item(PoolGroup, poolgroup)
 
-            if modelstate.split(':')[0] != 'Error':
+            if modelstate.split(':')[0] != 'Success':
                 return HttpResponseRedirect(reverse('poolgroup:create', args=(),
                                             kwargs = {'modelstate':modelstate,
                                                         'groupowner_id': groupowner_id,
@@ -252,7 +252,7 @@ class edit(View):
             poolgroup.groupowner_id = form.data['groupowner_id']
             modelstate = PoolGroup.edit_item(PoolGroup, poolgroup)
 
-            if modelstate.split(':')[0] != 'Error':
+            if modelstate.split(':')[0] != 'Success':
 
                 return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
                                                     kwargs = {'modelstate': modelstate,
@@ -318,8 +318,8 @@ class transfer(View):
         if poolgroup_id == 0:
             return HttpResponseForbidden('<h1> Bad Request </h1>')            
 
-        poolgroup_id = int(request.POST['id'])
-        groupowner_id = int(request.POST['groupowner_id'])
+        poolgroup_id = int(poolgroup_id)
+        groupowner_id = int(groupowner_id)
         filter = int(request.POST['filter'])
 
         form = PoolGroupForm_SuperUser_Transfer(request.POST)
@@ -327,7 +327,7 @@ class transfer(View):
 
             poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)
               
-            if poolgroup.groupowner_id == int(form.data['groupowner_id']):
+            if form.data['new_groupowner_id'] == poolgroup.groupowner_id:
 
                 modelstate = 'Error: New groupowner is same as old groupower!'
 
@@ -340,21 +340,19 @@ class transfer(View):
                                                                     'groupowner_id': groupowner_id,
                                                                     'filter': filter}))
 
-            poolgroup = PoolGroup.get_items_by_id(PoolGroup, poolgroup.id)
+            modelstate = PoolGroup.transfer_group_ownership([poolgroup], form.data['new_groupowner_id'], modelstate)
 
-            modelstate = PoolGroup.transfer_group_ownership(poolgroup, form.data['groupowner_id'], modelstate)
-
-            if modelstate.split(':')[0] != 'Error':
+            if modelstate.split(':')[0] != 'Success':
 
                 return HttpResponseRedirect(reverse('poolgroup:transfer', args=(),
                                             kwargs = {'modelstate':modelstate,
                                                         'poolgroup_id': poolgroup_id,
-                                                        'groupowner_id': poolgroup_id,
+                                                        'groupowner_id': groupowner_id,
                                                         'filter' : filter}))
 
             return HttpResponseRedirect(reverse('poolgroup:index', args=(),
                                                     kwargs = {'modelstate':modelstate,
-                                                                'groupowner_id': form.data['groupowner_id'],
+                                                                'groupowner_id': form.data['new_groupowner_id'],
                                                                 'filter': form.data['filter']}))
 
         else:

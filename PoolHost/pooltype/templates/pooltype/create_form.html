@@ -1,0 +1,6 @@
+﻿        <form action="{% url form_url %}" method="post">
+            {% csrf_token %}
+            <div class="col-lg-12">
+                {% include form_html %}
+            </div>
+        </form>
