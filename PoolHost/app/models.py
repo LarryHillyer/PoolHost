@@ -13,6 +13,25 @@ class CronJobType (models.Model, HelperMixins):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def get_exactly_same_cronjobtype(cls, cronjobtype_id, cronjobtype_name):
+        exactly_same_cronjobtype = None
+        try:
+            exactly_same_cronjobtype = PoolType.objects.filter(id = cronjobtype_id, name=cronjobtype_name)
+        except:
+            pass
+        return exactly_same_cronjobtype
+
+    @classmethod
+    def get_same_cronjobtype_in_database(cls, cronjobtype_name):
+        same_cronjobtype = None
+        try:
+            same_cronjobtype = PoolType.objects.filter(name=cronjobtype_name)
+        except:
+            pass
+        return same_cronjobtype
+
+
 class CronJob (models.Model, HelperMixins):
 
     name = models.CharField(max_length = 50)
