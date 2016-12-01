@@ -18,7 +18,8 @@ class BaseViewModel(object):
                             'modelstate': modelstate,
                             'modelstate_html': 'app/modelstatus.html' }
 
-class Index_ViewModel(BaseViewModel):
+
+class Table_ViewModel(BaseViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, groupowners, filter):
         
@@ -135,7 +136,7 @@ class Delete_ViewModel(DescriptiveList_ViewModel):
         self.viewmodel['delete_form'] = 'groupowner/delete_form.html'
 
 
-class SuperUser_Index(Index_ViewModel):
+class SuperUser_Index(Table_ViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, groupowners, filter):
         

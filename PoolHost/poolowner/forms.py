@@ -1,10 +1,11 @@
 from django import forms
 from django.forms import ModelForm
 from django.db import models
+
 from app.models import PoolOwner
 from app.models import GroupOwner_Choices, PoolGroup_Choices, PoolOwner_Choices
 
-class PoolOwnerForm_SuperUser_Create(ModelForm):
+class PoolOwnerForm_Create(ModelForm):
     
     name = forms.CharField(max_length = 100,
                             widget = forms.TextInput({
@@ -45,25 +46,3 @@ class PoolOwnerForm_Transfer(ModelForm):
     class Meta:
         model = PoolOwner
         fields = ['name']
-
-
-class PoolOwnerForm_GroupOwner_Create(ModelForm):
-
-    name = forms.CharField(max_length = 100,
-                            widget = forms.TextInput({
-                                    'class':'form-control',
-                                    'placeholder': 'Enter Pool Owner Name'}))
-
-    poolgroup_id = forms.ChoiceField(choices = PoolGroup_Choices.make_poolgroup_choices,
-                            widget = forms.Select({'class':'form-control'}))    
-    
-    groupowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices, required = False,
-                            widget = forms.Select({'class':'form-control',
-                                                    'disabled': 'disabled'}))
-    
-    filter = forms.IntegerField(widget = forms.HiddenInput())
-                        
-    class Meta:
-        model = PoolOwner
-        fields = [ 'name', 'poolgroup_id', 'groupowner_id']
-

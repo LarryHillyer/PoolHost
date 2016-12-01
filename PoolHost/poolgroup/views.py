@@ -15,8 +15,7 @@ from poolgroup.viewmodels import SuperUser_Index,  SuperUser_Create, SuperUser_E
 from poolgroup.viewmodels import GroupOwner_Index, GroupOwner_Create, GroupOwner_Edit, GroupOwner_Details
 from poolgroup.viewmodels import User_Delete
 
-from poolgroup.forms import PoolGroupForm_SuperUser_Create, PoolGroupForm_SuperUser_Edit, PoolGroupForm_SuperUser_Transfer
-from poolgroup.forms import PoolGroupForm_GroupOwner_Create, PoolGroupForm_GroupOwner_Edit
+from poolgroup.forms import PoolGroupForm_Create, PoolGroupForm_Edit, PoolGroupForm_Transfer
 
 class index(View):
 
@@ -70,14 +69,6 @@ class create(View):
             viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title,  
                 modelstate, filter, groupowner_id)
 
-        '''
-        if viewmodel['modelstate'].split(':')[0] == 'Error':
-            return HttpResponseRedirect(reverse('poolgroup:index', args=(),
-                                        kwargs = {'modelstate':viewmodel['modelstate'],
-                                                    'groupowner_id': groupowner_id,
-                                                    'filter' : filter}))
-        '''
-
         return render(request, self.template_name, viewmodel)
 
     def post(self, request,  groupowner_id = 0, filter = 0):
@@ -94,10 +85,7 @@ class create(View):
         groupowner_id = int(request.POST['groupowner_id'])
         filter = int(request.POST['filter'])
 
-        if site_user.is_superuser:
-            form = PoolGroupForm_SuperUser_Create(request.POST)
-        if site_user.is_groupowner and site_user.is_superuser != True:
-            form = PoolGroupForm_GroupOwner_Create(request.POST)
+        form = PoolGroupForm_Create(request.POST)
             
         if form.is_valid():
             same_poolgroup = PoolGroup.get_same_poolgroup_in_database(form.data['name'], form.data['groupowner_id'])
@@ -164,12 +152,6 @@ class edit(View):
         else:
             viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user, self.title, modelstate, poolgroup_id, filter, groupowner_id)
 
-        '''
-        if viewmodel['modelstate'].split(':')[0] == 'Error':
-            return HttpResponseRedirect(reverse('poolgroup:index', args=(),
-                                        kwargs = {'modelstate':viewmodel['modelstate']}))
-        '''
-
         return render(request, self.template_name, viewmodel)
 
     def post(self, request, poolgroup_id = 0, groupowner_id = 0, filter = 0):
@@ -187,10 +169,7 @@ class edit(View):
         groupowner_id = int(request.POST['groupowner_id'])
         filter = int(request.POST['filter'])
 
-        if site_user.is_superuser:
-            form = PoolGroupForm_SuperUser_Edit(request.POST)
-        else:
-            form = PoolGroupForm_GroupOwner_Edit(request.POST)
+        form = PoolGroupForm_Edit(request.POST)
 
         if form.is_valid():
 
@@ -322,7 +301,8 @@ class transfer(View):
         groupowner_id = int(groupowner_id)
         filter = int(request.POST['filter'])
 
-        form = PoolGroupForm_SuperUser_Transfer(request.POST)
+        form = PoolGroupForm_Transfer(request.POST)
+
         if form.is_valid():
 
             poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)

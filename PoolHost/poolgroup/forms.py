@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from django.db import models
 from app.models import PoolGroup, GroupOwner_Choices, GroupOwner
 
-class PoolGroupForm_SuperUser_Create(ModelForm):
+class PoolGroupForm_Create(ModelForm):
     
     name = forms.CharField(max_length = 100,
                             widget = forms.TextInput({
@@ -19,7 +19,7 @@ class PoolGroupForm_SuperUser_Create(ModelForm):
         model = PoolGroup
         fields = ['name', 'groupowner_id']
 
-class PoolGroupForm_SuperUser_Edit(ModelForm):
+class PoolGroupForm_Edit(ModelForm):
 
     id = forms.IntegerField(widget = forms.HiddenInput({}))
    
@@ -37,7 +37,7 @@ class PoolGroupForm_SuperUser_Edit(ModelForm):
         model = PoolGroup
         fields = ['id', 'name', 'groupowner_id']
 
-class PoolGroupForm_SuperUser_Transfer(ModelForm):
+class PoolGroupForm_Transfer(ModelForm):
 
     name = forms.CharField(max_length = 100, required = False,
                         widget = forms.TextInput({
@@ -58,36 +58,4 @@ class PoolGroupForm_SuperUser_Transfer(ModelForm):
         model = PoolGroup
         fields = ['name']
 
-class PoolGroupForm_GroupOwner_Create(ModelForm):
-
-   
-    name = forms.CharField(max_length = 100,
-                            widget = forms.TextInput({
-                                    'class':'form-control',
-                                    'placeholder': 'Enter Pool Group Name'}))
-    
-    groupowner_id = forms.IntegerField(widget = forms.HiddenInput())
-    
-    filter = forms.IntegerField(widget = forms.HiddenInput())
-                        
-    class Meta:
-        model = PoolGroup
-        fields = [ 'name', 'groupowner_id']
-
-class PoolGroupForm_GroupOwner_Edit(ModelForm):
-
-    id = forms.IntegerField(widget = forms.HiddenInput({}))
-   
-    name = forms.CharField(max_length = 100,
-                            widget = forms.TextInput({
-                                    'class':'form-control',
-                                    'placeholder': 'Enter Pool Group Name'}))
-    
-    groupowner_id = forms.IntegerField(widget = forms.HiddenInput())
-
-    filter = forms.IntegerField(widget = forms.HiddenInput())
-                        
-    class Meta:
-        model = PoolGroup
-        fields = ['id', 'name', 'groupowner_id']
 

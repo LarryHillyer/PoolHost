@@ -6,9 +6,7 @@ from app.models import SiteUser, PoolOwner, PoolGroup, GroupOwner, SuperUser
 from app.models import GroupOwner_Choices, PoolGroup_Choices, PoolOwner_Choices
 from app.mixins import HelperMixins
 
-from poolowner.forms import PoolOwnerForm_SuperUser_Create
-from poolowner.forms import PoolOwnerForm_GroupOwner_Create
-from poolowner.forms import PoolOwnerForm_Transfer
+from poolowner.forms import PoolOwnerForm_Create, PoolOwnerForm_Transfer
 
 class BaseViewModel(object):
 
@@ -22,7 +20,7 @@ class BaseViewModel(object):
                             'modelstate_html': 'app/modelstatus.html' }
 
 
-class Index_ViewModel(BaseViewModel):
+class Table_ViewModel(BaseViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, poolowners, filter,
         poolgroup_id, groupowner_id):
@@ -96,7 +94,7 @@ class DescriptiveList_ViewModel(BaseViewModel):
         self.viewmodel['index_url'] = 'poolowner:index'
 
 
-class Index_Pagination_ViewModel(Index_ViewModel):
+class Pagination_Routing_ViewModel(Table_ViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, poolowners, poolgroups, groupowners, filter,
         poolgroup_id, groupowner_id):
@@ -104,18 +102,19 @@ class Index_Pagination_ViewModel(Index_ViewModel):
         super().__init__(site_user, title, modelstate, modelsuccess_bool, poolowners, filter,
             poolgroup_id, groupowner_id)
  
-        self.viewmodel['pagination_html'] = 'app/user_navigation.html'  
+        self.viewmodel['pagination_routing_html'] = 'app/pagination_routing.html'  
 
-        self.viewmodel['superuser_pagination_html'] = 'poolowner/superuser_pagination.html' 
-        self.viewmodel['groupowner_pagination_html'] = 'poolowner/groupowner_pagination.html'
+        self.viewmodel['superuser_pagination_list_html'] = 'poolowner/superuser_pagination_list.html' 
+        self.viewmodel['groupowner_pagination_list_html'] = 'poolowner/groupowner_pagination_list.html'
+
+        self.viewmodel['shared_groupowner_pagination_list_html'] = 'app/shared_groupowner_pagination_list.html'
+        self.viewmodel['shared_poolgroup_pagination_list_html'] = 'app/shared_poolgroup_pagination_list.html'
+        self.viewmodel['shared_poolowner_pagination_list_html'] = 'app/shared_poolowner_pagination_list.html'
 
         self.viewmodel['groupowner_pagination_link_html'] = 'poolowner/groupowner_pagination_link.html'
         self.viewmodel['poolgroup_pagination_link_html'] = 'poolowner/poolgroup_pagination_link.html'
         self.viewmodel['poolowner_pagination_link_html'] = 'poolowner/poolowner_pagination_link.html'
 
-        self.viewmodel['shared_groupowner_pagination_html'] = 'app/shared_groupowner_pagination.html'
-        self.viewmodel['shared_poolgroup_pagination_html'] = 'app/shared_poolgroup_pagination.html'
-        self.viewmodel['shared_poolowner_pagination_html'] = 'app/shared_poolowner_pagination.html'
 
         self.viewmodel['index_url'] = 'poolowner:index'
                              
@@ -176,7 +175,8 @@ class Delete_ViewModel(DescriptiveList_ViewModel):
         self.viewmodel['delete_form'] = 'poolowner/delete_form.html'
         self.viewmodel['delete_url'] = 'poolowner:delete'
 
-class SuperUser_Index(Index_Pagination_ViewModel):
+
+class SuperUser_Index(Pagination_Routing_ViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, poolowners, poolgroups, groupowners, filter,
         poolgroup_id, groupowner_id):
@@ -284,7 +284,7 @@ class SuperUser_Create(Create_ViewModel):
         poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
         PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
 
-        form = PoolOwnerForm_SuperUser_Create(initial={'poolgroup_id': poolgroup_id,
+        form = PoolOwnerForm_Create(initial={'poolgroup_id': poolgroup_id,
                                                         'groupowner_id' : groupowner_id,
                                                         'filter' : filter})
 
@@ -348,7 +348,7 @@ class SuperUser_Details(Details_ViewModel):
         return viewmodel
 
 
-class GroupOwner_Index(Index_Pagination_ViewModel):
+class GroupOwner_Index(Pagination_Routing_ViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, poolowners, poolgroups, groupowners, 
         filter, poolgroup_id, groupowner_id):
@@ -428,9 +428,11 @@ class GroupOwner_Create(Create_ViewModel):
         poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
         PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
 
-        form = PoolOwnerForm_GroupOwner_Create(initial = {'poolgroup_id': poolgroup_id,
+        form = PoolOwnerForm_Create(initial = {'poolgroup_id': poolgroup_id,
                                                            'groupowner_id' : groupowner_id,
                                                            'filter': filter})
+
+        form.fields['groupowner_id'].widget.attrs['disabled'] = 'disabled'
 
         submit_label = 'Create'
         viewmodel = GroupOwner_Create(site_user, title, modelstate, modelsuccess_bool, form, filter, 

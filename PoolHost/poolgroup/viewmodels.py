@@ -5,9 +5,7 @@ from django.db import models
 from app.models import SiteUser, PoolGroup, GroupOwner, SuperUser, GroupOwner_Choices, PoolGroup_Choices
 from app.mixins import HelperMixins
 
-from poolgroup.forms import PoolGroupForm_SuperUser_Create, PoolGroupForm_SuperUser_Edit, PoolGroupForm_SuperUser_Transfer
-from poolgroup.forms import PoolGroupForm_GroupOwner_Create, PoolGroupForm_GroupOwner_Edit
-
+from poolgroup.forms import PoolGroupForm_Create, PoolGroupForm_Edit, PoolGroupForm_Transfer
 
 class BaseViewModel(object):
 
@@ -21,7 +19,7 @@ class BaseViewModel(object):
                             'modelstate_html': 'app/modelstatus.html' }
 
 
-class Index_ViewModel(BaseViewModel):
+class Table_ViewModel(BaseViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, poolgroups, filter,
         groupowner_id):
@@ -91,7 +89,7 @@ class DescriptiveList_ViewModel(BaseViewModel):
         self.viewmodel['index_url'] = 'poolgroup:index'
 
 
-class Index_Pagination_ViewModel(Index_ViewModel):
+class Pagination_Routing_ViewModel(Table_ViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, poolgroups, groupowners, filter,
         groupowner_id):
@@ -99,18 +97,19 @@ class Index_Pagination_ViewModel(Index_ViewModel):
         super().__init__(site_user, title, modelstate, modelsuccess_bool, poolgroups, filter,
             groupowner_id)
  
-        self.viewmodel['pagination_html'] = 'app/user_navigation.html'  
+        self.viewmodel['pagination_routing_html'] = 'app/pagination_routing.html'  
 
-        self.viewmodel['superuser_pagination_html'] = 'poolgroup/superuser_pagination.html' 
-        self.viewmodel['groupowner_pagination_html'] = 'poolgroup/groupowner_pagination.html'
+        self.viewmodel['superuser_pagination_list_html'] = 'poolgroup/superuser_pagination_list.html' 
+        self.viewmodel['groupowner_pagination_list_html'] = 'poolgroup/groupowner_pagination_list.html'
+
+        self.viewmodel['shared_groupowner_pagination_list_html'] = 'app/shared_groupowner_pagination_list.html'
+        self.viewmodel['shared_poolgroup_pagination_list_html'] = 'app/shared_poolgroup_pagination_list.html'
+        self.viewmodel['shared_poolowner_pagination_list_html'] = 'app/shared_poolowner_pagination_list.html'
 
         self.viewmodel['groupowner_pagination_link_html'] = 'poolgroup/groupowner_pagination_link.html'
         self.viewmodel['poolgroup_pagination_link_html'] = 'poolgroup/poolgroup_pagination_link.html'
         self.viewmodel['poolowner_pagination_link_html'] = 'poolgroup/poolowner_pagination_link.html'
 
-        self.viewmodel['shared_groupowner_pagination_html'] = 'app/shared_groupowner_pagination.html'
-        self.viewmodel['shared_poolgroup_pagination_html'] = 'app/shared_poolgroup_pagination.html'
-        self.viewmodel['shared_poolowner_pagination_html'] = 'app/shared_poolowner_pagination.html'
 
         self.viewmodel['index_url'] = 'poolgroup:index'
                              
@@ -188,7 +187,7 @@ class Delete_ViewModel(DescriptiveList_ViewModel):
         self.viewmodel['delete_form'] = 'poolgroup/delete_form.html'
 
 
-class SuperUser_Index(Index_Pagination_ViewModel):
+class SuperUser_Index(Pagination_Routing_ViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, poolgroups, groupowners, filter,
         groupowner_id):
@@ -266,7 +265,7 @@ class SuperUser_Create(Create_ViewModel):
         groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
         GroupOwner_Choices.get_groupowner_choices()
 
-        form = PoolGroupForm_SuperUser_Create(initial={'groupowner_id' : groupowner_id,
+        form = PoolGroupForm_Create(initial={'groupowner_id' : groupowner_id,
                                                         'filter' : filter})
 
         submit_label = 'Create'
@@ -292,9 +291,9 @@ class SuperUser_Edit(Edit_ViewModel):
 
         groupowners = GroupOwner.get_all_items(GroupOwner)
         groupowner_id = poolgroup.groupowner_id
-        GroupOwner_Choices.get_groupowner_choices(groupowner_id)
+        GroupOwner_Choices.get_groupowner_choices()
         
-        form = PoolGroupForm_SuperUser_Edit(instance = poolgroup, initial = {'filter':filter})
+        form = PoolGroupForm_Edit(instance = poolgroup, initial = {'filter':filter})
 
         submit_label = 'Edit'
         viewmodel = SuperUser_Edit(site_user, title, modelstate, modelsuccess_bool, form, filter, 
@@ -327,7 +326,7 @@ class SuperUser_Transfer(Transfer_ViewModel):
         GroupOwner_Choices.get_groupowner_choices_2(groupowner_id)
         groupowner_choices = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
 
-        form = PoolGroupForm_SuperUser_Transfer(initial = {'filter':filter,
+        form = PoolGroupForm_Transfer(initial = {'filter':filter,
                                                             'name': poolgroup.name,
                                                             'groupowner_name': poolgroup.groupowner.name,
                                                             'new_groupowner_id': groupowner_choices[0].groupowner_id})
@@ -360,7 +359,7 @@ class SuperUser_Details(Details_ViewModel):
         return viewmodel
 
 
-class GroupOwner_Index(Index_ViewModel):
+class GroupOwner_Index(Table_ViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, poolgroups, filter,
         groupowner_id):
@@ -398,8 +397,10 @@ class GroupOwner_Create(Create_ViewModel):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
-        form = PoolGroupForm_GroupOwner_Create(initial = {'groupowner_id' : groupowner_id,
+        form = PoolGroupForm_Create(initial = {'groupowner_id' : groupowner_id,
                                                            'filter': filter})
+
+        form.fields['groupowner_id'].widget.attrs['disabled'] = 'disabled'
 
         submit_label = 'Create'
         viewmodel = GroupOwner_Create(site_user, title, modelstate, modelsuccess_bool, form, filter, 
@@ -424,9 +425,11 @@ class GroupOwner_Edit(Edit_ViewModel):
 
         poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)
         
-        form = PoolGroupForm_GroupOwner_Edit(instance = poolgroup, 
+        form = PoolGroupForm_Edit(instance = poolgroup, 
                                                 initial = {'groupowner_id': groupowner_id,
                                                             'filter': filter})
+
+        form.fields['groupowner_id'].widget.attrs['disabled'] = 'disabled'
 
         submit_label = 'Edit'
         viewmodel = GroupOwner_Edit(site_user, title, modelstate, modelsuccess_bool, form, filter, 

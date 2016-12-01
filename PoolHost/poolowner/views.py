@@ -17,9 +17,7 @@ from poolowner.viewmodels import SuperUser_Index, SuperUser_Create, SuperUser_Tr
 from poolowner.viewmodels import GroupOwner_Index, GroupOwner_Create, GroupOwner_Transfer, GroupOwner_Details
 from poolowner.viewmodels import User_Delete
 
-from poolowner.forms import PoolOwnerForm_SuperUser_Create  
-from poolowner.forms import PoolOwnerForm_GroupOwner_Create
-from poolowner.forms import PoolOwnerForm_Transfer
+from poolowner.forms import PoolOwnerForm_Create, PoolOwnerForm_Transfer
 
 class index(View):
 
@@ -103,10 +101,7 @@ class create(View):
 
         PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
 
-        if site_user.is_superuser:
-            form = PoolOwnerForm_SuperUser_Create(request.POST)
-        elif site_user.is_groupowner and site_user.is_superuser != True:
-            form = PoolOwnerForm_GroupOwner_Create(request.POST)
+        form = PoolOwnerForm_Create(request.POST)
         
         if form.is_valid():
 

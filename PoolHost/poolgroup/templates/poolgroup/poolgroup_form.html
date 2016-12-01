@@ -1,20 +1,7 @@
 ﻿
 <div class="form-horizontal">
 
-    {% if site_user.is_superuser %}
-        {{form.filter}}
-    {% endif %}
-
-    {% if site_user.is_groupowner and not site_user.is_superuser%}
-        {{form.groupowner_id}}
-        {{form.filter}}
-    {% endif %}
-
-    {% if site_user.is_superuser and form_label_submit == 'Edit' %}
-        {{form.id}}
-    {% elif site_user.is_groupowner and not site_user.is_superuser and form_label_submit == 'Edit' %}
-        {{form.id}}
-    {% endif %}
+    {{form.filter}}
 
     <div class="form-group">
         <label class="control-label col-md-2" for="id_name">{{form_label_name}}</label>
@@ -23,14 +10,13 @@
         </div>
     </div>
 
-    {% if site_user.is_superuser %}
+
     <div class="form-group">
         <label class="control-label col-md-2" for="id_name">{{form_label_groupowner}}</label>
         <div class="col-md-10">
             {{form.groupowner_id}}        
         </div>
     </div>
-    {% endif %}
 
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">

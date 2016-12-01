@@ -1,24 +1,24 @@
 ﻿<nav aria-label="User Navigation">
 
     {% if site_user.is_superuser %}
-        {% include superuser_pagination_html %}
+        {% include superuser_pagination_list_html %}
     {% elif site_user.is_groupowner and not site_user.is_superuser %}
-        {% include groupowner_pagination_html %}
+        {% include groupowner_pagination_list_html %}
     {% endif %}
 
     
     {% if filter == 0 %}
 
     {% elif filter == 1 and site_user.is_superuser %}             
-        {% include shared_groupowner_pagination_html %}
+        {% include shared_groupowner_pagination_list_html %}
     {% elif filter == 1 and site_user.is_groupowner and not site_user.is_superuser %}
-        {% include shared_poolgroup_pagination_html %}
+        {% include shared_poolgroup_pagination_list_html %}
     {% elif filter == 2 or filter == 3 %}
         <span>    </span>
-        {% include shared_poolgroup_pagination_html %}
+        {% include shared_poolgroup_pagination_list_html %}
     {% elif filter == 4 or filter == 5 or filter == 6 or filter == 7 %}
         <span>    </span>
-        {% include shared_poolowner_pagination_html %}
+        {% include shared_poolowner_pagination_list_html %}
     {% endif %}
     
 

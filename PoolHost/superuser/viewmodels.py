@@ -7,6 +7,7 @@ from app.mixins import HelperMixins
 
 from superuser.forms import SuperUserForm_Create
 
+
 class BaseViewModel(object):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool):
@@ -18,7 +19,8 @@ class BaseViewModel(object):
                             'modelstate': modelstate,
                             'modelstate_html': 'app/modelstatus.html' }
 
-class Index_ViewModel(BaseViewModel):
+
+class Table_ViewModel(BaseViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, superusers):
         
@@ -116,7 +118,7 @@ class Delete_ViewModel(DescriptiveList_ViewModel):
         return viewmodel
 
 
-class SuperUser_Index(Index_ViewModel):
+class SuperUser_Index(Table_ViewModel):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, superusers):
         
