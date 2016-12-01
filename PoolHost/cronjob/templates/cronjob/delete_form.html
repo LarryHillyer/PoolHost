@@ -1,0 +1,8 @@
+﻿<form action="{% url delete_url item.id %}" method="post">                          
+    {% csrf_token %}
+    <div class="form-actions no-color">
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <span>  |  </span>
+        <a href="{% url index_url %}">Index</a>
+    </div>
+</form>

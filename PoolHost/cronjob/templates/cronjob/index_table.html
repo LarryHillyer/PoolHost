@@ -1,0 +1,26 @@
+﻿<table class="table">
+    <tr>
+        <th>
+            {{header_label_item}}
+        </th>
+
+        <th></th>
+    </tr>
+
+    {% for  item in items %}
+    <tr>
+        <td>
+            {{item.name}}
+        </td>
+
+        <td>
+            <a href="{% url edit_url item.id %}">Edit</a>
+            <span>  |  </span>
+            <a href="{% url details_url item.id %}">Details</a>
+            <span>  |  </span>
+            <a href="{% url delete_url item.id %}">Delete</a>
+
+        </td>
+    </tr>
+    {% endfor %}
+</table>

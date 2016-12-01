@@ -31,6 +31,38 @@ class CronJobType (models.Model, HelperMixins):
             pass
         return same_cronjobtype
 
+class CronJobType_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    cronjobtype_id = models.IntegerField()
+
+    @classmethod
+    def get_cronjobtype_choices(cls, cronjobtype_id = 0):
+
+        try:
+
+            if cronjobtype_id == 0:
+                cronjobtypes = CronJobType.get_all_items(CronJobType)
+            else:
+                cronjobtypes = CronJobType.get_items_by_id(CronJobType, cronjobtype_id)
+
+            cronjobtype_choices = CronJobType_Choices.get_all_items(CronJobType_Choices)
+            if cronjobtype_choices.count() > 0:               
+                cronjobtype_choices.delete()
+            for cronjobtype in cronjobtypes:
+                cronjobtype_choice = CronJobType_Choices(name = cronjobtype.name, cronjobtype_id = cronjobtype.id)
+                CronJobType_Choices.add_item(CronJobType_Choices, cronjobtype_choice)
+        except:
+            pass
+
+
+    @classmethod
+    def make_cronjobtype_choices(cls):
+        cronjobtype_choices_1 = CronJobType_Choices.get_all_items(CronJobType_Choices)
+        cronjobtype_choices = []
+        for cronjobtype_choice in cronjobtype_choices_1:
+            cronjobtype_choices.append((cronjobtype_choice.cronjobtype_id, cronjobtype_choice.name))
+        return cronjobtype_choices
 
 class CronJob (models.Model, HelperMixins):
 
@@ -40,6 +72,26 @@ class CronJob (models.Model, HelperMixins):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def get_exactly_same_cronjob(cls, cronjob_id, cronjob_name, cronjob_cronjobtype_id):
+        exactly_same_cronjob = None
+        try:
+            exactly_same_cronjob = CronJob.objects.filter(id = cronjob_id, name=cronjob_name, 
+                cronjobtype_id = cronjob_cronjobtype_id)
+        except:
+            pass
+        return exactly_same_cronjob
+
+    @classmethod
+    def get_same_cronjob_in_database(cls, cronjob_name):
+        same_cronjob = None
+        try:
+            same_cronjob = CronJob.objects.filter(name=cronjob_name)
+        except:
+            pass
+        return same_cronjob
+
 
 class SiteUser(models.Model, HelperMixins):
     

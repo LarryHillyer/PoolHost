@@ -100,7 +100,7 @@ class Edit_ViewModel(Form_ViewModel):
         self.viewmodel['form_html'] = 'cronjobtype/cronjobtype_form.html'
         self.viewmodel['form_url'] = 'cronjobtype:edit'
 
-        self.viewmodel['form_label_name'] = 'Cron Type'
+        self.viewmodel['form_label_name'] = 'Cron Job Type'
 
 class Details_ViewModel(DescriptiveList_ViewModel):
 

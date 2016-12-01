@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'pooltype',
     'cronjobtype',
+    'cronjob',
     # Add your apps here to enable them
     'django.contrib.admin',
     'django.contrib.auth',
