@@ -95,9 +95,15 @@ class create(View):
         if site_user.is_superuser != True and site_user.is_groupowner != True:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        poolgroup_id = int(request.POST['poolgroup_id'])
-        groupowner_id = int(request.POST['groupowner_id'])
-        filter = int(request.POST['filter'])
+        if site_user.is_superuser:
+            poolgroup_id = int(request.POST['poolgroup_id'])       
+            groupowner_id = int(request.POST['groupowner_id'])
+            filter = int(request.POST['filter'])
+
+        elif site_user.is_groupowner and not site_user.is_superuser:
+            poolgroup_id = int(request.POST['poolgroup_id'])       
+            groupowner_id = int(groupowner_id)
+            filter = int(request.POST['filter'])
 
         PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
 
@@ -114,28 +120,21 @@ class create(View):
                 poolowners = poolowners.filter(name = form.data['name'])
 
                 if poolowners.count() == 0:
-
-                    user_id = SiteUser.get_item_by_name(SiteUser,form.data['name']).user_id
-
+                    new_poolowner = SiteUser.get_item_by_name(SiteUser,form.data['name'])
+                    user_id = new_poolowner.user_id
+                    SiteUser.make_siteuser_poolowner(new_poolowner)
                     poolowner = PoolOwner(name = form.data['name'], poolgroup_id = form.data['poolgroup_id'], user_id = user_id)
                     modelstate = PoolOwner.add_item(PoolOwner, poolowner)
 
                     return HttpResponseRedirect(reverse('poolowner:index', args = (),
                                                         kwargs = {'modelstate': modelstate,
-                                                                    'poolgroup_id': form.data['poolgroup_id'],
-                                                                    'groupowner_id': form.data['groupowner_id'],
-                                                                    'filter' : form.data['filter']}))
+                                                                    'poolgroup_id': poolgroup_id,
+                                                                    'groupowner_id': groupowner_id,
+                                                                    'filter' : filter}))
 
                 else:
 
                     modelstate = 'Error: Pool Owner, ' + form.data['name'] + ' is already a PoolOwner!!!'
-
-                    if site_user.is_superuser:
-                        viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
-                            modelstate, filter, poolgroup_id, groupowner_id)
-                    else:
-                        viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title, 
-                            modelstate, filter, poolgroup_id, groupowner_id)
 
                     return HttpResponseRedirect(reverse('poolowner:create', args = (),
                                                         kwargs = {'modelstate': modelstate,
@@ -144,27 +143,15 @@ class create(View):
                                                                     'filter' : filter}))
             else:
                 modelstate = 'Error: Pool Owner, ' + form.data['name'] + ' is not a vaild site username!'
-                if site_user.is_superuser:
-                    viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
-                        modelstate, filter, poolgroup_id, groupowner_id)
-                else:
-                    viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title, 
-                        modelstate, filter, poolgroup_id, groupowner_id)
 
-                    return HttpResponseRedirect(reverse('poolowner:create', args = (),
-                                                        kwargs = {'modelstate': modelstate,
-                                                                    'poolgroup_id': poolgroup_id,
-                                                                    'groupowner_id': groupowner_id,
-                                                                    'filter' : filter}))
+                return HttpResponseRedirect(reverse('poolowner:create', args = (),
+                                                    kwargs = {'modelstate': modelstate,
+                                                                'poolgroup_id': poolgroup_id,
+                                                                'groupowner_id': groupowner_id,
+                                                                'filter' : filter}))
         
         else:
             modelstate = 'Error: Invalid Data!!! '
-            if site_user.is_superuser:
-                viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
-                    modelstate, filter, poolgroup_id, groupowner_id)
-            else:
-                viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title, 
-                    modelstate, filter, poolgroup_id, groupowner_id)
 
             return HttpResponseRedirect(reverse('poolowner:create', args = (),
                                             kwargs = {'modelstate': modelstate,
@@ -234,7 +221,7 @@ class transfer(View):
             pass
 
 class details(View):
-    title = 'Pool Group - Details'
+    title = 'Pool Owner - Details'
     template_name = 'app/shared_details.html'
 
     def get(self,request, poolowner_id = 0, poolgroup_id = 0, groupowner_id = 0, 
@@ -267,7 +254,7 @@ class details(View):
         return render(request, self.template_name, viewmodel)
 
 class delete(View):
-    title = 'Pool Group - Delete'
+    title = 'Pool Owner - Delete'
     template_name = 'app/shared_delete.html'
 
     def get(self,request, poolowner_id = 0, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
@@ -313,12 +300,13 @@ class delete(View):
         filter = int(filter)
 
         poolowner = PoolOwner.get_item_by_id(PoolOwner, poolowner_id)
-
+        old_poolowner = SiteUser.get_item_by_userid(SiteUser, poolowner.user_id)
+        SiteUser.delete_siteuser_poolowner(old_poolowner)
         modelstate = PoolOwner.delete_item(PoolOwner, poolowner)
 
         return HttpResponseRedirect(reverse('poolowner:index', args=(),
                                     kwargs = {'modelstate': modelstate,
-                                                'poolgroup_id': poolowner_id,
+                                                'poolgroup_id': poolgroup_id,
                                                 'groupowner_id': groupowner_id,
                                                 'filter': filter}))
 

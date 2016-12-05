@@ -1,0 +1,45 @@
+﻿<ul class="pagination pagination-sm custom-page">
+
+    {% if filter == 0 %}
+        <li class="active"><a href="{% url index_url  0 0 0 0%}">No Filter</a></li>
+        <li><a href="{% url index_url 0 0 groupowner_id 1 %}">Grp. Own.</a></li>
+        <li><a href="{% url index_url 0 poolgroup_id 0 2 %}">P. Grp.</a></li>
+        <li><a href="{% url index_url poolowner_id 0 0 4 %}">P. Own.</a></li>
+    {% elif filter == 1 %}
+        <li><a href="{% url index_url 0 0 0 0 %}">No Filter</a></li>
+        <li class="active"><a href="{% url index_url 0 0 0 0 %}">Grp. Own.</a></li>
+        <li><a href="{% url index_url 0 poolgroup_id groupowner_id 3 %}">P. Grp.</a></li>
+        <li><a href="{% url index_url poolowner_id 0 groupowner_id 5 %}">P. Own.</a></li>
+    {% elif filter == 2 %}
+        <li><a href="{% url index_url 0 0 0 0 %}">No Filter</a></li>
+        <li><a href="{% url index_url 0 poolgroup_id groupowner_id 3 %}">Grp. Own.</a></li>
+        <li class="active"><a href="{% url index_url 0 0 0 0 %}">P. Grp.</a></li>
+        <li><a href="{% url index_url poolowner_id poolgroup_id 0 6 %}">P. Own.</a></li>
+    {% elif filter == 3 %}
+        <li><a href="{% url index_url 0 0 0 0 %}">No Filter</a></li>
+        <li class="active"><a href="{% url index_url 0 poolgroup_id 0 2 %}">Grp. Own.</a></li>
+        <li class="active"><a href="{% url index_url 0 0 groupowner_id 1 %}">P. Grp.</a></li>
+        <li><a href="{% url index_url poolowner_id poolgroup_id groupowner_id 7 %}">P. Own.</a></li>
+    {% elif filter == 4 %}
+        <li><a href="{% url index_url  0 0 0 0 %}">No Filter</a></li>
+        <li><a href="{% url index_url poolowner_id 0 groupowner_id 5 %}">Grp. Own.</a></li>
+        <li><a href="{% url index_url poolowner_id poolgroup_id 0 6 %}">P. Grp.</a></li>
+        <li class="active"><a href="{% url index_url 0 0 0 0 %}">P. Own.</a></li>
+    {% elif filter == 5 %}
+        <li><a href="{% url index_url  0 0 0 0 %}">No Filter</a></li>
+        <li class="active"><a href="{% url index_url poolowner_id 0 groupowner_id 4 %}">Grp. Own.</a></li>
+        <li><a href="{% url index_url poolowner_id poolgroup_id groupowner_id 7 %}">P. Grp.</a></li>
+        <li class="active"><a href="{% url index_url 0 0 groupowner_id 1 %}">P. Own.</a></li>
+    {% elif filter == 6 %}
+        <li><a href="{% url index_url  0 0 0 0 %}">No Filter</a></li>
+        <li><a href="{% url index_url poolowner_id poolowner_id groupowner_id 7 %}">Grp. Own.</a></li>
+        <li class="active"><a href="{% url index_url poolowner_id 0 0 4 %}">P. Grp.</a></li>
+        <li class="active"><a href="{% url index_url 0 poolgroup_id 0 2 %}">P. Own.</a></li>
+    {% elif filter == 7 %}
+        <li><a href="{% url index_url  0 0 0 0 %}">No Filter</a></li>
+        <li class="active"><a href="{% url index_url poolowner_id poolgroup_id 0 6 %}">Grp. Own.</a></li>
+        <li class="active"><a href="{% url index_url poolowner_id 0 groupowner_id 5  %}">P. Grp.</a></li>
+        <li class="active"><a href="{% url index_url 0 poolgroup_id groupowner_id 3 %}">P. Own.</a></li>
+    {% endif %}
+
+</ul>

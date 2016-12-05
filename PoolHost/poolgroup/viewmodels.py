@@ -222,27 +222,13 @@ class SuperUser_Index(Pagination_Routing_ViewModel):
 
         elif filter == 1:
 
-            if groupowner_id == 0:     
-                groupowners = GroupOwner.get_all_items(GroupOwner)
-            else:
-                groupowners = GroupOwner.get_items_by_id(GroupOwner, groupowner_id)
-            
-            groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)       
-
-            if groupowner_id != 0:
-                poolgroups = SuperUser_Index.filter_poolgroups(groupowner_id)
+            groupowners = GroupOwner.get_all_items(GroupOwner)
+            if groupowner_id == 0:
+                groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)       
+               
+            poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
 
         return groupowner_id, poolgroups
-
-    @classmethod
-    def filter_poolgroups(cls, groupowner_id = 0, poolgroup_id = 0,):
-
-        if poolgroup_id != 0:
-            poolgroups = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
-        elif groupowner_id != 0:
-            poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
-        
-        return poolgroups
 
 class SuperUser_Create(Create_ViewModel):
 

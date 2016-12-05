@@ -219,19 +219,19 @@ class SuperUser_Index(Pagination_Routing_ViewModel):
 
         elif filter == 1:
 
+            groupowners = GroupOwner.get_all_items(GroupOwner)
             if groupowner_id == 0:     
-                groupowners = GroupOwner.get_all_items(GroupOwner)
-                groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)                       
+                groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
 
-            poolowners = SuperUser_Index.filter_poolowners(groupowner_id, poolgroup_id)
+            poolowners = PoolOwner.get_items_by_groupowner_id(PoolOwner, groupowner_id)
+
 
         elif filter == 2:
-
+            poolgroups = PoolGroup.get_all_items(PoolGroup)
             if poolgroup_id == 0:
-                poolgroups = PoolGroup.get_all_items(PoolGroup)
                 poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
 
-            poolowners = SuperUser_Index.filter_poolowners(groupowner_id, poolgroup_id)
+            poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
 
         elif filter == 3:
 
@@ -239,21 +239,13 @@ class SuperUser_Index(Pagination_Routing_ViewModel):
                 groupowner_id = PoolGroup.get_item_by_id(PoolGroup,poolgroup_id).groupowner_id
 
             poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
-            poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
-            
-            poolowners = SuperUser_Index.filter_poolowners(groupowner_id, poolgroup_id)
+            if poolgroup_id == 0:
+                poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
 
+            poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
+ 
         return groupowner_id, poolgroup_id, poolowners
 
-    @classmethod
-    def filter_poolowners(cls, groupowner_id = 0, poolgroup_id = 0,):
-
-        if poolgroup_id != 0:
-            poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
-        elif groupowner_id != 0:
-            poolowners = PoolOwner.get_items_by_groupowner_id(PoolGroup, groupowner_id)
-        
-        return poolowners
 
 class SuperUser_Create(Create_ViewModel):
 
@@ -309,7 +301,7 @@ class SuperUser_Transfer(Transfer_ViewModel):
 
         poolowner = PoolOwner.get_item_by_id(PoolOwner, poolowner_id)
 
-        PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolowner.poolgroup_id, poolowner.id)
+        PoolOwner_Choices.get_differentpoolowner_choices_by_poolgroup_id(poolowner.poolgroup_id, poolowner.id)
         poolowner_choices = PoolOwner_Choices.get_all_items(PoolOwner_Choices)
         if poolowner_choices.count() == 0:
             viewmodel = {'modelstate':'Error: No other poolowner is in pool group, add a pool owner to pool group first!'}
@@ -386,23 +378,14 @@ class GroupOwner_Index(Pagination_Routing_ViewModel):
 
         elif filter == 1:
 
+            poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
+
             if poolgroup_id == 0:
-                poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
                 poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
 
-            poolowners = GroupOwner_Index.filter_poolowners(groupowner_id, poolgroup_id)
+            poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
 
         return poolgroup_id, poolowners
-
-    @classmethod
-    def filter_poolowners(cls, groupowner_id = 0, poolgroup_id = 0,):
-
-        if poolgroup_id != 0:
-            poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
-        elif groupowner_id != 0:
-            poolowners = PoolOwner.get_items_by_groupowner_id(PoolGroup, groupowner_id)
-        
-        return poolowners
 
 class GroupOwner_Create(Create_ViewModel):
 

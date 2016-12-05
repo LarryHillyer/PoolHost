@@ -17,12 +17,27 @@ class HelperMixins(object):
         return model_cls.objects.filter(poolgroup_id = model_poolgroup_id)
 
     @classmethod
+    def get_items_by_poolowner_id(cls, model_cls, model_poolowner_id):
+        return model_cls.objects.filter(poolowner_id = model_poolowner_id)
+
+    @classmethod
     def get_items_by_name(cls, model_cls, model_name):
         return model_cls.objects.filter(name = model_name)
 
     @classmethod
     def get_items_by_userid(cls, model_cls, model_userid):
         return model_cls.objects.filter(user_id = model_userid)
+
+    @classmethod
+    def get_items_without_dups(cls, model_cls, model_list_with_dups):
+        items_without_dups = []
+        item_names = []
+        for item in model_list_with_dups:
+            if not(item.name in item_names):
+                items_without_dups.append(item)
+                item_names.append(item.name)
+        return items_without_dups
+
 
     @classmethod
     def get_item_by_id(cls, model_cls, model_id):

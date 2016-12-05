@@ -16,7 +16,8 @@ class PoolOwnerForm_Create(ModelForm):
                             widget = forms.Select({'class':'form-control'}))
 
     groupowner_id = forms.ChoiceField(choices = GroupOwner_Choices.make_groupowner_choices,
-                            widget = forms.Select({'class':'form-control'}))
+                            widget = forms.Select({'class':'form-control'}),
+                            required = False)
 
     filter = forms.IntegerField(widget = forms.HiddenInput())
 

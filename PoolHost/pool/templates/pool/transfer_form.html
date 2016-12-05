@@ -1,1 +1,6 @@
-﻿
+﻿<form action="{% url form_url  pool_id poolowner_id poolgroup_id groupowner_id filter %}" method="post">
+    {% csrf_token %}
+    <div class="col-lg-12">
+        {% include form_html %}
+    </div>
+</form>

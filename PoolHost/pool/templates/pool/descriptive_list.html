@@ -1,1 +1,49 @@
-﻿
+﻿<dl class="dl-horizontal">
+
+    <dt>
+        {{item_label_name}}
+    </dt>
+    <dd>
+        {{item.name}}
+    </dd>
+
+    <dt>
+        {{item_label_poolowner}}
+    </dt>
+    <dd>
+        {{item.poolowner.name}}
+    </dd>
+
+    <dt>
+        {{item_label_cronjob}}
+    </dt>
+    <dd>
+        {{item.cronjob.name}}
+    </dd>
+
+    <dt>
+        {{item_label_pooltype}}
+    </dt>
+    <dd>
+        {{item.pooltype.name}}
+    </dd>
+
+    <dt>
+        {{item_label_poolgroup}}
+    </dt>
+
+    <dd>
+        {{item.poolgroup.name}}
+    </dd>
+
+    {% if site_user.is_superuser %}
+    <dt>
+        {{item_label_groupowner}}
+    </dt>
+
+    <dd>
+        {{ item.poolgroup.groupowner.name }}
+    </dd>
+    {% endif %}
+
+</dl>

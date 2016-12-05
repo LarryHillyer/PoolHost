@@ -1,1 +1,51 @@
-﻿
+﻿<table class="table">
+
+    <tr>
+        <th>
+            {{header_label_item}}
+        </th>
+
+        <th>
+            {{header_label_poolgroup}}
+        </th>
+
+        {% if site_user.is_superuser %}
+        <th>
+            {{header_label_groupowner}}
+        </th>                
+        {% endif %}
+
+        <th></th>
+        <th></th>
+    </tr>
+
+    {% for item in items %}
+    <tr>
+        <td>
+            <a href="{% url item_url item.id poolowner_id poolgroup_id groupowner_id filter %}">{{item.name}}</a>
+        </td>
+
+        <td>
+            {{ item.poolgroup.name}}
+        </td>
+
+        {% if site_user.is_superuser %}
+        <td>
+            {{item.poolgroup.groupowner.name}}
+        </td>
+        {% endif %}
+
+        <td>
+            <a href="{% url transfer_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Transfer Pool Ownership</a>            
+        </td>
+
+        <td>
+                <a href="{% url edit_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Edit</a>
+                <span>  |  </span>
+                <a href="{% url details_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Details</a>
+                <span>  |  </span>
+                <a href="{% url delete_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>

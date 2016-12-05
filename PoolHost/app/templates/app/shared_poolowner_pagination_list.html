@@ -1,1 +1,15 @@
-﻿
+﻿<ul class="pagination pagination-sm custom-page-2" id="po_id">
+    {% if poolowner_id != 0 %}
+        {% for poolowner in poolowners %}
+            {% if poolowner.id == poolowner_id %}
+                <li class="active">
+                        {% include poolowner_pagination_link_html %}
+                </li>
+            {% else %}
+                <li>
+                        {% include poolowner_pagination_link_html %}
+                </li>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</ul>
