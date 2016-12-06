@@ -423,8 +423,7 @@ class delete(View):
         filter = int(filter)
 
         poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)
-
-        modelstate = PoolGroup.delete_item(PoolGroup, poolgroup)
+        modelstate = PoolGroup.delete_item(poolgroup)
 
         return HttpResponseRedirect(reverse('poolgroup:index', args=(),
                                     kwargs = {'modelstate': modelstate,

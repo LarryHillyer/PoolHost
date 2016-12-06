@@ -11,7 +11,7 @@ from django.urls import reverse
 
 from rest_framework.renderers import JSONRenderer
 
-from app.models import PoolOwner, PoolGroup, PoolGroup_Choices, GroupOwner, SiteUser
+from app.models import Pool, PoolOwner, PoolGroup, PoolGroup_Choices, GroupOwner, SiteUser
 
 from poolowner.viewmodels import SuperUser_Index, SuperUser_Create, SuperUser_Transfer, SuperUser_Details
 from poolowner.viewmodels import GroupOwner_Index, GroupOwner_Create, GroupOwner_Transfer, GroupOwner_Details
@@ -209,6 +209,7 @@ class transfer(View):
         if poolowner_id == 0:
             return HttpResponseForbidden('<h1> Bad Request </h1>')            
 
+        old_poolowner_id = int(poolowner_id)
         poolowner_id = int(request.POST['new_poolowner_id'])
         poolowner = PoolOwner.get_item_by_id(PoolOwner, poolowner_id)
         poolgroup_id = poolowner.poolgroup_id
@@ -218,7 +219,22 @@ class transfer(View):
         form = PoolOwnerForm_Transfer(request.POST)
 
         if form.is_valid():
-            pass
+
+            poolowner_pools = Pool.get_items_by_poolowner_id(Pool, old_poolowner_id)               
+            modelstate = Pool.transfer_pool_ownership(poolowner_pools, poolowner_id, modelstate)
+            return HttpResponseRedirect(reverse('poolowner:index', args=(),
+                                                    kwargs = {'modelstate':modelstate,
+                                                               'poolgroup_id': poolgroup_id,
+                                                                'groupowner_id': groupowner_id,
+                                                                'filter': filter}))
+
+        else:
+            return HttpResponseRedirect(reverse('poolowner:transfer', args=(),
+                                                    kwargs = {'modelstate':modelstate,
+                                                                'poolowner_id': poolowner_id,
+                                                                'poolgroup_id': poolgroup_id,
+                                                                'groupowner_id': groupowner_id,
+                                                                'filter': filter}))
 
 class details(View):
     title = 'Pool Owner - Details'
@@ -300,9 +316,7 @@ class delete(View):
         filter = int(filter)
 
         poolowner = PoolOwner.get_item_by_id(PoolOwner, poolowner_id)
-        old_poolowner = SiteUser.get_item_by_userid(SiteUser, poolowner.user_id)
-        SiteUser.delete_siteuser_poolowner(old_poolowner)
-        modelstate = PoolOwner.delete_item(PoolOwner, poolowner)
+        modelstate = PoolOwner.delete_item(poolowner)
 
         return HttpResponseRedirect(reverse('poolowner:index', args=(),
                                     kwargs = {'modelstate': modelstate,

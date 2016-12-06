@@ -36,7 +36,7 @@ class Table_ViewModel(BaseViewModel):
         self.viewmodel['index_table_html'] = 'groupowner/index_table.html'
 
         self.viewmodel['items'] = groupowners
-        self.viewmodel['header_label_item'] = 'Group Owner Name'
+        self.viewmodel['header_label_item'] = 'Group Owner'
         self.viewmodel['item_url'] = 'poolgroup:index'
         self.viewmodel['transfer_url'] = 'groupowner:transfer' 
         self.viewmodel['details_url'] = 'groupowner:details' 
@@ -124,7 +124,8 @@ class Details_ViewModel(DescriptiveList_ViewModel):
             filter)
 
         self.viewmodel['details_links_html'] = 'groupowner/details_links.html'
-        
+        self.viewmodel['transfer_url'] = 'groupowner:transfer'
+       
 class Delete_ViewModel(DescriptiveList_ViewModel):
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, groupowner,  
         filter):

@@ -379,7 +379,23 @@ class transfer(View):
         form = PoolForm_Transfer(request.POST)
 
         if form.is_valid():
-            pass
+            poolowner_pool = Pool.get_item_by_id(Pool, pool_id)               
+            modelstate = Pool.transfer_pool_ownership_2(poolowner_pool, poolowner_id, modelstate)
+            return HttpResponseRedirect(reverse('pool:index', args=(),
+                                                    kwargs = {'modelstate':modelstate,
+                                                                'poolowner_id': poolowner_id,
+                                                                'poolgroup_id': poolgroup_id,
+                                                                'groupowner_id': groupowner_id,
+                                                                'filter': filter}))
+
+        else:
+            return HttpResponseRedirect(reverse('pool:transfer', args=(),
+                                                    kwargs = {'modelstate':modelstate,
+                                                                'pool_id': pool_id,
+                                                                'poolowner_id': poolowner_id,
+                                                                'poolgroup_id': poolgroup_id,
+                                                                'groupowner_id': groupowner_id,
+                                                                'filter': filter}))
 
 class details(View):
     title = 'Pool - Details'

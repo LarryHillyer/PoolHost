@@ -6,6 +6,14 @@
         </th>
 
         <th>
+            {{header_label_poolowner}}
+        </th>
+
+        <th>
+            {{header_label_cronjob}}
+        </th>
+
+        <th>
             {{header_label_poolgroup}}
         </th>
 
@@ -14,8 +22,9 @@
             {{header_label_groupowner}}
         </th>                
         {% endif %}
-
+        {% if site_user.is_superuser or site_user.is_groupowner %}
         <th></th>
+        {% endif %}
         <th></th>
     </tr>
 
@@ -26,6 +35,14 @@
         </td>
 
         <td>
+            {{item.poolowner.name}}
+        </td>
+            
+        <td>
+            {{item.cronjob.name}}
+        </td>
+            
+        <td>
             {{ item.poolgroup.name}}
         </td>
 
@@ -33,12 +50,13 @@
         <td>
             {{item.poolgroup.groupowner.name}}
         </td>
-        {% endif %}
+        {% endif%}
 
+        {% if site_user.is_superuser or site_user.is_groupowner %}
         <td>
             <a href="{% url transfer_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Transfer Pool Ownership</a>            
         </td>
-
+        {% endif %}
         <td>
                 <a href="{% url edit_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Edit</a>
                 <span>  |  </span>

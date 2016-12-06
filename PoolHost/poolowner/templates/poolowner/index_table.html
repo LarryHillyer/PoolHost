@@ -23,7 +23,11 @@
     {% for item in items %}
     <tr>
         <td>
-            <a href="{% url item_url item.id poolgroup_id groupowner_id filter %}">{{item.name}}</a>
+            {% if site_user.is_superuser %}
+            <a href="{% url item_url item.id poolgroup_id groupowner_id 7 %}">{{item.name}}</a>
+            {% elif site_user.is_groupowner and not site_user.is_superuser %}
+            <a href="{% url item_url item.id poolgroup_id groupowner_id 3 %}">{{item.name}}</a>
+            {% endif %}
         </td>
 
         <td>

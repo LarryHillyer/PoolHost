@@ -30,7 +30,7 @@
                             success: function (data) {
                                 data = JSON.parse(data);
                                 poolOwnerDropDownList.html("");
-                                if ($("#id_poolgroup_id").val() != -1) {
+                                if ($("#id_poolgroup_id").val() != -1 && data != []) {
                                     $.each(data, function (id, option) {
                                         poolOwnerDropDownList.append($("<option></option>").val(option.id).html(option.name))
                                     });
@@ -61,7 +61,7 @@
             success: function (data) {
                 data = JSON.parse(data);
                 poolOwnerDropDownList.html("");
-                if ($("#id_poolgroup_id").val() != -1) {
+                if (data.length !== 0) {
                     $.each(data, function (id, option) {
                         poolOwnerDropDownList.append($("<option></option>").val(option.id).html(option.name))
                     });

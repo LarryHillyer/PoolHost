@@ -190,6 +190,7 @@ class GroupOwner(models.Model, HelperMixins):
     def delete_item(cls, groupowner):
         try:
             SiteUser.delete_siteuser_groupowner(groupowner)
+            PoolGroup.delete_groupowner_poolgroups(groupowner.id)
             groupowner.delete()
             modelstate = 'Success: groupowner, ' + groupowner.name + ' has been deleted!'
         except:
@@ -219,6 +220,18 @@ class GroupOwner(models.Model, HelperMixins):
             groupowner = GroupOwner.get_item_by_id(GroupOwner, poolgroup.groupowner_id)
             groupowners.append(groupowner)
         return groupowners
+
+    @classmethod
+    def get_groupowners_with_poolowners(cls, groupowners):
+        groupowners_with_poolowners = []
+        for groupowner in groupowners:
+            groupowner_poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner.id)
+            for groupowner_poolgroup in groupowner_poolgroups:
+                poolgroup_poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, groupowner_poolgroup.id)
+                if poolgroup_poolowners.count() > 0:
+                    groupowners_with_poolowners.append(groupowner)
+                    break
+        return groupowners_with_poolowners
 
 class GroupOwner_Choices(models.Model, HelperMixins):
 
@@ -262,6 +275,19 @@ class GroupOwner_Choices(models.Model, HelperMixins):
             pass
 
     @classmethod
+    def get_groupowner_choices_3(cls, groupowners):
+
+        try:
+            groupowner_choices = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
+            if groupowner_choices.count() > 0:               
+                groupowner_choices.delete()
+            for groupowner in groupowners:
+                groupowner_choice = GroupOwner_Choices(name = groupowner.name, groupowner_id = groupowner.id)
+                GroupOwner_Choices.add_item(GroupOwner_Choices, groupowner_choice)
+        except:
+            pass
+
+    @classmethod
     def make_groupowner_choices(cls):
         groupowner_choices_1 = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
         groupowner_choices = []
@@ -290,6 +316,9 @@ class SuperUser(models.Model, HelperMixins):
 class PoolGroup (models.Model, HelperMixins):
     name = models.CharField(max_length = 50)
     groupowner = models.ForeignKey(GroupOwner, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['groupowner']
 
     def __str__(self):
         return self.name
@@ -345,6 +374,7 @@ class PoolGroup (models.Model, HelperMixins):
         
         poolgroups = []
         poolgroups_set = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
+        poolgroups_set = PoolGroup.get_poolgroups_with_poolowners(poolgroups_set)
         for poolgroup in poolgroups_set:
             poolgroups.append({'id' : poolgroup.id, 'name': poolgroup.name})
         return json.dumps(poolgroups)
@@ -357,6 +387,48 @@ class PoolGroup (models.Model, HelperMixins):
             poolgroup = PoolGroup.get_item_by_id(PoolGroup,poolowner.poolgroup_id)
             poolgroups.append(poolgroup)
         return poolgroups
+
+    @classmethod
+    def delete_poolgroup_poolowners(cls, poolgroup_id):
+
+        poolgroup_poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
+        for poolgroup_poolowner in poolgroup_poolowners:
+            try:
+                Pool.delete_poolowner_pools(poolgroup_poolowner.id)
+                PoolOwner.delete_item(poolgroup_poolowner)
+                modelstate = 'Success: ' + poolgroup_poolowner.name + ' has been deleted!'
+            except:
+                modelstate = 'Error: Database Error!!! ' + poolgroup_poolowner.name + ' was not deleted!'
+
+            return modelstate
+
+    @classmethod
+    def delete_groupowner_poolgroups(cls, groupowner_id):
+        groupowner_poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
+        for groupowner_poolgroup in groupowner_poolgroups:
+            modelstate = PoolGroup.delete_item(groupowner_poolgroup)
+
+        return modelstate
+
+    @classmethod
+    def delete_item(cls, poolgroup):
+        try:
+            PoolGroup.delete_poolgroup_poolowners(poolgroup.id)
+            modelstate = PoolGroup.delete(poolgroup)
+            modelstate = 'Success: ' + poolgroup.name + ' has been deleted!'
+        except:
+            modelstate = 'Error: Database Error!!! ' + poolgroup.name + ' was not deleted!'
+        return modelstate
+
+    @classmethod
+    def get_poolgroups_with_poolowners(cls, poolgroups):
+        poolgroups_with_poolowners = []
+        for poolgroup in poolgroups:
+            poolgroup_poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup.id)
+            if poolgroup_poolowners.count() > 0:
+                poolgroups_with_poolowners.append(poolgroup)
+                break
+        return poolgroups_with_poolowners
 
 class PoolGroup_Choices(models.Model, HelperMixins):
 
@@ -404,11 +476,13 @@ class PoolGroup_Choices(models.Model, HelperMixins):
             poolgroup_choices.append((poolgroup_choice.poolgroup_id, poolgroup_choice.name))
         return poolgroup_choices
 
-
 class PoolOwner (models.Model, HelperMixins):
     name = models.CharField(max_length = 50)
     poolgroup = models.ForeignKey(PoolGroup, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete = models.DO_NOTHING)
+
+    class Meta:
+        ordering = ['poolgroup']
 
     def __str__(self):
         return self.name
@@ -488,6 +562,19 @@ class PoolOwner (models.Model, HelperMixins):
 
         return poolowners
 
+    @classmethod
+    def delete_item(cls, poolowner):
+        poolowners = PoolOwner.get_items_by_name(PoolOwner, poolowner.name)
+        if poolowners.count() == 1:
+            old_poolowner = SiteUser.get_item_by_userid(SiteUser, poolowner.user_id)
+            SiteUser.delete_siteuser_poolowner(old_poolowner)
+        Pool.delete_poolowner_pools(poolowner.id)
+        try:
+            PoolOwner.delete(poolowner)
+            modelstate = 'Success: ' + poolowner.name + ' has been deleted!'
+        except:
+            modelstate = 'Error: Database Error!!! ' + poolowner.name + ' was not deleted!'
+        return modelstate
 
 
 class PoolOwner_Choices(models.Model, HelperMixins):
@@ -709,3 +796,38 @@ class Pool (models.Model, HelperMixins):
             for groupowner_pool in groupowner_pools:
                 pools.append(groupowner_pool)
         return pools
+
+    @classmethod
+    def transfer_pool_ownership(cls, pools, new_poolowner_id, modelstate):
+        error = None
+        for pool in pools:
+            pool.poolowner_id = new_poolowner_id
+            modelstate = PoolGroup.edit_item(Pool, pool)
+            if modelstate.split(':')[0] != 'Success':
+                error = 'Error'
+        if error == None:
+            return 'Success: Pool ownership was transfered'
+        else:
+            return 'Error: Database Error must be investigated'
+
+    @classmethod
+    def transfer_pool_ownership_2(cls, pool, new_poolowner_id, modelstate):
+        error = None
+
+        pool.poolowner_id = new_poolowner_id
+        modelstate = PoolGroup.edit_item(Pool, pool)
+        if modelstate.split(':')[0] != 'Success':
+            error = 'Error'
+
+        if error == None:
+            return 'Success: Pool ownership was transfered'
+        else:
+            return 'Error: Database Error must be investigated'
+
+    @classmethod
+    def delete_poolowner_pools(cls, poolowner_id):
+        
+        poolowner_pools = Pool.get_items_by_poolowner_id(Pool, poolowner_id)
+        for poolowner_pool in poolowner_pools:
+            Pool.delete_item(Pool, poolowner_pool)
+        

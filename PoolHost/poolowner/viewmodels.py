@@ -186,7 +186,7 @@ class SuperUser_Index(Pagination_Routing_ViewModel):
 
         self.viewmodel['use_pagination'] = True  # app/shared_index_pagination.html          
         
-        self.viewmodel['header_label_groupowner'] = 'Group Owner Name' # poolowner/index_table.html
+        self.viewmodel['header_label_groupowner'] = 'Group Owner' # poolowner/index_table.html
 
 
     @classmethod
@@ -224,7 +224,6 @@ class SuperUser_Index(Pagination_Routing_ViewModel):
                 groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
 
             poolowners = PoolOwner.get_items_by_groupowner_id(PoolOwner, groupowner_id)
-
 
         elif filter == 2:
             poolgroups = PoolGroup.get_all_items(PoolGroup)

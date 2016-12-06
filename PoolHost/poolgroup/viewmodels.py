@@ -38,7 +38,7 @@ class Table_ViewModel(BaseViewModel):
         self.viewmodel['index_table_html'] = 'poolgroup/index_table.html' 
  
         self.viewmodel['items'] = poolgroups # poolgroup/index_table.html params
-        self.viewmodel['header_label_item'] = 'Pool Group Name'
+        self.viewmodel['header_label_item'] = 'Pool Group'
         self.viewmodel['item_url'] = 'poolowner:index'
         self.viewmodel['transfer_url'] = 'poolgroup:transfer' 
         self.viewmodel['edit_url'] = 'poolgroup:edit'
@@ -173,6 +173,7 @@ class Details_ViewModel(DescriptiveList_ViewModel):
         filter, groupowner_id)
 
         self.viewmodel['edit_url'] = 'poolgroup:edit'
+        self.viewmodel['transfer_url'] = 'poolgroup:transfer'
         self.viewmodel['details_links_html'] = 'poolgroup/details_links.html'
 
 class Delete_ViewModel(DescriptiveList_ViewModel):
@@ -197,7 +198,7 @@ class SuperUser_Index(Pagination_Routing_ViewModel):
 
         self.viewmodel['use_pagination'] = True  # app/shared_index_pagination.html          
 
-        self.viewmodel['header_label_groupowner'] = 'Group Owner Name' # poolgroup/index_table.html
+        self.viewmodel['header_label_groupowner'] = 'Group Owner' # poolgroup/index_table.html
 
 
     @classmethod

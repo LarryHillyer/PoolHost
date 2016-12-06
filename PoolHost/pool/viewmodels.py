@@ -43,6 +43,9 @@ class Table_ViewModel(BaseViewModel):
  
         self.viewmodel['items'] = pools # pool/index_table.html params
         self.viewmodel['header_label_item'] = 'Pool'
+        self.viewmodel['header_label_groupowner'] = 'Group Owner'
+        self.viewmodel['header_label_cronjob'] = 'CronJob'
+        self.viewmodel['header_label_poolowner'] = 'Pool Owner'
         self.viewmodel['header_label_poolgroup'] = 'Pool Group'
         self.viewmodel['item_url'] = 'pool:index'
         self.viewmodel['transfer_url'] = 'pool:transfer'
@@ -220,8 +223,6 @@ class SuperUser_Index(Pagination_Routing_ViewModel):
 
         self.viewmodel['use_pagination'] = True            
         
-        self.viewmodel['header_label_groupowner'] = 'Group Owner Name' 
-
 
     @classmethod
     def get_index_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, 
@@ -365,15 +366,17 @@ class SuperUser_Create(Create_ViewModel):
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
         groupowners = GroupOwner.get_all_items(GroupOwner)
-        if groupowners.count() == 0:
+        groupowners = GroupOwner.get_groupowners_with_poolowners(groupowners)
+        if len(groupowners) == 0:
             viewmodel = {'modelstate':'Error: Create a Group Owner First!'}
             return viewmodel
 
         groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
-        GroupOwner_Choices.get_groupowner_choices()
+        GroupOwner_Choices.get_groupowner_choices_3(groupowners)
 
         poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
-        if poolgroups.count() == 0:
+        poolgroups = PoolGroup.get_poolgroups_with_poolowners(poolgroups)
+        if len(poolgroups) == 0:
             viewmodel = {'modelstate':'Error: Create a Pool Group First!'}
             return viewmodel
 
