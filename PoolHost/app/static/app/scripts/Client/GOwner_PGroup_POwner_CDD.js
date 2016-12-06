@@ -16,31 +16,29 @@
                 poolGroupDropDownList.html("");
                 poolOwnerDropDownList.html("");
 
-                if ($("#id_groupowner_id").val() != -1) {
+                if (data.length !== 0) {
                     $.each(data, function (id, option) {
                         poolGroupDropDownList.append($("<option></option>").val(option.id).html(option.name))
                     });
-                    if (data.length != 0) {
-                        var selectedPoolGroup = data[0].id;
-                        $.ajax({
-                            cache: false,
-                            type: "GET",
-                            url: "../../../../../poolowners_by_poolgroup/",
-                            data: { "poolgroup_id": selectedPoolGroup },
-                            success: function (data) {
-                                data = JSON.parse(data);
-                                poolOwnerDropDownList.html("");
-                                if ($("#id_poolgroup_id").val() != -1 && data != []) {
-                                    $.each(data, function (id, option) {
-                                        poolOwnerDropDownList.append($("<option></option>").val(option.id).html(option.name))
-                                    });
-                                }
-                            },
-                            error: function (xhr, ajaxOptions, thrownError) {
-                                alert('PoolOwnerList failed to load')
+                    var selectedPoolGroup = data[0].id;
+                    $.ajax({
+                        cache: false,
+                        type: "GET",
+                        url: "../../../../../poolowners_by_poolgroup/",
+                        data: { "poolgroup_id": selectedPoolGroup },
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            poolOwnerDropDownList.html("");
+                            if (data.length !== 0) {
+                                $.each(data, function (id, option) {
+                                    poolOwnerDropDownList.append($("<option></option>").val(option.id).html(option.name))
+                                });
                             }
-                        });
-                    }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('PoolOwnerList failed to load')
+                        }
+                    });
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {
