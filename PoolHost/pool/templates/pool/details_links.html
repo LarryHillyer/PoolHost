@@ -1,5 +1,7 @@
-﻿            <a href="{% url transfer_url pool_id poolowner_id poolgroup_id groupowner_id filter %}">Transfer</a>
+﻿            {% if site_user.is_superuser or site_user.is_groupowner %}
+            <a href="{% url transfer_url pool_id poolowner_id poolgroup_id groupowner_id filter %}">Transfer</a>
             <span>  |  </span>
+            {% endif %}
             <a href="{% url edit_url pool_id poolowner_id poolgroup_id groupowner_id filter %}">Edit</a>
             <span>  |  </span>
             <a href="{% url index_url poolowner_id poolgroup_id groupowner_id filter %}">Index</a>

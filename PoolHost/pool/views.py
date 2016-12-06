@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 
 from django.shortcuts import render
 from django.http import HttpRequest
@@ -54,7 +55,7 @@ class index(View):
 
 class create(View):
 
-    title = 'Pool Owner - Create'
+    title = 'Pool - Create'
     template_name = 'app/shared_create.html'
 
     def get(self, request, poolowner_id = 0, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
@@ -83,7 +84,6 @@ class create(View):
             viewmodel = PoolOwner_Create.get_create_viewmodel(site_user,self.title,  
                 modelstate, filter, poolowner_id, poolgroup_id, groupowner_id)
 
-
         return render(request, self.template_name, viewmodel)
 
     def post(self, request, poolowner_id = 0, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
@@ -103,26 +103,20 @@ class create(View):
             groupowner_id = int(request.POST['groupowner_id'])
             filter = int(request.POST['filter'])
 
-            PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
-            PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolgroup_id)
-
         elif site_user.is_groupowner and not site_user.is_superuser:
             poolowner_id = int(request.POST['poolowner_id'])
             poolgroup_id = int(request.POST['poolgroup_id'])       
             groupowner_id = int(groupowner_id)
             filter = int(request.POST['filter'])
 
-            PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
-            PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolgroup_id)
-
         else:
             poolowner_id = int(poolowner_id)
             poolgroup_id = int(request.POST['poolgroup_id'])       
             groupowner_id = int(groupowner_id)
             filter = int(request.POST['filter'])
-            
-            PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
-            PoolOwner_Choices.get_poolowner_choices(poolowner_id)
+
+        PoolGroup_Choices.get_poolgroup_choices(poolgroup_id)
+        PoolOwner_Choices.get_poolowner_choices(poolowner_id)
 
         form = PoolForm_Create(request.POST)
         
@@ -139,7 +133,7 @@ class create(View):
 
                 pool = Pool(name = form.data['name'],
                             cronjob_id = cronjob_id,
-                            pooltype_id = form.data['pooltype_id'],
+                            pooltype_id = int(form.data['pooltype_id']),
                             poolgroup_id = poolgroup_id,
                             poolowner_id = poolowner_id)
 
@@ -227,26 +221,20 @@ class edit(View):
             groupowner_id = int(request.POST['groupowner_id'])
             filter = int(request.POST['filter'])
 
-            PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
-            PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolgroup_id)
-
         elif site_user.is_groupowner and not site_user.is_superuser:
             poolowner_id = int(request.POST['poolowner_id'])
             poolgroup_id = int(request.POST['poolgroup_id'])       
             groupowner_id = int(groupowner_id)
             filter = int(request.POST['filter'])
 
-            PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
-            PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolgroup_id)
-
         else:
             poolowner_id = int(poolowner_id)
             poolgroup_id = int(request.POST['poolgroup_id'])       
             groupowner_id = int(groupowner_id)
             filter = int(request.POST['filter'])
-            
-            PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
-            PoolOwner_Choices.get_poolowner_choices(poolowner_id)
+
+        PoolGroup_Choices.get_poolgroup_choices(poolgroup_id)
+        PoolOwner_Choices.get_poolowner_choices(poolowner_id)
 
         form = PoolForm_Edit(request.POST)
 
@@ -507,7 +495,7 @@ class poolgroups_by_groupowner_id(View):
     def get(self,request):
 
         groupowner_id = int(request.GET['groupowner_id'])
-        poolgroups = PoolGroup.get_poolgroups_by_groupowner_id(groupowner_id)
+        poolgroups = PoolGroup.get_poolgroups_with_poolowners_by_groupowner_id(groupowner_id)
         return JSONResponse(poolgroups)
 
 class poolowners_by_poolgroup_id(View):

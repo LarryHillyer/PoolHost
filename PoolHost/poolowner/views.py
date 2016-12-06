@@ -105,7 +105,8 @@ class create(View):
             groupowner_id = int(groupowner_id)
             filter = int(request.POST['filter'])
 
-        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
+        poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)      
+        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id, poolgroups)
 
         form = PoolOwnerForm_Create(request.POST)
         
@@ -338,6 +339,6 @@ class poolgroups_by_groupowner_id(View):
     def get(self,request):
 
         groupowner_id = int(request.GET['groupowner_id'])
-        poolgroups = PoolGroup.get_poolgroups_by_groupowner_id(groupowner_id)
+        poolgroups = PoolGroup.get_poolgroups_by_groupowner_id_2(groupowner_id)
         return JSONResponse(poolgroups)
     

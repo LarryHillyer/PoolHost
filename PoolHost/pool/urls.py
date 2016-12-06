@@ -27,4 +27,7 @@ urlpatterns = [
     url(r'^poolgroups_by_groupowner/$', views.poolgroups_by_groupowner_id.as_view(), name = 'poolgroups_by_groupowner_id'),
     url(r'^poolowners_by_poolgroup/$', views.poolowners_by_poolgroup_id.as_view(), name = 'poolowners_by_poolgroup_id'),
 
+    url(r'^edit/poolgroups_by_groupowner/$', views.poolgroups_by_groupowner_id.as_view(), name = 'poolgroups_by_groupowner_id'),
+    url(r'^edit/poolowners_by_poolgroup/$', views.poolowners_by_poolgroup_id.as_view(), name = 'poolowners_by_poolgroup_id'),
+
 ]

@@ -82,29 +82,27 @@ class create(View):
         if site_user.is_superuser != True and site_user.is_groupowner != True:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        groupowner_id = int(request.POST['groupowner_id'])
-        filter = int(request.POST['filter'])
+        if site_user.is_superuser:    
+            groupowner_id = int(request.POST['groupowner_id'])
+            filter = int(request.POST['filter'])
+
+        elif site_user.is_groupowner and not site_user.is_superuser:     
+            groupowner_id = int(groupowner_id)
+            filter = int(request.POST['filter'])
 
         form = PoolGroupForm_Create(request.POST)
             
         if form.is_valid():
-            same_poolgroup = PoolGroup.get_same_poolgroup_in_database(form.data['name'], form.data['groupowner_id'])
+            same_poolgroup = PoolGroup.get_same_poolgroup_in_database(form.data['name'], groupowner_id)
             if same_poolgroup.count() > 0:
                 modelstate = 'Error: Pool Group, ' + form.data['name'] + ' has already been taken!'
-                
-                if site_user.is_superuser:
-                    viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
-                        modelstate, filter, groupowner_id)
-                else:
-                    viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title, 
-                        modelstate, filter, groupowner_id)
 
                 return HttpResponseRedirect(reverse('poolgroup:create', args = (),
                                                     kwargs = {'modelstate': modelstate,
                                                                 'groupowner_id': groupowner_id,
                                                                 'filter' : filter}))
             
-            poolgroup = PoolGroup(name = form.data['name'], groupowner_id = form.data['groupowner_id'])
+            poolgroup = PoolGroup(name = form.data['name'], groupowner_id = groupowner_id)
             modelstate = PoolGroup.add_item(PoolGroup, poolgroup)
 
             if modelstate.split(':')[0] != 'Success':
@@ -115,7 +113,7 @@ class create(View):
 
             return HttpResponseRedirect(reverse('poolgroup:index', args = (),
                                                 kwargs = {'modelstate': modelstate,
-                                                            'groupowner_id': form.data['groupowner_id'],
+                                                            'groupowner_id': groupowner_id,
                                                             'filter' : form.data['filter']}))
 
         else:
@@ -165,70 +163,48 @@ class edit(View):
         if site_user.is_superuser != True and site_user.is_groupowner != True:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        poolgroup_id = int(request.POST['id'])
-        groupowner_id = int(request.POST['groupowner_id'])
-        filter = int(request.POST['filter'])
+        if site_user.is_superuser:
+            poolgroup_id = int(request.POST['id'])
+            groupowner_id = int(request.POST['groupowner_id'])
+            filter = int(request.POST['filter'])
+
+        elif site_user.is_groupowner and not site_user.is_superuser:
+            poolgroup_id = int(request.POST['id'])     
+            groupowner_id = int(groupowner_id)
+            filter = int(request.POST['filter'])
 
         form = PoolGroupForm_Edit(request.POST)
 
         if form.is_valid():
 
             exactly_same_poolgroup = PoolGroup.get_exactly_same_poolgroup(form.data['id'], 
-                form.data['name'], form.data['groupowner_id'])
+                form.data['name'], groupowner_id)
 
             if exactly_same_poolgroup.count() > 0:
 
                 modelstate = 'Error: No Changes were made during edit, update aborted!'
+
+                return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
+                                                    kwargs = {'modelstate': modelstate,
+                                                                'poolgroup_id': poolgroup_id,
+                                                                'groupowner_id': groupowner_id,
+                                                                'filter' : filter}))
    
-                if site_user.is_superuser:
-                    viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title,
-                         modelstate, poolgroup_id, filter, groupowner_id)
-
-                    return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
-                                                        kwargs = {'modelstate': modelstate,
-                                                                    'poolgroup_id': poolgroup_id,
-                                                                    'groupowner_id': groupowner_id,
-                                                                    'filter' : filter}))
-                else:
-                    viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user, self.title, 
-                        modelstate, form.data['id'], filter, groupowner_id)
-
-                    return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
-                                                        kwargs = {'modelstate': modelstate,
-                                                                    'poolgroup_id': poolgroup_id,
-                                                                    'groupowner_id': groupowner_id,
-                                                                    'filter' : filter}))
-
             same_poolgroup = PoolGroup.get_same_poolgroup_in_database(form.data['name'], 
-                form.data['groupowner_id']) 
+                groupowner_id) 
 
             if same_poolgroup.count() > 0:
                 modelstate = 'Error: Poolgroup is already in the database, update aborted!'    
 
-                if site_user.is_superuser:
-
-                    viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, modelstate, 
-                        poolgroup_id, filter, groupowner_id)
-
-                    return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
-                                                        kwargs = {'modelstate': modelstate,
-                                                                    'poolgroup_id': poolgroup_id,
-                                                                    'groupowner_id': groupowner_id,
-                                                                    'filter' : filter}))
-
-                else:
-                    viewmodel = GroupOwner_Edit.get_create_viewmodel(site_user, self.title, form, 
-                        modelstate, filter, groupowner_id)
-
-                    return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
-                                                        kwargs = {'modelstate': modelstate,
-                                                                    'poolgroup_id': poolgroup_id,
-                                                                    'groupowner_id': groupowner_id,
-                                                                    'filter' : filter}))
+                return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
+                                                    kwargs = {'modelstate': modelstate,
+                                                                'poolgroup_id': poolgroup_id,
+                                                                'groupowner_id': groupowner_id,
+                                                                'filter' : filter}))
 
             poolgroup = PoolGroup.get_item_by_id(PoolGroup, form.data['id'])
             poolgroup.name = form.data['name']
-            poolgroup.groupowner_id = form.data['groupowner_id']
+            poolgroup.groupowner_id = groupowner_id
             modelstate = PoolGroup.edit_item(PoolGroup, poolgroup)
 
             if modelstate.split(':')[0] != 'Success':
@@ -241,14 +217,11 @@ class edit(View):
 
             return HttpResponseRedirect(reverse('poolgroup:index', args = (),
                                                 kwargs = {'modelstate': modelstate,
-                                                            'groupowner_id': form.data['groupowner_id'],
+                                                            'groupowner_id': groupowner_id,
                                                             'filter' : form.data['filter']}))
 
         else:
             modelstate = 'Error: Invalid Input!'
- 
-            viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, modelstate, 
-                poolgroup_id, filter, groupowner_id)
 
             return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
                                                 kwargs = {'modelstate': modelstate,

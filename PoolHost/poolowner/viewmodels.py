@@ -260,20 +260,21 @@ class SuperUser_Create(Create_ViewModel):
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
         groupowners = GroupOwner.get_all_items(GroupOwner)
-        if groupowners.count() == 0:
+        groupowners = GroupOwner.get_groupowners_with_poolgroups(groupowners)
+        if len(groupowners) == 0:
             viewmodel = {'modelstate':'Error: Create a Group Owner First!'}
             return viewmodel
+        GroupOwner_Choices.get_groupowner_choices_3(groupowners)
 
         groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
-        GroupOwner_Choices.get_groupowner_choices()
 
-        poolgroups = PoolGroup.get_all_items(PoolGroup)
-        if poolgroups.count() == 0:
+        poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
+        if len(poolgroups) == 0:
             viewmodel = {'modelstate':'Error: Create a Pool Group First!'}
             return viewmodel
+        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id, poolgroups)
 
         poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
-        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
 
         form = PoolOwnerForm_Create(initial={'poolgroup_id': poolgroup_id,
                                                         'groupowner_id' : groupowner_id,
@@ -406,9 +407,9 @@ class GroupOwner_Create(Create_ViewModel):
         if poolgroups.count() == 0:
             viewmodel = {'modelstate':'Error: Create a Pool Group First!'}
             return viewmodel
+        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id, poolgroups)
 
         poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
-        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
 
         form = PoolOwnerForm_Create(initial = {'poolgroup_id': poolgroup_id,
                                                            'groupowner_id' : groupowner_id,
@@ -436,7 +437,7 @@ class GroupOwner_Transfer(Transfer_ViewModel):
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
         poolowner = PoolOwner.get_item_by_id(PoolOwner, poolowner_id)
-        PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolowner.poolgroup_id, poolowner.id)
+        PoolOwner_Choices.get_differentpoolowner_choices_by_poolgroup_id(poolowner.poolgroup_id, poolowner.id)
         poolowner_choices = PoolOwner_Choices.get_all_items(PoolOwner_Choices)
         if poolowner_choices.count() == 0:
             viewmodel = {'modelstate':'Error: No other poolowner is in pool group, add a pool owner to pool group first!'}

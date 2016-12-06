@@ -233,6 +233,15 @@ class GroupOwner(models.Model, HelperMixins):
                     break
         return groupowners_with_poolowners
 
+    @classmethod
+    def get_groupowners_with_poolgroups(cls, groupowners):
+        groupowners_with_poolgroups = []
+        for groupowner in groupowners:
+            groupowner_poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner.id)
+            if groupowner_poolgroups.count() > 0:
+                groupowners_with_poolgroups.append(groupowner)
+        return groupowners_with_poolgroups
+
 class GroupOwner_Choices(models.Model, HelperMixins):
 
     name = models.CharField(max_length = 50)
@@ -370,11 +379,20 @@ class PoolGroup (models.Model, HelperMixins):
         return poolgroup_id
 
     @classmethod
-    def get_poolgroups_by_groupowner_id(cls, groupowner_id):
+    def get_poolgroups_with_poolowners_by_groupowner_id(cls, groupowner_id):
         
         poolgroups = []
         poolgroups_set = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
         poolgroups_set = PoolGroup.get_poolgroups_with_poolowners(poolgroups_set)
+        for poolgroup in poolgroups_set:
+            poolgroups.append({'id' : poolgroup.id, 'name': poolgroup.name})
+        return json.dumps(poolgroups)
+
+    @classmethod
+    def get_poolgroups_by_groupowner_id_2(cls, groupowner_id):
+        
+        poolgroups = []
+        poolgroups_set = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
         for poolgroup in poolgroups_set:
             poolgroups.append({'id' : poolgroup.id, 'name': poolgroup.name})
         return json.dumps(poolgroups)
@@ -404,6 +422,7 @@ class PoolGroup (models.Model, HelperMixins):
 
     @classmethod
     def delete_groupowner_poolgroups(cls, groupowner_id):
+        modelstate = None
         groupowner_poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
         for groupowner_poolgroup in groupowner_poolgroups:
             modelstate = PoolGroup.delete_item(groupowner_poolgroup)
@@ -427,7 +446,6 @@ class PoolGroup (models.Model, HelperMixins):
             poolgroup_poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup.id)
             if poolgroup_poolowners.count() > 0:
                 poolgroups_with_poolowners.append(poolgroup)
-                break
         return poolgroups_with_poolowners
 
 class PoolGroup_Choices(models.Model, HelperMixins):
@@ -452,11 +470,9 @@ class PoolGroup_Choices(models.Model, HelperMixins):
 
 
     @classmethod
-    def get_poolgroup_choices_by_groupowner_id(cls, groupowner_id, poolgroup_id = 0):
+    def get_poolgroup_choices_by_groupowner_id(cls, groupowner_id, poolgroups, poolgroup_id = 0):
 
         try:
-
-            poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
 
             poolgroup_choices = PoolGroup_Choices.get_all_items(PoolGroup_Choices)
             if poolgroup_choices.count() > 0:               
@@ -602,7 +618,7 @@ class PoolOwner_Choices(models.Model, HelperMixins):
             pass
 
     @classmethod
-    def get_poolowner_choices_by_poolgroup_id(cls, poolgroup_id, poolowner_id = 0):
+    def get_poolowner_choices_by_poolgroup_id(cls, poolgroup_id):
 
         try:
 
@@ -619,9 +635,7 @@ class PoolOwner_Choices(models.Model, HelperMixins):
             pass
 
     @classmethod
-    def get_differentpoolowner_choices_by_poolgroup_id(cls, poolgroup_id, poolowner_id = 0):
-
-        try:
+    def get_differentpoolowner_choices_by_poolgroup_id(cls, poolgroup_id, poolowner_id):
 
             poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
 
@@ -633,8 +647,6 @@ class PoolOwner_Choices(models.Model, HelperMixins):
                     if poolowner.id != poolowner_id:
                         poolowner_choice = PoolOwner_Choices(name = poolowner.name, poolowner_id = poolowner.id)
                         PoolOwner_Choices.add_item(PoolOwner_Choices, poolowner_choice)
-        except:
-            pass
 
     @classmethod
     def make_poolowner_choices(cls):
