@@ -37,7 +37,7 @@ class index(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True and site_user.is_poolowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner and not site_user.is_poolowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         poolowner_id = int(poolowner_id)
@@ -51,6 +51,7 @@ class index(View):
             viewmodel = GroupOwner_Index.get_index_viewmodel(site_user,self.title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id)
         else:
             viewmodel = PoolOwner_Index.get_index_viewmodel(site_user,self.title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id)      
+
         return render(request, self.template_name, viewmodel)
 
 class create(View):
@@ -66,23 +67,33 @@ class create(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True and site_user.is_poolowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner and not site_user.is_poolowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         poolowner_id = int(poolowner_id)
         poolgroup_id = int(poolgroup_id)
         groupowner_id = int(groupowner_id)
         filter = int(filter)
+        form = None
 
         if site_user.is_superuser:
             viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
-                modelstate, filter, poolowner_id, poolgroup_id, groupowner_id)
+                modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
         elif site_user.is_groupowner and not site_user.is_superuser:
             viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title,  
-                modelstate, filter, poolowner_id, poolgroup_id, groupowner_id)
+                modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
         else:
             viewmodel = PoolOwner_Create.get_create_viewmodel(site_user,self.title,  
-                modelstate, filter, poolowner_id, poolgroup_id, groupowner_id)
+                modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
+
+        if viewmodel['modelstate'] != None and viewmodel['modelstate'] != "":
+            if viewmodel['modelstate'].split(':')[0] != 'Success':
+                return HttpResponseRedirect(reverse('pool:index', args = (),
+                                                kwargs = {'modelstate': viewmodel['modelstate'],
+                                                            'poolowner_id': poolowner_id,
+                                                            'poolgroup_id': poolgroup_id,
+                                                            'groupowner_id': groupowner_id,
+                                                            'filter' : filter}))
 
         return render(request, self.template_name, viewmodel)
 
@@ -94,7 +105,7 @@ class create(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True and site_user.is_poolowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner and not site_user.is_poolowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         if site_user.is_superuser:
@@ -115,8 +126,11 @@ class create(View):
             groupowner_id = int(groupowner_id)
             filter = int(request.POST['filter'])
 
-        PoolGroup_Choices.get_poolgroup_choices(poolgroup_id)
-        PoolOwner_Choices.get_poolowner_choices(poolowner_id)
+        poolgroups = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
+        PoolGroup_Choices.get_choices_by_poolgroups(poolgroups)
+
+        poolowners = PoolOwner.get_items_by_id(PoolOwner, poolowner_id)
+        PoolOwner_Choices.get_choices_by_poolowners(poolowners)
 
         form = PoolForm_Create(request.POST)
         
@@ -141,12 +155,19 @@ class create(View):
                 modelstate = Pool.add_item(Pool, pool)
 
                 if modelstate.split(':')[0] != 'Success':
-                    return HttpResponseRedirect(reverse('pool:create', args=(),
-                                                kwargs = {'modelstate':modelstate,
-                                                            'poolowner_id': poolowner_id,
-                                                            'poolgroup_id': poolgroup_id,
-                                                            'groupowner_id': groupowner_id,
-                                                            'filter' : filter}))
+
+                    if site_user.is_superuser:
+                        viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
+                            modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
+                    elif site_user.is_groupowner and not site_user.is_superuser:
+                        viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title,  
+                            modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
+
+                    else:
+                        viewmodel = PoolOwner_Create.get_create_viewmodel(site_user,self.title,  
+                            modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
+
+                    return render(request, self.template_name, viewmodel)
 
                 return HttpResponseRedirect(reverse('pool:index', args = (),
                                                     kwargs = {'modelstate': modelstate,
@@ -157,22 +178,32 @@ class create(View):
             else:
                 modelstate = 'Error: Pool, ' + form.data['name'] + ' has already been taken!'
                 
-                return HttpResponseRedirect(reverse('pool:create', args = (),
-                                                    kwargs = {'modelstate': modelstate,
-                                                                'poolowner_id': poolowner_id,
-                                                                'poolgroup_id': poolgroup_id,
-                                                                'groupowner_id': groupowner_id,
-                                                                'filter' : filter}))
+                if site_user.is_superuser:
+                    viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
+                        modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
+                elif site_user.is_groupowner and not site_user.is_superuser:
+                    viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title,  
+                        modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
+                else:
+                    viewmodel = PoolOwner_Create.get_create_viewmodel(site_user,self.title,  
+                        modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
+
+                return render(request, self.template_name, viewmodel)
         
         else:
             modelstate = 'Error: Invalid Data!!! '
 
-            return HttpResponseRedirect(reverse('pool:create', args = (),
-                                            kwargs = {'modelstate': modelstate,
-                                                        'poolowner_id': poolowner_id,
-                                                        'poolgroup_id': poolgroup_id,
-                                                        'groupowner_id': groupowner_id,
-                                                        'filter' : filter}))
+            if site_user.is_superuser:
+                viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
+                    modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
+            elif site_user.is_groupowner and not site_user.is_superuser:
+                viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title,  
+                    modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
+            else:
+                viewmodel = PoolOwner_Create.get_create_viewmodel(site_user,self.title,  
+                    modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form)
+
+            return render(request, self.template_name, viewmodel)
 
 class edit(View):
     title = 'Pool - Edit'
@@ -186,7 +217,7 @@ class edit(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True and site_user.is_poolowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner and not site_user.is_poolowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         pool_id = int(pool_id)
@@ -194,13 +225,17 @@ class edit(View):
         poolgroup_id = int(poolgroup_id)
         groupowner_id = int(groupowner_id)
         filter = int(filter)
+        form = None
 
         if site_user.is_superuser:
-            viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, modelstate,  filter, pool_id, poolowner_id, poolgroup_id, groupowner_id)
+            viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, modelstate,  filter, 
+                pool_id, poolowner_id, poolgroup_id, groupowner_id, form)
         elif site_user.is_groupowner and not site_user.is_superuser:
-            viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user, self.title, modelstate,  filter, pool_id, poolowner_id, poolgroup_id, groupowner_id)
+            viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user, self.title, modelstate,  filter, 
+                pool_id, poolowner_id, poolgroup_id, groupowner_id, form)
         else:
-            viewmodel = PoolOwner_Edit.get_edit_viewmodel(site_user, self.title, modelstate,  filter, pool_id, poolowner_id, poolgroup_id, groupowner_id)
+            viewmodel = PoolOwner_Edit.get_edit_viewmodel(site_user, self.title, modelstate,  filter, 
+                pool_id, poolowner_id, poolgroup_id, groupowner_id, form)
 
         return render(request, self.template_name, viewmodel)
 
@@ -233,8 +268,16 @@ class edit(View):
             groupowner_id = int(groupowner_id)
             filter = int(request.POST['filter'])
 
-        PoolGroup_Choices.get_poolgroup_choices(poolgroup_id)
-        PoolOwner_Choices.get_poolowner_choices(poolowner_id)
+        if int(request.POST['cronjob_id']) == -1:
+            cronjob_id = None
+        else:
+            cronjob_id = int(request.POST['cronjob_id'])
+
+        poolgroups = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
+        PoolGroup_Choices.get_choices_by_poolgroups(poolgroups)
+
+        poolowners = PoolOwner.get_items_by_id(PoolOwner, poolowner_id)
+        PoolOwner_Choices.get_choices_by_poolowners(poolowners)
 
         form = PoolForm_Edit(request.POST)
 
@@ -247,29 +290,40 @@ class edit(View):
 
                 modelstate = 'Error: No Changes were made during edit, update aborted!'
 
-                return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
-                                                    kwargs = {'modelstate': modelstate,
-                                                                'poolgroup_id': poolgroup_id,
-                                                                'groupowner_id': groupowner_id,
-                                                                'filter' : filter}))
+                if site_user.is_superuser:
+                    viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, 
+                        modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                        form)
+                elif site_user.is_groupowner and not site_user.is_superuser:
+                    viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                        modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                        form)
+                else:
+                    viewmodel = PoolOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                        modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                        form)
+
+                return render(request, self.template_name, viewmodel)
 
             same_pool = Pool.get_same_pool_in_database(form.data['name'], int(form.data['id'])) 
 
             if same_pool != None:
                 modelstate = 'Error: Pool is already in the database, update aborted!'    
 
-                return HttpResponseRedirect(reverse('pool:edit', args = (),
-                                                    kwargs = {'modelstate': modelstate,
-                                                                'pool_id': pool_id,
-                                                                'poolowner_id': poolowner_id,
-                                                                'poolgroup_id': poolgroup_id,
-                                                                'groupowner_id': groupowner_id,
-                                                                'filter' : filter}))
+                if site_user.is_superuser:
+                    viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, 
+                        modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                        form)
+                elif site_user.is_groupowner and not site_user.is_superuser:
+                    viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                        modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                        form)
+                else:
+                    viewmodel = PoolOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                        modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                        form)
 
-            if int(form.data['cronjob_id']) == -1:
-                cronjob_id = None
-            else:
-                cronjob_id = int(form.data['cronjob_id'])
+                return render(request, self.template_name, viewmodel)
 
             pool = Pool.get_item_by_id(Pool, pool_id)
             pool.name = form.data['name']
@@ -281,13 +335,20 @@ class edit(View):
 
             if modelstate.split(':')[0] != 'Success':
 
-                return HttpResponseRedirect(reverse('pool:edit', args = (),
-                                                    kwargs = {'modelstate': modelstate,
-                                                                'pool_id': pool_id,
-                                                                'poolowner_id': poolowner_id,
-                                                                'poolgroup_id': poolgroup_id,
-                                                                'groupowner_id': groupowner_id,
-                                                                'filter' : filter}))
+                if site_user.is_superuser:
+                    viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, 
+                        modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                        form)
+                elif site_user.is_groupowner and not site_user.is_superuser:
+                    viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                        modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                        form)
+                else:
+                    viewmodel = PoolOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                        modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                        form)
+
+                return render(request, self.template_name, viewmodel)
 
             return HttpResponseRedirect(reverse('pool:index', args = (),
                                                 kwargs = {'modelstate': modelstate,
@@ -299,13 +360,20 @@ class edit(View):
         else:
             modelstate = 'Error: Invalid Input!'
  
-            return HttpResponseRedirect(reverse('pool:edit', args = (),
-                                                kwargs = {'modelstate': modelstate,
-                                                            'pool_id': pool_id,
-                                                            'poolowner_id': poolowner_id,
-                                                            'poolgroup_id': poolgroup_id,
-                                                            'groupowner_id': groupowner_id,
-                                                            'filter' : filter}))
+            if site_user.is_superuser:
+                viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, 
+                    modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                    form)
+            elif site_user.is_groupowner and not site_user.is_superuser:
+                viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                    modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                    form)
+            else:
+                viewmodel = PoolOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                    modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                    form)
+
+            return render(request, self.template_name, viewmodel)
 
 class transfer(View):
     title = 'Pool - Transfer'
@@ -327,11 +395,14 @@ class transfer(View):
         poolgroup_id = int(poolgroup_id)
         groupowner_id = int(groupowner_id)
         filter = int(filter)
+        form = None
 
         if site_user.is_superuser == True:
-            viewmodel = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id)
+            viewmodel = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, modelstate, filter,
+                pool_id, poolowner_id, poolgroup_id, groupowner_id, form)
         else:
-            viewmodel = GroupOwner_Transfer.get_transfer_viewmodel(site_user,self.title, modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id)
+            viewmodel = GroupOwner_Transfer.get_transfer_viewmodel(site_user,self.title, modelstate, filter, 
+                pool_id, poolowner_id, poolgroup_id, groupowner_id, form)
 
         if viewmodel['modelstate'] != None and viewmodel['modelstate'] != "":
             if viewmodel['modelstate'].split(':')[0] != 'Success':
@@ -351,7 +422,7 @@ class transfer(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner != True:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         if pool_id == 0:
@@ -367,8 +438,23 @@ class transfer(View):
         form = PoolForm_Transfer(request.POST)
 
         if form.is_valid():
+
             poolowner_pool = Pool.get_item_by_id(Pool, pool_id)               
             modelstate = Pool.transfer_pool_ownership_2(poolowner_pool, poolowner_id, modelstate)
+
+            if modelstate.split(':')[0] != 'Success':
+
+                if site_user.is_superuser:
+                    viewmodel = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, 
+                        modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                        form)
+                else:
+                    viewmodel = GroupOwner_Transfer.get_transfer_viewmodel(site_user,self.title, 
+                        modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                        form)
+
+                return render(request, self.template_name, viewmodel)
+
             return HttpResponseRedirect(reverse('pool:index', args=(),
                                                     kwargs = {'modelstate':modelstate,
                                                                 'poolowner_id': poolowner_id,
@@ -377,13 +463,25 @@ class transfer(View):
                                                                 'filter': filter}))
 
         else:
-            return HttpResponseRedirect(reverse('pool:transfer', args=(),
-                                                    kwargs = {'modelstate':modelstate,
-                                                                'pool_id': pool_id,
-                                                                'poolowner_id': poolowner_id,
-                                                                'poolgroup_id': poolgroup_id,
-                                                                'groupowner_id': groupowner_id,
-                                                                'filter': filter}))
+
+            modelstate = 'Error: Invalid form!'
+
+            if site_user.is_superuser:
+                viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, 
+                    modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                    form)
+
+            elif site_user.is_groupowner and not site_user.is_superuser:
+                viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                    modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                    form)
+
+            else:
+                viewmodel = PoolOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                    modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id, 
+                    form)
+
+            return render(request, self.template_name, viewmodel)
 
 class details(View):
     title = 'Pool - Details'
@@ -398,7 +496,7 @@ class details(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True and site_user.is_poolowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner and not site_user.is_poolowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         pool_id = int(pool_id)
@@ -433,7 +531,7 @@ class delete(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True and site_user.is_poolowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner and not site_user.is_poolowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         if pool_id == 0:

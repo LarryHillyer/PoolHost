@@ -30,6 +30,7 @@ class Table_ViewModel(BaseViewModel):
 
         self.viewmodel['groupowner_id'] = groupowner_id
         self.viewmodel['filter' ] = filter
+        self.viewmodel['state_list'] = [groupowner_id, filter]
 
         self.viewmodel['create_url'] = 'poolgroup:create'
         self.viewmodel['create_link_name'] = 'Create Pool Group'
@@ -159,8 +160,8 @@ class Transfer_ViewModel(Form_ViewModel):
         self.viewmodel['form_html'] = 'poolgroup/transfer_ownership_form.html'
 
         self.viewmodel['form_name'] = poolgroup.name
-        self.viewmodel['form_label_name'] = 'Existing Pool Owner'
-        self.viewmodel['form_label_groupowner'] = 'Group Owner'
+        self.viewmodel['form_label_name'] = 'Pool Group'
+        self.viewmodel['form_label_groupowner'] = 'Existing Group Owner'
         self.viewmodel['form_groupowner_name'] = poolgroup.groupowner.name
         self.viewmodel['form_label_new_groupowner'] = 'New Group Owner'
 
@@ -241,7 +242,7 @@ class SuperUser_Create(Create_ViewModel):
         self.viewmodel['form_url'] = 'poolgroup:create'
         
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, modelstate, filter, groupowner_id):
+    def get_create_viewmodel(cls, site_user, title, modelstate, filter, groupowner_id, form):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
         groupowners = GroupOwner.get_all_items(GroupOwner)
@@ -250,9 +251,10 @@ class SuperUser_Create(Create_ViewModel):
             return viewmodel
 
         groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
-        GroupOwner_Choices.get_groupowner_choices()
+        GroupOwner_Choices.get_choices_by_groupowners(groupowners)
 
-        form = PoolGroupForm_Create(initial={'groupowner_id' : groupowner_id,
+        if form == None:
+            form = PoolGroupForm_Create(initial={'groupowner_id' : groupowner_id,
                                                         'filter' : filter})
 
         submit_label = 'Create'
@@ -270,18 +272,21 @@ class SuperUser_Edit(Edit_ViewModel):
 
 
     @classmethod
-    def get_edit_viewmodel(cls, site_user, title, modelstate, poolgroup_id, filter, groupowner_id):
+    def get_edit_viewmodel(cls, site_user, title, modelstate, filter, poolgroup_id, groupowner_id, form):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
         poolgroup = PoolGroup.get_item_by_id(PoolGroup, poolgroup_id)
 
-        groupowners = GroupOwner.get_all_items(GroupOwner)
         groupowner_id = poolgroup.groupowner_id
-        GroupOwner_Choices.get_groupowner_choices()
+        groupowners = GroupOwner.get_all_items(GroupOwner)
+        GroupOwner_Choices.get_choices_by_groupowners(groupowners)
         
-        form = PoolGroupForm_Edit(instance = poolgroup, initial = {'filter':filter})
-
+        if form == None:       
+            form = PoolGroupForm_Edit(initial = {'id': poolgroup.id,
+                                                 'name': poolgroup.name,
+                                                 'groupowner_id': poolgroup.groupowner_id,
+                                                 'filter':filter})
         submit_label = 'Edit'
         viewmodel = SuperUser_Edit(site_user, title, modelstate, modelsuccess_bool, form, filter, 
             poolgroup_id, groupowner_id, submit_label).viewmodel
@@ -296,8 +301,8 @@ class SuperUser_Transfer(Transfer_ViewModel):
             poolgroup, groupowner_id, submit_label)
 
     @classmethod
-    def get_transfer_viewmodel(cls, site_user, title, filter, poolgroup_id, groupowner_id, 
-            modelstate):
+    def get_transfer_viewmodel(cls, site_user, title, modelstate, filter, poolgroup_id, groupowner_id, 
+            form):
 
         modelstate, modelsuccess_bool = GroupOwner.get_modelstate(modelstate)
 
@@ -310,13 +315,14 @@ class SuperUser_Transfer(Transfer_ViewModel):
 
         groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, poolgroup.groupowner_id)
 
-        GroupOwner_Choices.get_groupowner_choices_2(groupowner_id)
+        GroupOwner_Choices.get_different_choices_than_groupowner(groupowner_id, groupowners)
         groupowner_choices = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
 
-        form = PoolGroupForm_Transfer(initial = {'filter':filter,
-                                                            'name': poolgroup.name,
-                                                            'groupowner_name': poolgroup.groupowner.name,
-                                                            'new_groupowner_id': groupowner_choices[0].groupowner_id})
+        if form == None:
+            form = PoolGroupForm_Transfer(initial = {'filter':filter,
+                                                        'name': poolgroup.name,
+                                                        'groupowner_name': poolgroup.groupowner.name,
+                                                        'new_groupowner_id': groupowner_choices[0].groupowner_id})
 
         submit_label = 'Transfer'
 
@@ -334,7 +340,7 @@ class SuperUser_Details(Details_ViewModel):
             filter, groupowner_id) 
 
     @classmethod
-    def get_details_viewmodel(cls, site_user, title, modelstate, poolgroup_id, filter, 
+    def get_details_viewmodel(cls, site_user, title, modelstate, filter, poolgroup_id, 
         groupowner_id):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
@@ -380,12 +386,13 @@ class GroupOwner_Create(Create_ViewModel):
         self.viewmodel['form_url'] = 'poolgroup:create'
 
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, modelstate, filter, groupowner_id):
+    def get_create_viewmodel(cls, site_user, title, modelstate, filter, groupowner_id, form):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
-        form = PoolGroupForm_Create(initial = {'groupowner_id' : groupowner_id,
-                                                           'filter': filter})
+        if form == None:
+            form = PoolGroupForm_Create(initial = {'groupowner_id' : groupowner_id,
+                                                               'filter': filter})
 
         form.fields['groupowner_id'].widget.attrs['disabled'] = 'disabled'
 
@@ -433,7 +440,7 @@ class GroupOwner_Details(Details_ViewModel):
             groupowner_id) 
 
     @classmethod
-    def get_details_viewmodel(cls, site_user, title, modelstate, poolgroup_id, filter, groupowner_id):
+    def get_details_viewmodel(cls, site_user, title, modelstate, filter, poolgroup_id, groupowner_id):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
@@ -454,7 +461,7 @@ class User_Delete(Delete_ViewModel):
             groupowner_id) 
 
     @classmethod
-    def get_delete_viewmodel(cls, site_user, title, modelstate, poolgroup_id, filter,
+    def get_delete_viewmodel(cls, site_user, title, modelstate, filter, poolgroup_id,
         groupowner_id):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)

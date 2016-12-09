@@ -165,11 +165,12 @@ class SuperUser_Create(Create_ViewModel):
             form, filter, submit_label)
 
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, filter, modelstate):
+    def get_create_viewmodel(cls, site_user, title, filter, modelstate, form):
 
         modelstate, modelsuccess_bool = GroupOwner.get_modelstate(modelstate)
 
-        form = GroupOwnerForm_Create(initial = {'filter':filter})
+        if form == None:
+            form = GroupOwnerForm_Create(initial = {'filter':filter})
 
         submit_label = 'Create'
 
@@ -186,7 +187,7 @@ class SuperUser_Transfer(Transfer_ViewModel):
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter, groupowner, submit_label)
 
     @classmethod
-    def get_transfer_viewmodel(cls, site_user, title, groupowner_id, filter, modelstate):
+    def get_transfer_viewmodel(cls, site_user, title, groupowner_id, filter, modelstate, form):
 
         modelstate, modelsuccess_bool = GroupOwner.get_modelstate(modelstate)
 
@@ -197,12 +198,13 @@ class SuperUser_Transfer(Transfer_ViewModel):
 
         groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
         groupowner = GroupOwner.get_item_by_id(GroupOwner, groupowner_id)
-        GroupOwner_Choices.get_groupowner_choices_2(groupowner_id)
+        GroupOwner_Choices.get_different_choices_than_groupowner(groupowner_id, groupowners)
         groupowner_choices = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
 
-        form = GroupOwnerForm_Transfer(initial = {'filter':filter,
-                                                    'name': groupowner.name,
-                                                    'new_groupowner_id': groupowner_choices[0].groupowner_id})
+        if form == None:
+            form = GroupOwnerForm_Transfer(initial = {'filter':filter,
+                                                        'name': groupowner.name,
+                                                        'new_groupowner_id': groupowner_choices[0].groupowner_id})
 
         submit_label = 'Transfer'
 

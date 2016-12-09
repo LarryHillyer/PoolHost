@@ -361,7 +361,7 @@ class SuperUser_Create(Create_ViewModel):
             poolowner_id, poolgroup_id, groupowner_id, submit_label)
         
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id):
+    def get_create_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
@@ -370,7 +370,7 @@ class SuperUser_Create(Create_ViewModel):
         if len(groupowners) == 0:
             viewmodel = {'modelstate':'Error: Create a Group Owner First!'}
             return viewmodel
-        GroupOwner_Choices.get_groupowner_choices_3(groupowners)
+        GroupOwner_Choices.get_choices_by_groupowners(groupowners)
 
         groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
 
@@ -379,7 +379,7 @@ class SuperUser_Create(Create_ViewModel):
         if len(poolgroups) == 0:
             viewmodel = {'modelstate':'Error: Create a Pool Group First!'}
             return viewmodel
-        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id, poolgroups)
+        PoolGroup_Choices.get_choices_by_poolgroups(poolgroups)
 
         poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
 
@@ -389,15 +389,16 @@ class SuperUser_Create(Create_ViewModel):
             return viewmodel
         
         poolowner_id = PoolOwner.get_poolowner_id_if_needed_and_possible(poolowners, poolowner_id)
-        PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolgroup_id)
+        PoolOwner_Choices.get_choices_by_poolowners(poolowners)
 
         CronJob_Choices.get_cronjob_choices()
         cronjob_id = CronJob_Choices.get_all_items(CronJob_Choices)[0].cronjob_id
 
         PoolType_Choices.get_pooltype_choices()
         pooltype_id = PoolType_Choices.get_all_items(PoolType_Choices)[0].pooltype_id
-        
-        form = PoolForm_Create(initial = {'cronjob_id': cronjob_id,
+
+        if form == None:        
+            form = PoolForm_Create(initial = {'cronjob_id': cronjob_id,
                                             'pooltype_id': pooltype_id,
                                             'groupowner_id': groupowner_id,
                                             'poolgroup_id': poolgroup_id,
@@ -420,7 +421,8 @@ class SuperUser_Edit(Edit_ViewModel):
 
 
     @classmethod
-    def get_edit_viewmodel(cls, site_user, title, modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id):
+    def get_edit_viewmodel(cls, site_user, title, modelstate, filter, pool_id, poolowner_id, 
+        poolgroup_id, groupowner_id, form):
 
         modelstate, modelsuccess_bool = Pool.get_modelstate(modelstate)
 
@@ -428,35 +430,36 @@ class SuperUser_Edit(Edit_ViewModel):
 
         groupowners = GroupOwner.get_all_items(GroupOwner)
         groupowners = GroupOwner.get_groupowners_with_poolowners(groupowners)
-        GroupOwner_Choices.get_groupowner_choices_3(groupowners)
+        GroupOwner_Choices.get_choices_by_groupowners(groupowners)
 
         groupowner_id = pool.poolgroup.groupowner_id
 
         poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
         poolgroups = PoolGroup.get_poolgroups_with_poolowners(poolgroups)
-        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id, poolgroups)
+        PoolGroup_Choices.get_choices_by_poolgroups(poolgroups)
 
         poolgroup_id = pool.poolgroup_id
 
         poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
-        PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolgroup_id)
+        PoolOwner_Choices.get_choices_by_poolowners(poolowners)
 
         poolowner_id = pool.poolowner_id
 
         CronJob_Choices.get_cronjob_choices()
-        cronjob_id = CronJob_Choices.get_all_items(CronJob_Choices)[0].cronjob_id
+        cronjob_id = pool.cronjob_id
 
         PoolType_Choices.get_pooltype_choices()
-        pooltype_id = PoolType_Choices.get_all_items(PoolType_Choices)[0].pooltype_id
-        
-        form = PoolForm_Edit(initial = {'id': pool_id,
-                                            'name': pool.name,
-                                            'cronjob_id': cronjob_id,
-                                            'pooltype_id': pooltype_id,
-                                            'groupowner_id': groupowner_id,
-                                            'poolgroup_id': poolgroup_id,
-                                            'poolowner_id' : poolowner_id,
-                                            'filter' : filter})
+        pooltype_id = pool.pooltype_id
+
+        if form == None:        
+            form = PoolForm_Edit(initial = {'id': pool_id,
+                                                'name': pool.name,
+                                                'cronjob_id': cronjob_id,
+                                                'pooltype_id': pooltype_id,
+                                                'groupowner_id': groupowner_id,
+                                                'poolgroup_id': poolgroup_id,
+                                                'poolowner_id' : poolowner_id,
+                                                'filter' : filter})
 
         submit_label = 'Edit'
         viewmodel = SuperUser_Edit(site_user, title, modelstate, modelsuccess_bool, form, filter, 
@@ -473,22 +476,25 @@ class SuperUser_Transfer(Transfer_ViewModel):
             pool, poolowner_id, poolgroup_id, groupowner_id, submit_label)
         
     @classmethod
-    def get_transfer_viewmodel(cls, site_user, title, modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id):
+    def get_transfer_viewmodel(cls, site_user, title, modelstate, filter, pool_id, poolowner_id, 
+        poolgroup_id, groupowner_id, form):
 
         modelstate, modelsuccess_bool = Pool.get_modelstate(modelstate)
 
         pool = Pool.get_item_by_id(Pool, pool_id)
 
-        PoolOwner_Choices.get_differentpoolowner_choices_by_poolgroup_id(pool.poolgroup_id, pool.poolowner_id)
+        poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, pool.poolgroup_id)
+        PoolOwner_Choices.get_different_choices_than_poolowner(pool.poolowner_id, poolowners)
         poolowner_choices = PoolOwner_Choices.get_all_items(PoolOwner_Choices)
         if poolowner_choices.count() == 0:
             viewmodel = {'modelstate':'Error: No other poolowner is in pool group, add a pool owner to pool group first!'}
             return viewmodel
 
-        form = PoolForm_Transfer(initial={'name' : pool.name,
-                                            'new_poolowner_id': poolowner_choices[0].poolowner_id,
-                                            'poolgroup_name': pool.poolgroup.name,
-                                            'filter' : filter})
+        if form == None:
+            form = PoolForm_Transfer(initial={'name' : pool.name,
+                                                'new_poolowner_id': poolowner_choices[0].poolowner_id,
+                                                'poolgroup_name': pool.poolgroup.name,
+                                                'filter' : filter})
 
         submit_label = 'Transfer'
         viewmodel = SuperUser_Transfer(site_user, title, modelstate, modelsuccess_bool, form, filter, 
@@ -609,19 +615,20 @@ class GroupOwner_Create(Create_ViewModel):
             poolowner_id, poolgroup_id, groupowner_id, submit_label) 
 
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id):
+    def get_create_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
         groupowner_id = GroupOwner.get_item_by_userid(GroupOwner, site_user.user_id).id
-        GroupOwner_Choices.get_groupowner_choices(groupowner_id)
+        groupowners = GroupOwner.get_items_by_id(GroupOwner, groupowner_id)
+        GroupOwner_Choices.get_choices_by_groupowners(groupowners)
 
         poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
         poolgroups = PoolGroup.get_poolgroups_with_poolowners(poolgroups)
         if len(poolgroups) == 0:
             viewmodel = {'modelstate':'Error: Create a Pool Group First!'}
             return viewmodel
-        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id, poolgroups)
+        PoolGroup_Choices.get_choices_by_poolgroups(poolgroups)
 
         poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
 
@@ -631,15 +638,16 @@ class GroupOwner_Create(Create_ViewModel):
             return viewmodel
         
         poolowner_id = PoolOwner.get_poolowner_id_if_needed_and_possible(poolowners, poolowner_id)
-        PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolgroup_id)
+        PoolOwner_Choices.get_choices_by_poolowners(poolowners)
 
         CronJob_Choices.get_cronjob_choices()
         cronjob_id = CronJob_Choices.get_all_items(CronJob_Choices)[0].cronjob_id
 
         PoolType_Choices.get_pooltype_choices()
         pooltype_id = PoolType_Choices.get_all_items(PoolType_Choices)[0].pooltype_id
-        
-        form = PoolForm_Create(initial = {'cronjob_id': cronjob_id,
+
+        if form == None:        
+            form = PoolForm_Create(initial = {'cronjob_id': cronjob_id,
                                             'pooltype_id': pooltype_id,
                                             'groupowner_id': groupowner_id,
                                             'poolgroup_id': poolgroup_id,
@@ -663,7 +671,8 @@ class GroupOwner_Edit(Edit_ViewModel):
             pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label)
 
     @classmethod
-    def get_edit_viewmodel(cls, site_user, title, modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id):
+    def get_edit_viewmodel(cls, site_user, title, modelstate, filter, pool_id, 
+        poolowner_id, poolgroup_id, groupowner_id, form):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
@@ -671,30 +680,30 @@ class GroupOwner_Edit(Edit_ViewModel):
 
         groupowner_id = pool.poolgroup.groupowner_id
         groupowners = GroupOwner.get_items_by_id(GroupOwner, groupowner_id)
-        GroupOwner_Choices.get_groupowner_choices(groupowner_id)
+        GroupOwner_Choices.get_choices_by_groupowners(groupowners)
 
         poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
         poolgroups = PoolGroup.get_poolgroups_with_poolowners(poolgroups)
-        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id)
+        PoolGroup_Choices.get_choices_by_poolgroups(poolgroups)
 
         poolgroup_id = pool.poolgroup_id
 
         poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
         poolowner_id = pool.poolowner_id
-        PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolgroup_id)
+        PoolOwner_Choices.get_choices_by_poolowners(poolowners)
 
         CronJob_Choices.get_cronjob_choices()
-        cronjob_id = CronJob_Choices.get_all_items(CronJob_Choices)[0].cronjob_id
+        cronjob_id = pool.cronjob_id
 
         PoolType_Choices.get_pooltype_choices()
-        pooltype_id = PoolType_Choices.get_all_items(PoolType_Choices)[0].pooltype_id
-        
-        form = PoolForm_Edit(instance = pool, initial = {'filter':filter,
-                                                        'groupowner_id':groupowner_id,
-                                                        'poolgroup_id':poolgroup_id,
-                                                        'poolowner_id':poolowner_id})
-        
+        pooltype_id = pool.pooltype_id
 
+        if form == None:        
+            form = PoolForm_Edit(instance = pool, initial = {'filter':filter,
+                                                            'groupowner_id':groupowner_id,
+                                                            'poolgroup_id':poolgroup_id,
+                                                            'poolowner_id':poolowner_id})
+        
         form.fields['groupowner_id'].widget.attrs['disabled'] = 'disabled'
 
         submit_label = 'Edit'
@@ -712,22 +721,25 @@ class GroupOwner_Transfer(Transfer_ViewModel):
             pool, poolowner_id, poolgroup_id, groupowner_id, submit_label)
         
     @classmethod
-    def get_transfer_viewmodel(cls, site_user, title, modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id):
+    def get_transfer_viewmodel(cls, site_user, title, modelstate, filter, pool_id,
+        poolowner_id, poolgroup_id, groupowner_id, form):
 
         modelstate, modelsuccess_bool = Pool.get_modelstate(modelstate)
 
         pool = Pool.get_item_by_id(Pool, pool_id)
 
-        PoolOwner_Choices.get_differentpoolowner_choices_by_poolgroup_id(pool.poolgroup_id, pool.poolowner_id)
+        poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, pool.poolgroup_id)
+        PoolOwner_Choices.get_different_choices_than_poolowner(pool.poolowner_id, poolowners)
         poolowner_choices = PoolOwner_Choices.get_all_items(PoolOwner_Choices)
         if poolowner_choices.count() == 0:
             viewmodel = {'modelstate':'Error: No other poolowner is in pool group, add a pool owner to pool group first!'}
             return viewmodel
 
-        form = PoolForm_Transfer(initial={'name' : pool.name,
-                                            'new_poolowner_id': poolowner_choices[0].poolowner_id,
-                                            'poolgroup_name': pool.poolgroup.name,
-                                            'filter' : filter})
+        if form == None:
+            form = PoolForm_Transfer(initial={'name' : pool.name,
+                                                'new_poolowner_id': poolowner_choices[0].poolowner_id,
+                                                'poolgroup_name': pool.poolgroup.name,
+                                                'filter' : filter})
 
         submit_label = 'Transfer'
         viewmodel = SuperUser_Transfer(site_user, title, modelstate, modelsuccess_bool, form, filter, 
@@ -800,16 +812,16 @@ class PoolOwner_Create(Create_ViewModel):
 
         poolowner = PoolOwner.get_item_by_userid(PoolOwner,site_user.user_id)
 
+        groupowner_id = poolowner.poolgroup.groupowner_id
+        groupowners = [poolowner.poolgroup.groupowner]
+        GroupOwner_Choices.get_choices_by_groupowners(groupowners)
+
         poolgroup_id = poolowner.poolgroup_id
         poolgroups = [poolowner.poolgroup]
+        PoolGroup_Choices.get_choices_by_poolgroups(poolgroups)
 
-        groupowner_id = poolowner.poolgroup.groupowner_id
-
-        GroupOwner_Choices.get_groupowner_choices(groupowner_id)
-
-        PoolGroup_Choices.get_poolgroup_choices(0, poolgroups)
-
-        PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolgroup_id)
+        poolowners = [poolowner]
+        PoolOwner_Choices.get_choices_by_poolowners(poolowners)
 
         CronJob_Choices.get_cronjob_choices()
         cronjob_id = CronJob_Choices.get_all_items(CronJob_Choices)[0].cronjob_id
@@ -843,7 +855,8 @@ class PoolOwner_Edit(Edit_ViewModel):
             pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label)
 
     @classmethod
-    def get_edit_viewmodel(cls, site_user, title, modelstate, filter, pool_id, poolowner_id, poolgroup_id, groupowner_id):
+    def get_edit_viewmodel(cls, site_user, title, modelstate, filter, pool_id, 
+        poolowner_id, poolgroup_id, groupowner_id, form):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
@@ -858,24 +871,25 @@ class PoolOwner_Edit(Edit_ViewModel):
         groupowner_id = pool.poolgroup.groupowner_id
         groupowners = [pool.poolgroup.groupowner]
 
-        GroupOwner_Choices.get_groupowner_choices(groupowner_id)
-        PoolGroup_Choices.get_poolgroup_choices(0, poolgroups)
-        PoolOwner_Choices.get_poolowner_choices_by_poolgroup_id(poolgroup_id)
+        GroupOwner_Choices.get_choices_by_groupowners(groupowners)
+        PoolGroup_Choices.get_choices_by_poolgroups(poolgroups)
+        PoolOwner_Choices.get_choices_by_poolowners(poolowners)
         
         CronJob_Choices.get_cronjob_choices()
-        cronjob_id = CronJob_Choices.get_all_items(CronJob_Choices)[0].cronjob_id
+        cronjob_id = pool.cronjob_id
 
         PoolType_Choices.get_pooltype_choices()
-        pooltype_id = PoolType_Choices.get_all_items(PoolType_Choices)[0].pooltype_id
-        
-        form = PoolForm_Edit(initial = {'id': pool.id,
-                                            'name': pool.name,
-                                            'cronjob_id': cronjob_id,
-                                            'pooltype_id': pooltype_id,
-                                            'groupowner_id': groupowner_id,
-                                            'poolgroup_id': poolgroup_id,
-                                            'poolowner_id' : poolowner_id,
-                                            'filter' : filter})
+        pooltype_id = pool.pooltype_id
+
+        if form == None:        
+            form = PoolForm_Edit(initial = {'id': pool.id,
+                                                'name': pool.name,
+                                                'cronjob_id': cronjob_id,
+                                                'pooltype_id': pooltype_id,
+                                                'groupowner_id': groupowner_id,
+                                                'poolgroup_id': poolgroup_id,
+                                                'poolowner_id' : poolowner_id,
+                                                'filter' : filter})
 
         form.fields['groupowner_id'].widget.attrs['disabled'] = 'disabled'
 

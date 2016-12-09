@@ -1,7 +1,21 @@
 from django import template
     
 register = template.Library()
-register.simple_tag(lambda x: 1, name='filter_1')
-register.simple_tag(lambda x: 0, name='filter_0')
-register.simple_tag(lambda x: x, name='change_name')
-register.simple_tag(lambda x: 0, name='groupowner_0')
+
+@register.inclusion_tag('poolgroup/create_link.html', takes_context = True)
+def create_url(context):
+    return {
+        'create_link' : context['create_url'] + str(context['groupowner_id']) 
+                        + '/' + str(context['filter']) + '/',
+        'create_link_name' : context['create_link_name']
+    }
+
+@register.inclusion_tag('poolgroup/create_form.html', takes_context = True)
+def create_form(context):
+    return {
+        'form_action' : context['form_url'] + str(context['groupowner_id']) 
+                        + '/' + str(context['filter']) + '/',
+        'form_html' : context['form_html'],
+        'form_label_submit' : context['form_label_submit']
+
+    }

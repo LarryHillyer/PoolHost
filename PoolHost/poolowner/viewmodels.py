@@ -255,7 +255,8 @@ class SuperUser_Create(Create_ViewModel):
             poolgroup_id, groupowner_id, submit_label)
         
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, modelstate, filter, poolgroup_id, groupowner_id):
+    def get_create_viewmodel(cls, site_user, title, modelstate, filter, poolgroup_id, 
+        groupowner_id, form):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
@@ -264,7 +265,7 @@ class SuperUser_Create(Create_ViewModel):
         if len(groupowners) == 0:
             viewmodel = {'modelstate':'Error: Create a Group Owner First!'}
             return viewmodel
-        GroupOwner_Choices.get_groupowner_choices_3(groupowners)
+        GroupOwner_Choices.get_choices_by_groupowners(groupowners)
 
         groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
 
@@ -272,13 +273,14 @@ class SuperUser_Create(Create_ViewModel):
         if len(poolgroups) == 0:
             viewmodel = {'modelstate':'Error: Create a Pool Group First!'}
             return viewmodel
-        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id, poolgroups)
+        PoolGroup_Choices.get_choices_by_poolgroups(poolgroups)
 
         poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
 
-        form = PoolOwnerForm_Create(initial={'poolgroup_id': poolgroup_id,
-                                                        'groupowner_id' : groupowner_id,
-                                                        'filter' : filter})
+        if form == None:
+            form = PoolOwnerForm_Create(initial={'poolgroup_id': poolgroup_id,
+                                                            'groupowner_id' : groupowner_id,
+                                                            'filter' : filter})
 
         submit_label = 'Create'
         viewmodel = SuperUser_Create(site_user, title, modelstate, modelsuccess_bool, form, filter, 
@@ -295,22 +297,25 @@ class SuperUser_Transfer(Transfer_ViewModel):
             poolowner, poolgroup_id, groupowner_id, submit_label)
         
     @classmethod
-    def get_transfer_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id):
+    def get_transfer_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, 
+        poolgroup_id, groupowner_id, form):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
         poolowner = PoolOwner.get_item_by_id(PoolOwner, poolowner_id)
 
-        PoolOwner_Choices.get_differentpoolowner_choices_by_poolgroup_id(poolowner.poolgroup_id, poolowner.id)
+        poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolowner.poolgroup_id)
+        PoolOwner_Choices.get_different_choices_than_poolowner(poolowner.id, poolowners)
         poolowner_choices = PoolOwner_Choices.get_all_items(PoolOwner_Choices)
         if poolowner_choices.count() == 0:
             viewmodel = {'modelstate':'Error: No other poolowner is in pool group, add a pool owner to pool group first!'}
             return viewmodel
 
-        form = PoolOwnerForm_Transfer(initial={'name' : poolowner.name,
-                                                        'new_poolowner_id': poolowner_choices[0].poolowner_id,
-                                                        'poolgroup_name': poolowner.poolgroup.name,
-                                                        'filter' : filter})
+        if form == None:
+            form = PoolOwnerForm_Transfer(initial={'name' : poolowner.name,
+                                                            'new_poolowner_id': poolowner_choices[0].poolowner_id,
+                                                            'poolgroup_name': poolowner.poolgroup.name,
+                                                            'filter' : filter})
 
         submit_label = 'Transfer'
         viewmodel = SuperUser_Transfer(site_user, title, modelstate, modelsuccess_bool, form, filter, 
@@ -396,24 +401,27 @@ class GroupOwner_Create(Create_ViewModel):
             poolgroup_id, groupowner_id, submit_label) 
 
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, modelstate, filter, poolgroup_id, groupowner_id):
+    def get_create_viewmodel(cls, site_user, title, modelstate, filter, poolgroup_id, 
+        groupowner_id, form):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
         groupowner_id = GroupOwner.get_item_by_userid(GroupOwner, site_user.user_id).id
-        GroupOwner_Choices.get_groupowner_choices(groupowner_id)
+        groupowners = GroupOwner.get_items_by_id(GroupOwner, groupowner_id)
+        GroupOwner_Choices.get_choices_by_groupowners(groupowners)
 
         poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
         if poolgroups.count() == 0:
             viewmodel = {'modelstate':'Error: Create a Pool Group First!'}
             return viewmodel
-        PoolGroup_Choices.get_poolgroup_choices_by_groupowner_id(groupowner_id, poolgroups)
+        PoolGroup_Choices.get_choices_by_poolgroups(poolgroups)
 
         poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
 
-        form = PoolOwnerForm_Create(initial = {'poolgroup_id': poolgroup_id,
-                                                           'groupowner_id' : groupowner_id,
-                                                           'filter': filter})
+        if form == None:
+            form = PoolOwnerForm_Create(initial = {'poolgroup_id': poolgroup_id,
+                                                               'groupowner_id' : groupowner_id,
+                                                               'filter': filter})
 
         form.fields['groupowner_id'].widget.attrs['disabled'] = 'disabled'
 
@@ -432,21 +440,25 @@ class GroupOwner_Transfer(Transfer_ViewModel):
             poolowner, poolgroup_id, groupowner_id, submit_label)
         
     @classmethod
-    def get_transfer_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id):
+    def get_transfer_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, 
+        poolgroup_id, groupowner_id, form):
 
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
         poolowner = PoolOwner.get_item_by_id(PoolOwner, poolowner_id)
-        PoolOwner_Choices.get_differentpoolowner_choices_by_poolgroup_id(poolowner.poolgroup_id, poolowner.id)
+
+        poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolowner.poolgroup_id)
+        PoolOwner_Choices.get_different_choices_than_poolowner(poolowner.id, poolowners)
         poolowner_choices = PoolOwner_Choices.get_all_items(PoolOwner_Choices)
         if poolowner_choices.count() == 0:
             viewmodel = {'modelstate':'Error: No other poolowner is in pool group, add a pool owner to pool group first!'}
             return viewmodel
 
-        form = PoolOwnerForm_Transfer(initial={'name' : poolowner.name,
-                                                        'new_poolowner_id': poolowner_choices[0].poolowner_id,
-                                                        'poolgroup_name': poolowner.poolgroup.name,
-                                                        'filter' : filter})
+        if form == None:
+            form = PoolOwnerForm_Transfer(initial={'name' : poolowner.name,
+                                                            'new_poolowner_id': poolowner_choices[0].poolowner_id,
+                                                            'poolgroup_name': poolowner.poolgroup.name,
+                                                            'filter' : filter})
 
         submit_label = 'Transfer'
         viewmodel = GroupOwner_Transfer(site_user, title, modelstate, modelsuccess_bool, form, filter, 

@@ -248,53 +248,23 @@ class GroupOwner_Choices(models.Model, HelperMixins):
     groupowner_id = models.IntegerField()
 
     @classmethod
-    def get_groupowner_choices(cls, groupowner_id = 0):
-
-        try:
-
-            if groupowner_id == 0:
-                groupowners = GroupOwner.get_all_items(GroupOwner)
-            else:
-                groupowners = GroupOwner.get_items_by_id(GroupOwner, groupowner_id)
-
+    def get_choices_by_groupowners(cls, groupowners):
             groupowner_choices = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
             if groupowner_choices.count() > 0:               
                 groupowner_choices.delete()
             for groupowner in groupowners:
                 groupowner_choice = GroupOwner_Choices(name = groupowner.name, groupowner_id = groupowner.id)
                 GroupOwner_Choices.add_item(GroupOwner_Choices, groupowner_choice)
-        except:
-            pass
 
     @classmethod
-    def get_groupowner_choices_2(cls, groupowner_id = 0):
-
-        try:
-
-            groupowners = GroupOwner.get_all_items(GroupOwner)
-
-            groupowner_choices = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
-            if groupowner_choices.count() > 0:               
-                groupowner_choices.delete()
-            for groupowner in groupowners:
-                if groupowner.id != groupowner_id:
-                    groupowner_choice = GroupOwner_Choices(name = groupowner.name, groupowner_id = groupowner.id)
-                    GroupOwner_Choices.add_item(GroupOwner_Choices, groupowner_choice)
-        except:
-            pass
-
-    @classmethod
-    def get_groupowner_choices_3(cls, groupowners):
-
-        try:
-            groupowner_choices = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
-            if groupowner_choices.count() > 0:               
-                groupowner_choices.delete()
-            for groupowner in groupowners:
+    def get_different_choices_than_groupowner(cls, groupowner_id, groupowners):
+        groupowner_choices = GroupOwner_Choices.get_all_items(GroupOwner_Choices)
+        if groupowner_choices.count() > 0:               
+            groupowner_choices.delete()
+        for groupowner in groupowners:
+            if groupowner.id != groupowner_id:
                 groupowner_choice = GroupOwner_Choices(name = groupowner.name, groupowner_id = groupowner.id)
                 GroupOwner_Choices.add_item(GroupOwner_Choices, groupowner_choice)
-        except:
-            pass
 
     @classmethod
     def make_groupowner_choices(cls):
@@ -362,7 +332,7 @@ class PoolGroup (models.Model, HelperMixins):
         if error == None:
             return 'Success: Group ownership was transfered'
         else:
-            return 'Error: Database Error must be investigated'
+            return 'Error: Group ownership was not transfered'
 
     @classmethod
     def get_poolgroup_id_if_needed_and_possible(cls, poolgroups, poolgroup_id, 
@@ -454,35 +424,25 @@ class PoolGroup_Choices(models.Model, HelperMixins):
     poolgroup_id = models.IntegerField()
 
     @classmethod
-    def get_poolgroup_choices(cls, poolgroup_id = 0, poolgroups = []):
+    def get_choices_by_poolgroups(cls, poolgroups):
 
-            if poolgroup_id == 0 and poolgroups == []:
-                poolgroups = PoolGroup.get_all_items(PoolGroup)
-            elif poolgroups == []:
-                poolgroups = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
-
-            poolgroup_choices = PoolGroup_Choices.get_all_items(PoolGroup_Choices)
-            if poolgroup_choices.count() > 0:               
-                poolgroup_choices.delete()
-            for poolgroup in poolgroups:
-                poolgroup_choice = PoolGroup_Choices(name = poolgroup.name, poolgroup_id = poolgroup.id)
-                PoolGroup_Choices.add_item(PoolGroup_Choices, poolgroup_choice)
-
+        poolgroup_choices = PoolGroup_Choices.get_all_items(PoolGroup_Choices)
+        if poolgroup_choices.count() > 0:               
+            poolgroup_choices.delete()
+        for poolgroup in poolgroups:
+            poolgroup_choice = PoolGroup_Choices(name = poolgroup.name, poolgroup_id = poolgroup.id)
+            PoolGroup_Choices.add_item(PoolGroup_Choices, poolgroup_choice)
 
     @classmethod
-    def get_poolgroup_choices_by_groupowner_id(cls, groupowner_id, poolgroups, poolgroup_id = 0):
+    def get_different_choices_than_poolgroup(cls, poolgroup_id, poolgroups):
 
-        try:
-
-            poolgroup_choices = PoolGroup_Choices.get_all_items(PoolGroup_Choices)
-            if poolgroup_choices.count() > 0:               
-                poolgroup_choices.delete()
-            for poolgroup in poolgroups:
-                if poolgroup.id != poolgroup_id:
-                    poolgroup_choice = PoolGroup_Choices(name = poolgroup.name, poolgroup_id = poolgroup.id)
-                    PoolGroup_Choices.add_item(PoolGroup_Choices, poolgroup_choice)
-        except:
-            pass
+        poolgroup_choices = PoolGroup_Choices.get_all_items(PoolGroup_Choices)
+        if poolgroup_choices.count() > 0:               
+            poolgroup_choices.delete()
+        for poolgroup in poolgroups:
+            if poolgroup.id != poolgroup_id:
+                poolgroup_choice = PoolGroup_Choices(name = poolgroup.name, poolgroup_id = poolgroup.id)
+                PoolGroup_Choices.add_item(PoolGroup_Choices, poolgroup_choice)
 
     @classmethod
     def make_poolgroup_choices(cls):
@@ -592,61 +552,32 @@ class PoolOwner (models.Model, HelperMixins):
             modelstate = 'Error: Database Error!!! ' + poolowner.name + ' was not deleted!'
         return modelstate
 
-
 class PoolOwner_Choices(models.Model, HelperMixins):
     
     name = models.CharField(max_length = 50)
     poolowner_id = models.IntegerField()
 
+
     @classmethod
-    def get_poolowner_choices(cls, poolowner_id = 0):
+    def get_choices_by_poolowners(cls, poolowners):
 
-        try:
+        poolowner_choices = PoolOwner_Choices.get_all_items(PoolOwner_Choices)
+        if poolowner_choices.count() > 0:               
+            poolowner_choices.delete()
+        for poolowner in poolowners:
+            poolowner_choice = PoolOwner_Choices(name = poolowner.name, poolowner_id = poolowner.id)
+            PoolOwner_Choices.add_item(PoolOwner_Choices, poolowner_choice)
 
-            if poolowner_id == 0:
-                poolowners = PoolOwner.get_all_items(PoolOwner)
-            else:
-                poolowners = PoolOwner.get_items_by_id(PoolOwner, poolowner_id)
+    @classmethod
+    def get_different_choices_than_poolowner(cls, poolowner_id, poolowners):
 
-            poolowner_choices = PoolOwner_Choices.get_all_items(PoolOwner_Choices)
-            if poolowner_choices.count() > 0:               
-                poolowner_choices.delete()
-            for poolowner in poolowners:
+        poolowner_choices = PoolOwner_Choices.get_all_items(PoolOwner_Choices)
+        if poolowner_choices.count() > 0:               
+            poolowner_choices.delete()
+        for poolowner in poolowners:
+            if poolowner.id != poolowner_id:
                 poolowner_choice = PoolOwner_Choices(name = poolowner.name, poolowner_id = poolowner.id)
                 PoolOwner_Choices.add_item(PoolOwner_Choices, poolowner_choice)
-        except:
-            pass
-
-    @classmethod
-    def get_poolowner_choices_by_poolgroup_id(cls, poolgroup_id):
-
-        try:
-
-            poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
-
-            poolowner_choices = PoolOwner_Choices.get_all_items(PoolOwner_Choices)
-            if poolowner_choices.count() > 0:               
-                poolowner_choices.delete()
-            for poolowner in poolowners:
-                if poolowner.poolgroup_id == poolgroup_id:
-                    poolowner_choice = PoolOwner_Choices(name = poolowner.name, poolowner_id = poolowner.id)
-                    PoolOwner_Choices.add_item(PoolOwner_Choices, poolowner_choice)
-        except:
-            pass
-
-    @classmethod
-    def get_differentpoolowner_choices_by_poolgroup_id(cls, poolgroup_id, poolowner_id):
-
-            poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
-
-            poolowner_choices = PoolOwner_Choices.get_all_items(PoolOwner_Choices)
-            if poolowner_choices.count() > 0:               
-                poolowner_choices.delete()
-            for poolowner in poolowners:
-                if poolowner.poolgroup_id == poolgroup_id:
-                    if poolowner.id != poolowner_id:
-                        poolowner_choice = PoolOwner_Choices(name = poolowner.name, poolowner_id = poolowner.id)
-                        PoolOwner_Choices.add_item(PoolOwner_Choices, poolowner_choice)
 
     @classmethod
     def make_poolowner_choices(cls):

@@ -30,7 +30,7 @@ class index(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True:
+        if not site_user.is_superuser and  not site_user.is_groupowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         groupowner_id = int(groupowner_id)
@@ -56,18 +56,26 @@ class create(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         groupowner_id = int(groupowner_id)
         filter = int(filter)
+        form = None
 
-        if site_user.is_superuser == True:
+        if site_user.is_superuser:
             viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
-                modelstate, filter, groupowner_id)
+                modelstate, filter, groupowner_id, form)
         else:
             viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title,  
-                modelstate, filter, groupowner_id)
+                modelstate, filter, groupowner_id, form)
+
+        if viewmodel['modelstate'] != None and viewmodel['modelstate'] != "":
+            if viewmodel['modelstate'].split(':')[0] != 'Success':
+                return HttpResponseRedirect(reverse('poolgroup:index', args = (),
+                                                kwargs = {'modelstate': viewmodel['modelstate'],
+                                                            'groupowner_id': groupowner_id,
+                                                            'filter' : filter}))
 
         return render(request, self.template_name, viewmodel)
 
@@ -79,7 +87,7 @@ class create(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         if site_user.is_superuser:    
@@ -97,19 +105,30 @@ class create(View):
             if same_poolgroup.count() > 0:
                 modelstate = 'Error: Pool Group, ' + form.data['name'] + ' has already been taken!'
 
-                return HttpResponseRedirect(reverse('poolgroup:create', args = (),
-                                                    kwargs = {'modelstate': modelstate,
-                                                                'groupowner_id': groupowner_id,
-                                                                'filter' : filter}))
+                if site_user.is_superuser:
+                    viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
+                        modelstate, filter, groupowner_id, form)
+
+                else:
+                    viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title,  
+                        modelstate, filter, groupowner_id, form)
+
+                return render(request, self.template_name, viewmodel)
             
             poolgroup = PoolGroup(name = form.data['name'], groupowner_id = groupowner_id)
             modelstate = PoolGroup.add_item(PoolGroup, poolgroup)
 
             if modelstate.split(':')[0] != 'Success':
-                return HttpResponseRedirect(reverse('poolgroup:create', args=(),
-                                            kwargs = {'modelstate':modelstate,
-                                                        'groupowner_id': groupowner_id,
-                                                        'filter' : filter}))
+
+                if site_user.is_superuser:
+                    viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
+                        modelstate, filter, groupowner_id, form)
+
+                else:
+                    viewmodel = GroupOwner_Create.get_create_viewmodel(site_user,self.title,  
+                        modelstate, filter, groupowner_id, form)
+
+                return render(request, self.template_name, viewmodel)
 
             return HttpResponseRedirect(reverse('poolgroup:index', args = (),
                                                 kwargs = {'modelstate': modelstate,
@@ -119,12 +138,9 @@ class create(View):
         else:
             modelstate = 'Error: Invalid Input!' 
             viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, modelstate, filter,
-                groupowner_id)
+                groupowner_id, form)
 
-            return HttpResponseRedirect(reverse('poolgroup:create', args = (),
-                                                kwargs = {'modelstate': modelstate,
-                                                            'groupowner_id': groupowner_id,
-                                                            'filter' : filter}))
+            return render(request, self.template_name, viewmodel)
 
 class edit(View):
     title = 'Pool Group - Edit'
@@ -138,17 +154,18 @@ class edit(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         poolgroup_id = int(poolgroup_id)
         groupowner_id = int(groupowner_id)
         filter = int(filter)
+        form = None
 
-        if site_user.is_superuser == True:
-            viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, modelstate, poolgroup_id, filter, groupowner_id)
+        if site_user.is_superuser:
+            viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, modelstate, filter, poolgroup_id,  groupowner_id, form)
         else:
-            viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user, self.title, modelstate, poolgroup_id, filter, groupowner_id)
+            viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user, self.title, modelstate,  filter, poolgroup_id, groupowner_id, form)
 
         return render(request, self.template_name, viewmodel)
 
@@ -160,7 +177,7 @@ class edit(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         if site_user.is_superuser:
@@ -182,25 +199,33 @@ class edit(View):
 
             if exactly_same_poolgroup.count() > 0:
 
-                modelstate = 'Error: No Changes were made during edit, update aborted!'
+                modelstate = 'Error: No Changes were made to Pool Group, ' + form.data['name'] + ' update aborted!'
 
-                return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
-                                                    kwargs = {'modelstate': modelstate,
-                                                                'poolgroup_id': poolgroup_id,
-                                                                'groupowner_id': groupowner_id,
-                                                                'filter' : filter}))
+                if site_user.is_superuser:
+                    viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, 
+                        modelstate, filter, poolgroup_id, groupowner_id, form)
+
+                else:
+                    viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                        modelstate, filter, poolgroup_id, groupowner_id, form)
+
+                return render(request, self.template_name, viewmodel)
    
             same_poolgroup = PoolGroup.get_same_poolgroup_in_database(form.data['name'], 
                 groupowner_id) 
 
             if same_poolgroup.count() > 0:
-                modelstate = 'Error: Poolgroup is already in the database, update aborted!'    
+                modelstate = 'Error: Poolgroup, ' + form.data['name'] + ' is already in the database, update aborted!'    
 
-                return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
-                                                    kwargs = {'modelstate': modelstate,
-                                                                'poolgroup_id': poolgroup_id,
-                                                                'groupowner_id': groupowner_id,
-                                                                'filter' : filter}))
+                if site_user.is_superuser:
+                    viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, 
+                        modelstate, filter,  poolgroup_id, groupowner_id, form)
+
+                else:
+                    viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                        modelstate, filter, poolgroup_id, groupowner_id, form)
+
+                return render(request, self.template_name, viewmodel)
 
             poolgroup = PoolGroup.get_item_by_id(PoolGroup, form.data['id'])
             poolgroup.name = form.data['name']
@@ -209,11 +234,15 @@ class edit(View):
 
             if modelstate.split(':')[0] != 'Success':
 
-                return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
-                                                    kwargs = {'modelstate': modelstate,
-                                                                'poolgroup_id': poolgroup_id,
-                                                                'groupowner_id': groupowner_id,
-                                                                'filter' : filter}))
+                if site_user.is_superuser:
+                    viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, 
+                        modelstate, filter, poolgroup_id, groupowner_id, form)
+
+                else:
+                    viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                        modelstate, filter, poolgroup_id, groupowner_id, form)
+
+                return render(request, self.template_name, viewmodel)
 
             return HttpResponseRedirect(reverse('poolgroup:index', args = (),
                                                 kwargs = {'modelstate': modelstate,
@@ -223,11 +252,15 @@ class edit(View):
         else:
             modelstate = 'Error: Invalid Input!'
 
-            return HttpResponseRedirect(reverse('poolgroup:edit', args = (),
-                                                kwargs = {'modelstate': modelstate,
-                                                            'poolgroup_id': poolgroup_id,
-                                                            'groupowner_id': groupowner_id,
-                                                            'filter' : filter}))
+            if site_user.is_superuser:
+                viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, 
+                    modelstate, filter, poolgroup_id, groupowner_id, form)
+
+            else:
+                viewmodel = GroupOwner_Edit.get_edit_viewmodel(site_user,self.title,  
+                    modelstate, filter, poolgroup_id, groupowner_id, form)
+
+            return render(request, self.template_name, viewmodel)
  
 class transfer(View):
     title = 'Pool Group - Transfer Ownership'
@@ -241,7 +274,7 @@ class transfer(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True:
+        if not site_user.is_superuser:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         if groupowner_id == 0:
@@ -251,10 +284,19 @@ class transfer(View):
         groupowner_id = int(groupowner_id)
         filter = int(filter)
 
-        view_model = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title,  filter, poolgroup_id, 
-            groupowner_id, modelstate)
+        form = None
 
-        return render(request, self.template_name, view_model)
+        viewmodel = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, modelstate, filter, poolgroup_id, 
+            groupowner_id, form)
+
+        if viewmodel['modelstate'] != None and viewmodel['modelstate'] != "":
+            if viewmodel['modelstate'].split(':')[0] != 'Success':
+                return HttpResponseRedirect(reverse('poolgroup:index', args = (),
+                                                kwargs = {'modelstate': viewmodel['modelstate'],
+                                                            'groupowner_id': groupowner_id,
+                                                            'filter' : filter}))
+
+        return render(request, self.template_name, viewmodel)
 
     def post(self, request, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
 
@@ -264,7 +306,7 @@ class transfer(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True:
+        if not site_user.is_superuser:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         if poolgroup_id == 0:
@@ -284,39 +326,33 @@ class transfer(View):
 
                 modelstate = 'Error: New groupowner is same as old groupower!'
 
-                view_model = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, poolgroup_id, groupowner_id, 
-                    filter, modelstate)
+                viewmodel = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, modelstate, 
+                    filter, poolgroup_id, groupowner_id, form)
 
-                return HttpResponseRedirect(reverse('poolgroup:transfer', args=(),
-                                                        kwargs = {'modelstate':modelstate,
-                                                                    'poolgroup_id': poolgroup_id,
-                                                                    'groupowner_id': groupowner_id,
-                                                                    'filter': filter}))
+                return render(request, self.template_name, viewmodel)
 
             modelstate = PoolGroup.transfer_group_ownership([poolgroup], form.data['new_groupowner_id'], modelstate)
 
             if modelstate.split(':')[0] != 'Success':
 
-                return HttpResponseRedirect(reverse('poolgroup:transfer', args=(),
-                                            kwargs = {'modelstate':modelstate,
-                                                        'poolgroup_id': poolgroup_id,
-                                                        'groupowner_id': groupowner_id,
-                                                        'filter' : filter}))
+                viewmodel = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, modelstate, 
+                    filter, poolgroup_id, groupowner_id, form)
+
+                return render(request, self.template_name, viewmodel)
 
             return HttpResponseRedirect(reverse('poolgroup:index', args=(),
-                                                    kwargs = {'modelstate':modelstate,
-                                                                'groupowner_id': form.data['new_groupowner_id'],
-                                                                'filter': form.data['filter']}))
+                                            kwargs = {'modelstate':modelstate,
+                                                        'groupowner_id': form.data['new_groupowner_id'],
+                                                        'filter': form.data['filter']}))
 
         else:
 
-            view_model = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
-            
-            return HttpResponseRedirect(reverse('poolgroup:transfer', args=(),
-                                                    kwargs = {'modelstate':modelstate,
-                                                                'poolgroup_id': poolgroup_id,
-                                                                'groupowner_id': groupowner_id,
-                                                                'filter': filter}))
+            modelstate = 'Error: Invalid form'
+
+            viewmodel = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, modelstate, 
+                filter, poolgroup_id, groupowner_id, form)
+
+            return render(request, self.template_name, viewmodel)
   
 class details(View):
 
@@ -331,7 +367,7 @@ class details(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         poolgroup_id = int(poolgroup_id)
@@ -341,11 +377,11 @@ class details(View):
         if poolgroup_id == 0:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser == True:
-            viewmodel = SuperUser_Details.get_details_viewmodel(site_user, self.title, modelstate, poolgroup_id, filter,
+        if site_user.is_superuser:
+            viewmodel = SuperUser_Details.get_details_viewmodel(site_user, self.title, modelstate, filter, poolgroup_id,
                 groupowner_id)
         else:
-            viewmodel = GroupOwner_Details.get_details_viewmodel(site_user,self.title, modelstate, poolgroup_id, filter,
+            viewmodel = GroupOwner_Details.get_details_viewmodel(site_user,self.title, modelstate, filter, poolgroup_id,
                 groupowner_id)
         
         return render(request, self.template_name, viewmodel)
@@ -362,7 +398,7 @@ class delete(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         if poolgroup_id == 0:
@@ -373,7 +409,7 @@ class delete(View):
         filter = int(filter)
 
         viewmodel = User_Delete.get_delete_viewmodel(site_user, self.title, 
-               modelstate, poolgroup_id, filter, groupowner_id)
+               modelstate, filter, poolgroup_id, groupowner_id)
         
         return render(request, self.template_name, viewmodel)
 
@@ -385,7 +421,7 @@ class delete(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if site_user.is_superuser != True and site_user.is_groupowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         if poolgroup_id == 0:
