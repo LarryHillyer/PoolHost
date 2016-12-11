@@ -17,7 +17,7 @@ from groupowner.forms import GroupOwnerForm_Create, GroupOwnerForm_Transfer
 
 class index(View):
     title = 'Group Owner - Index'
-    template_name = 'app/shared_index.html'
+    template_name = 'app/shared_index_view.html'
     def get(self, request, filter = 0, modelstate = None):
 
         site_user = None
@@ -31,14 +31,15 @@ class index(View):
 
         filter = int(filter)
 
-        viewmodel = SuperUser_Index.get_index_viewmodel(site_user, self.title, modelstate, filter)
+        viewmodel = SuperUser_Index.get_index_viewmodel(site_user, self.title, 
+            modelstate, filter)
         
         return render(request, self.template_name, viewmodel)
 
 class create(View):
     title = 'Group Owner - Create'
     form_class = GroupOwnerForm_Create
-    template_name = 'app/shared_create.html'
+    template_name = 'app/shared_form_view.html'
 
     def get(self, request, filter = 0, modelstate = None):
         
@@ -107,7 +108,7 @@ class create(View):
 
 class transfer(View):
     title = 'Group Owner - Transfer Ownership'
-    template_name = 'app/shared_create.html'
+    template_name = 'app/shared_form_view.html'
 
     def get(self, request, groupowner_id = 0, filter = 0, modelstate = None):
         site_user = None
@@ -181,7 +182,7 @@ class transfer(View):
 class details(View):
 
     title = 'Group Owner - Details'
-    template_name = 'app/shared_details.html'
+    template_name = 'app/shared_details_view.html'
 
     def get(self, request, groupowner_id = 0, filter = 0, modelstate = None):
         site_user = None
@@ -206,7 +207,7 @@ class details(View):
 class delete(View):
 
     title = 'Group Owner - Delete'
-    template_name = 'app/shared_delete.html'
+    template_name = 'app/shared_delete_view.html'
 
     def get(self, request, groupowner_id = 0, filter = 0, modelstate = None):
         site_user = None

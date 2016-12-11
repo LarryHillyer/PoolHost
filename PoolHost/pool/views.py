@@ -27,7 +27,7 @@ from pool.forms import PoolForm_Create, PoolForm_Edit, PoolForm_Transfer
 class index(View):
 
     title = 'Pool - Index'
-    template_name = 'app/shared_index_pagination.html'
+    template_name = 'app/shared_index_view.html'
 
     def get(self, request, poolowner_id = 0, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
 
@@ -57,7 +57,7 @@ class index(View):
 class create(View):
 
     title = 'Pool - Create'
-    template_name = 'app/shared_create.html'
+    template_name = 'app/shared_form_view.html'
 
     def get(self, request, poolowner_id = 0, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
 
@@ -207,7 +207,7 @@ class create(View):
 
 class edit(View):
     title = 'Pool - Edit'
-    template_name = 'app/shared_create.html'
+    template_name = 'app/shared_form_view.html'
 
     def get(self, request, pool_id = 0, poolowner_id = 0, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
 
@@ -377,7 +377,7 @@ class edit(View):
 
 class transfer(View):
     title = 'Pool - Transfer'
-    template_name = 'app/shared_create.html'
+    template_name = 'app/shared_form_view.html'
 
     def get(self, request, pool_id = 0, poolowner_id = 0, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
 
@@ -485,7 +485,7 @@ class transfer(View):
 
 class details(View):
     title = 'Pool - Details'
-    template_name = 'app/shared_details.html'
+    template_name = 'app/shared_details_view.html'
 
     def get(self,request, pool_id = 0, poolowner_id = 0, poolgroup_id = 0, groupowner_id = 0, 
         filter = 0, modelstate = None):
@@ -522,7 +522,7 @@ class details(View):
 
 class delete(View):
     title = 'Pool - Delete'
-    template_name = 'app/shared_delete.html'
+    template_name = 'app/shared_delete_view.html'
 
     def get(self,request, pool_id = 0, poolowner_id = 0, poolgroup_id = 0, groupowner_id = 0, filter = 0, modelstate = None):
         site_user = None

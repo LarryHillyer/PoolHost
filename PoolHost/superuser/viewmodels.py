@@ -7,89 +7,121 @@ from app.mixins import HelperMixins
 
 from superuser.forms import SuperUserForm_Create
 
+class Layout_View(object):
 
-class BaseViewModel(object):
-
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool):
+    def __init__(self, site_user, title):
 
         self.viewmodel = {'site_user':site_user, # app/layout.html params
                             'title': title,
-                            'year': datetime.now().year,
-                            'modelsuccess_bool': modelsuccess_bool,
-                            'modelstate': modelstate,
-                            'modelstate_html': 'app/modelstatus.html' }
+                            'year': datetime.now().year,}
 
+class Index_Body_View(Layout_View):
 
-class Table_ViewModel(BaseViewModel):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, superusers):
-        
-        super().__init__(site_user, title, modelstate, modelsuccess_bool)
+        super().__init__(site_user, title)
 
-        self.viewmodel['partial_view_id'] = 'superuser-id' # app/shared_index.html params
+        self.viewmodel['partial_view_id'] = 'superuser-id'
+
+        self.viewmodel['index_url'] = 'superuser:index'
+
+        self.viewmodel['pagination_routing_html'] = 'app/pagination_routing.html'  
+
+        self.viewmodel['modelsuccess_bool'] = modelsuccess_bool
+        self.viewmodel['modelstate'] = modelstate
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
 
         self.viewmodel['create_url'] = 'superuser:create'
         self.viewmodel['create_link_name'] = 'Create Super User'
-        self.viewmodel['create_link_html'] = 'superuser/create_link.html'
+        self.viewmodel['create_link_html'] =  'superuser/create_link.html' 
+        self.viewmodel['shared_create_link_html'] = 'app/shared_create_link.html'
 
-        self.viewmodel['index_table_html'] = 'superuser/index_table.html'
-
-        self.viewmodel['items'] = superusers # super_user/index_table.html params
-        self.viewmodel['header_label_item'] = 'Super User Name' 
-        self.viewmodel['details_url'] = 'superuser:details' 
-        self.viewmodel['delete_url'] = 'superuser:delete'
+        self.viewmodel['index_table_html'] = 'superuser/index_table.html' 
 
         self.viewmodel['scripts'] = ['app/scripts/Client/TableStripping.js']
 
-class Form_ViewModel(BaseViewModel):
+class Form_Body_View(Layout_View):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
-        form, submit_label):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, form):
 
-        super().__init__(site_user, title, modelstate, modelsuccess_bool)
+        super().__init__(site_user, title)
         
         self.viewmodel['partial_view_id'] = 'superuser-id' 
 
         self.viewmodel['form'] = form 
-        self.viewmodel['form_label_submit'] = submit_label
+        self.viewmodel['form_html'] = 'superuser/superuser_form.html'
+
+        self.viewmodel['form_label_name'] = 'Super User'
+
+        self.viewmodel['modelsuccess_bool'] = modelsuccess_bool
+        self.viewmodel['modelstate'] = modelstate
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
 
         self.viewmodel['index_url'] = 'superuser:index'
         self.viewmodel['index_link_html'] = 'superuser/index_link.html'
+        self.viewmodel['shared_index_link_html'] = 'app/shared_index_link.html'
 
         self.viewmodel['scripts'] = ['app/scripts/jquery.validate.js']
 
-class DescriptiveList_ViewModel(BaseViewModel):
+class Details_Delete_Body_View(Layout_View):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, superuser):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
+            superuser):
 
-        super().__init__(site_user, title, modelstate, modelsuccess_bool)
+        super().__init__(site_user, title)
 
         self.viewmodel['partial_view_id'] = 'superuser-id' 
 
         self.viewmodel['superuser_id'] = superuser.id
 
-        self.viewmodel['descriptive_list'] = 'superuser/descriptive_list.html' 
+        self.viewmodel['descriptive_list'] = 'superuser/descriptive_list.html'
+
+        self.viewmodel['modelsuccess_bool'] = modelsuccess_bool
+        self.viewmodel['modelstate'] = modelstate
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
+
+        self.viewmodel['index_url'] = 'superuser:index'
+
+
+class Table_View(Index_Body_View):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, superusers):
+
+        super().__init__(site_user, title, modelstate, modelsuccess_bool)
+      
+        self.viewmodel['items'] = superusers 
+        self.viewmodel['header_label_item'] = 'Super User Name' 
+        self.viewmodel['details_url'] = 'superuser:details' 
+        self.viewmodel['delete_url'] = 'superuser:delete'
+
+class DescriptiveList_View(Details_Delete_Body_View):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
+            superuser):
+
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, 
+            superuser)
 
         self.viewmodel['item'] = superuser 
         self.viewmodel['item_label_name'] = 'Super User'
         self.viewmodel['item_label_email'] = 'E-mail'
 
-        self.viewmodel['index_url'] = 'superuser:index'
 
 
-class Create_ViewModel(Form_ViewModel):
+class Create_View(Form_Body_View):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, submit_label):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, form):
         
-        super().__init__(site_user, title, modelstate, modelsuccess_bool, form, submit_label)
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, form)
 
-        self.viewmodel['form_template_html'] = 'superuser/create_form.html'  
+        self.viewmodel['form_template_html'] = 'superuser/create_form.html'
+        self.viewmodel['form_create_html'] = 'app/shared_create_form.html'   
         self.viewmodel['form_url'] = 'superuser:create'
-        self.viewmodel['form_html'] = 'superuser/superuser_form.html'
 
-        self.viewmodel['form_label_name'] = 'Super User Name'
+        self.viewmodel['form_label_submit'] = 'Create'
 
-class Details_ViewModel(DescriptiveList_ViewModel):
+
+class Details_View(DescriptiveList_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, superuser):
         
@@ -97,7 +129,7 @@ class Details_ViewModel(DescriptiveList_ViewModel):
 
         self.viewmodel['details_links_html'] = 'superuser/details_links.html'
 
-class Delete_ViewModel(DescriptiveList_ViewModel):
+class Delete_View(DescriptiveList_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, superuser):
         
@@ -105,6 +137,7 @@ class Delete_ViewModel(DescriptiveList_ViewModel):
 
         self.viewmodel['delete_url'] = 'superuser:delete'
         self.viewmodel['delete_form'] = 'superuser/delete_form.html'
+        self.viewmodel['shared_delete_form_html'] = 'app/shared_delete_form.html'
 
     @classmethod
     def get_delete_viewmodel(cls, site_user, title, superuser_id, modelstate):
@@ -118,11 +151,13 @@ class Delete_ViewModel(DescriptiveList_ViewModel):
         return viewmodel
 
 
-class SuperUser_Index(Table_ViewModel):
+class SuperUser_Index(Table_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, superusers):
         
         super().__init__(site_user, title, modelstate, modelsuccess_bool, superusers)
+
+        self.viewmodel['use_pagination'] = False            
 
     @classmethod
     def get_index_viewmodel(cls, site_user, title, modelstate):
@@ -134,13 +169,13 @@ class SuperUser_Index(Table_ViewModel):
 
         return viewmodel
 
-class SuperUser_Create(Create_ViewModel):
+class SuperUser_Create(Create_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
-        form, submit_label):
+        form):
         
         super().__init__(site_user, title, modelstate, modelsuccess_bool, 
-            form, submit_label)
+            form)
 
     @classmethod
     def get_create_viewmodel(cls, site_user, title, modelstate):
@@ -149,13 +184,12 @@ class SuperUser_Create(Create_ViewModel):
 
         form = SuperUserForm_Create()
 
-        submit_label = 'Create'
-
-        viewmodel = Create_ViewModel(site_user, title, modelstate, modelsuccess_bool, form, submit_label).viewmodel
+        viewmodel = SuperUser_Create(site_user, title, modelstate, modelsuccess_bool, 
+            form).viewmodel
 
         return viewmodel
 
-class SuperUser_Details(Details_ViewModel):
+class SuperUser_Details(Details_View):
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, superuser):
         
         super().__init__(site_user, title, modelstate, modelsuccess_bool, superuser)
@@ -167,11 +201,11 @@ class SuperUser_Details(Details_ViewModel):
 
         superuser = SuperUser.get_item_by_id(SuperUser, superuser_id)
 
-        viewmodel = Details_ViewModel(site_user, title, modelstate, modelsuccess_bool, superuser).viewmodel
+        viewmodel = SuperUser_Details(site_user, title, modelstate, modelsuccess_bool, superuser).viewmodel
 
         return viewmodel
 
-class SuperUser_Delete(Delete_ViewModel):
+class SuperUser_Delete(Delete_View):
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, superuser):
         
         super().__init__(site_user, title, modelstate, modelsuccess_bool, superuser)
@@ -183,6 +217,6 @@ class SuperUser_Delete(Delete_ViewModel):
 
         superuser = SuperUser.get_item_by_id(SuperUser, superuser_id)
 
-        viewmodel = Delete_ViewModel(site_user, title, modelstate, modelsuccess_bool, superuser).viewmodel
+        viewmodel = SuperUser_Delete(site_user, title, modelstate, modelsuccess_bool, superuser).viewmodel
 
         return viewmodel

@@ -1,3 +1,2 @@
-﻿            <a href="{% url index_url poolgroup_id groupowner_id filter %}">Index</a>
-            <span>  |  </span>
-            <a href="{% url 'home' %}">Home</a>
+﻿{% url index_url poolgroup_id groupowner_id filter as index_url %}
+{% include shared_index_link_html %}

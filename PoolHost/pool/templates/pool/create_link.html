@@ -1,1 +1,2 @@
-﻿            <a href="{% url create_url poolowner_id poolgroup_id groupowner_id filter %}" class="user-option">{{create_link_name}}</a>
+﻿{% url create_url poolowner_id poolgroup_id groupowner_id filter as create_url %}
+{% include shared_create_link_html %}

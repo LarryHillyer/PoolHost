@@ -31,7 +31,14 @@
     {% for item in items %}
     <tr>
         <td>
+        {% if site_user.is_superuser %}
             <a href="{% url item_url item.id poolowner_id poolgroup_id groupowner_id filter %}">{{item.name}}</a>
+        {% elif site_user.is_groupowner and not site_user.is_superuser %}
+            <a href="{% url item_url item.id poolowner_id poolgroup_id groupowner_id filter %}">{{item.name}}</a>
+        {% else %}
+            <a href="{% url item_url item.id poolowner_id poolgroup_id groupowner_id filter %}">{{item.name}}</a>
+        {% endif %}
+
         </td>
 
         <td>
@@ -58,11 +65,11 @@
         </td>
         {% endif %}
         <td>
-                <a href="{% url edit_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Edit</a>
-                <span>  |  </span>
-                <a href="{% url details_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Details</a>
-                <span>  |  </span>
-                <a href="{% url delete_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Delete</a>
+            <a href="{% url edit_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Edit</a>
+            <span>  |  </span>
+            <a href="{% url details_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Details</a>
+            <span>  |  </span>
+            <a href="{% url delete_url item.id poolowner_id poolgroup_id groupowner_id filter %}">Delete</a>
         </td>
     </tr>
     {% endfor %}

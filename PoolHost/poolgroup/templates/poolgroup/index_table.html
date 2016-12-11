@@ -1,5 +1,4 @@
-﻿{% load tags %}
-
+﻿
 <table class="table">
     <tr>
         <th>
@@ -18,32 +17,35 @@
     </tr>
 
     {% for item in items %}
+
     <tr>
         <td>
-            {% if site_user.is_superuser %}
-            <a href="{% url item_url item.id groupowner_id 3 %}">{{item.name}}</a>
-            {% elif site_user.is_groupowner and not site_user.is_superuser %}
-            <a href="{% url item_url item.id groupowner_id 1 %}">{{item.name}}</a>
-            {% endif %}
-        </td>
-
         {% if site_user.is_superuser %}
-            <td>
-                {{item.groupowner.name}}
-            </td>
-            <td>
-                <a href="{% url transfer_url item.id groupowner_id filter %}">Transfer Pool Group Ownership</a>            
-            </td>
+            <a href="{% url item_url item.id groupowner_id 3 %}">{{item.name}}</a>
+        {% else %}
+            <a href="{% url item_url item.id groupowner_id 1 %}">{{item.name}}</a>
         {% endif %}
 
+        </td>
+
+        {% if site_user.is_superuser%}
+        <td>
+            {{item.groupowner.name}}
+        </td>
+        {% endif %}
+
+        {% if user_has_transfer_privileges %}
+        <td>
+            <a href="{% url transfer_url item.id groupowner_id filter %}">Transfer Pool Group Ownership</a>            
+        </td>
+        {% endif %}
 
         <td>
-                <a href="{% url edit_url item.id groupowner_id filter %}">Edit</a>
-                <span>  |  </span>
-                <a href="{% url details_url item.id groupowner_id filter %}">Details</a>
-                <span>  |  </span>
-                <a href="{% url delete_url item.id groupowner_id filter %}">Delete</a>
-
+            <a href="{% url edit_url item.id groupowner_id filter %}">Edit</a>
+            <span>  |  </span>
+            <a href="{% url details_url item.id groupowner_id filter %}">Details</a>
+            <span>  |  </span>
+            <a href="{% url delete_url item.id groupowner_id filter %}">Delete</a>
         </td>
     </tr>
     {% endfor %}

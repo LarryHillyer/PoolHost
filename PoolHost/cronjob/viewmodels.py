@@ -7,113 +7,145 @@ from app.mixins import HelperMixins
 
 from cronjob.forms import CronJobForm_Create, CronJobForm_Edit
 
-class BaseViewModel(object):
+class Layout_View(object):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool):
+    def __init__(self, site_user, title):
 
         self.viewmodel = {'site_user':site_user, # app/layout.html params
                             'title': title,
-                            'year': datetime.now().year,
-                            'modelsuccess_bool': modelsuccess_bool,
-                            'modelstate': modelstate,
-                            'modelstate_html': 'app/modelstatus.html' }
+                            'year': datetime.now().year,}
 
-class Table_ViewModel(BaseViewModel):
+class Index_Body_View(Layout_View):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, cronjobs):
-        
-        super().__init__(site_user, title, modelstate, modelsuccess_bool)
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool):
 
-        self.viewmodel['partial_view_id'] = 'cronjob-id' 
+        super().__init__(site_user, title)
+
+        self.viewmodel['partial_view_id'] = 'cronjob-id'
+
+        self.viewmodel['index_url'] = 'cronjob:index'
+
+        self.viewmodel['pagination_routing_html'] = 'app/pagination_routing.html'  
+
+        self.viewmodel['modelsuccess_bool'] = modelsuccess_bool
+        self.viewmodel['modelstate'] = modelstate
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
 
         self.viewmodel['create_url'] = 'cronjob:create'
         self.viewmodel['create_link_name'] = 'Create Cron Job'
-        self.viewmodel['create_link_html'] = 'cronjob/create_link.html'
+        self.viewmodel['create_link_html'] =  'cronjob/create_link.html' 
+        self.viewmodel['shared_create_link_html'] = 'app/shared_create_link.html'
 
-        self.viewmodel['index_table_html'] = 'cronjob/index_table.html'
-
-        self.viewmodel['items'] = cronjobs 
-        self.viewmodel['header_label_item'] = 'Cron Job Name'
-        self.viewmodel['edit_url'] = 'cronjob:edit' 
-        self.viewmodel['details_url'] = 'cronjob:details' 
-        self.viewmodel['delete_url'] = 'cronjob:delete'
+        self.viewmodel['index_table_html'] = 'cronjob/index_table.html' 
 
         self.viewmodel['scripts'] = ['app/scripts/Client/TableStripping.js']
 
-class Form_ViewModel(BaseViewModel):
+class Form_Body_View(Layout_View):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
-        form, submit_label):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, form):
 
-        super().__init__(site_user, title, modelstate, modelsuccess_bool)
+        super().__init__(site_user, title)
         
         self.viewmodel['partial_view_id'] = 'cronjob-id' 
 
         self.viewmodel['form'] = form 
-        self.viewmodel['form_label_submit'] = submit_label
+        self.viewmodel['form_html'] = 'cronjob/cronjob_form.html'
+
+        self.viewmodel['form_label_name'] = 'Cron Job'
+        self.viewmodel['form_label_cronjobtype'] = 'Cron Job Type'
+
+        self.viewmodel['modelsuccess_bool'] = modelsuccess_bool
+        self.viewmodel['modelstate'] = modelstate
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
 
         self.viewmodel['index_url'] = 'cronjob:index'
         self.viewmodel['index_link_html'] = 'cronjob/index_link.html'
+        self.viewmodel['shared_index_link_html'] = 'app/shared_index_link.html'
 
         self.viewmodel['scripts'] = ['app/scripts/jquery.validate.js']
 
-class DescriptiveList_ViewModel(BaseViewModel):
+class Details_Delete_Body_View(Layout_View):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, cronjob):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
+            cronjob):
 
-        super().__init__(site_user, title, modelstate, modelsuccess_bool)
+        super().__init__(site_user, title)
 
         self.viewmodel['partial_view_id'] = 'cronjob-id' 
 
         self.viewmodel['cronjob_id'] = cronjob.id
 
-        self.viewmodel['descriptive_list'] = 'cronjob/descriptive_list.html' 
+        self.viewmodel['descriptive_list'] = 'cronjob/descriptive_list.html'
+
+        self.viewmodel['modelsuccess_bool'] = modelsuccess_bool
+        self.viewmodel['modelstate'] = modelstate
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
+
+        self.viewmodel['index_url'] = 'cronjob:index'
+
+
+class Table_View(Index_Body_View):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, cronjobs):
+
+        super().__init__(site_user, title, modelstate, modelsuccess_bool)
+      
+        self.viewmodel['items'] = cronjobs 
+        self.viewmodel['header_label_item'] = 'Cron Job'
+        self.viewmodel['edit_url'] = 'cronjob:edit' 
+        self.viewmodel['details_url'] = 'cronjob:details' 
+        self.viewmodel['delete_url'] = 'cronjob:delete'
+
+class DescriptiveList_View(Details_Delete_Body_View):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
+            cronjob):
+
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, 
+            cronjob)
 
         self.viewmodel['item'] = cronjob 
         self.viewmodel['item_label_name'] = 'Cron Job'
         self.viewmodel['item_label_cronjobtype'] = 'Cron Job Type'
 
-        self.viewmodel['index_url'] = 'cronjob:index'
 
 
-class Create_ViewModel(Form_ViewModel):
+class Create_View(Form_Body_View):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, submit_label):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, form):
         
-        super().__init__(site_user, title, modelstate, modelsuccess_bool, form, submit_label)
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, form)
 
-        self.viewmodel['form_template_html'] = 'cronjob/create_form.html'  
+        self.viewmodel['form_template_html'] = 'cronjob/create_form.html' 
+        self.viewmodel['form_create_html'] = 'app/shared_create_form.html' 
         self.viewmodel['form_url'] = 'cronjob:create'
-        self.viewmodel['form_html'] = 'cronjob/cronjob_form.html'
 
-        self.viewmodel['form_label_name'] = 'Cron Job'
-        self.viewmodel['form_label_cronjobtype'] = 'Cron Job Type'
+        self.viewmodel['form_label_submit'] = 'Create'
 
-class Edit_ViewModel(Form_ViewModel):
+class Edit_View(Form_Body_View):
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form,
-        cronjob_id, submit_label):
+        cronjob_id):
 
-        super().__init__(site_user, title, modelstate, modelsuccess_bool, form,
-            submit_label)
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, form)
         
         self.viewmodel['cronjob_id'] = cronjob_id
 
         self.viewmodel['form_template_html'] = 'cronjob/edit_form.html'
-        self.viewmodel['form_html'] = 'cronjob/cronjob_form.html'
+        self.viewmodel['form_edit_html'] = 'app/shared_edit_form.html'
         self.viewmodel['form_url'] = 'cronjob:edit'
 
-        self.viewmodel['form_label_name'] = 'Cron Job'
-        self.viewmodel['form_label_cronjobtype'] = 'Cron Job Type'
+        self.viewmodel['form_label_submit'] = 'Edit'
 
-class Details_ViewModel(DescriptiveList_ViewModel):
+class Details_View(DescriptiveList_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, cronjob):
         
         super().__init__(site_user, title, modelstate, modelsuccess_bool, cronjob)
 
+        self.viewmodel['edit_url'] = 'cronjob:edit'
         self.viewmodel['details_links_html'] = 'cronjob/details_links.html'
 
-class Delete_ViewModel(DescriptiveList_ViewModel):
+class Delete_View(DescriptiveList_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, cronjob):
         
@@ -121,14 +153,17 @@ class Delete_ViewModel(DescriptiveList_ViewModel):
 
         self.viewmodel['delete_url'] = 'cronjob:delete'
         self.viewmodel['delete_form'] = 'cronjob/delete_form.html'
+        self.viewmodel['shared_delete_form_html'] = 'app/shared_delete_form.html'
 
 
-class SuperUser_Index(Table_ViewModel):
+class SuperUser_Index(Table_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, cronjobs):
         
         super().__init__(site_user, title, modelstate, modelsuccess_bool, cronjobs)
 
+        self.viewmodel['use_pagination'] = False            
+        
     @classmethod
     def get_index_viewmodel(cls, site_user, title, modelstate):
 
@@ -139,13 +174,13 @@ class SuperUser_Index(Table_ViewModel):
 
         return viewmodel
 
-class SuperUser_Create(Create_ViewModel):
+class SuperUser_Create(Create_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
-        form, submit_label):
+        form):
         
         super().__init__(site_user, title, modelstate, modelsuccess_bool, 
-            form, submit_label)
+            form)
 
     @classmethod
     def get_create_viewmodel(cls, site_user, title, modelstate):
@@ -161,18 +196,16 @@ class SuperUser_Create(Create_ViewModel):
 
         form = CronJobForm_Create(initial = {'conjobtype_id':cronjobtype_id})
 
-        submit_label = 'Create'
-
-        viewmodel = Create_ViewModel(site_user, title, modelstate, modelsuccess_bool, form, submit_label).viewmodel
+        viewmodel = SuperUser_Create(site_user, title, modelstate, modelsuccess_bool, form).viewmodel
 
         return viewmodel
 
-class SuperUser_Edit(Edit_ViewModel):
+class SuperUser_Edit(Edit_View):
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form,
-        cronjob_id, submit_label):
+        cronjob_id):
 
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form,
-            cronjob_id, submit_label)
+            cronjob_id)
 
 
     @classmethod
@@ -185,13 +218,12 @@ class SuperUser_Edit(Edit_ViewModel):
 
         form = CronJobForm_Edit(instance = cronjob, initial = {'cronjobtype_id':cronjob.cronjobtype_id})
 
-        submit_label = 'Edit'
         viewmodel = SuperUser_Edit(site_user, title, modelstate, modelsuccess_bool, form, 
-            cronjob_id, submit_label).viewmodel
+            cronjob_id).viewmodel
         
         return viewmodel
 
-class SuperUser_Details(Details_ViewModel):
+class SuperUser_Details(Details_View):
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, cronjob):
         
         super().__init__(site_user, title, modelstate, modelsuccess_bool, cronjob)
@@ -203,11 +235,11 @@ class SuperUser_Details(Details_ViewModel):
 
         cronjob = CronJob.get_item_by_id(CronJob, cronjob_id)
 
-        viewmodel = Details_ViewModel(site_user, title, modelstate, modelsuccess_bool, cronjob).viewmodel
+        viewmodel = SuperUser_Details(site_user, title, modelstate, modelsuccess_bool, cronjob).viewmodel
 
         return viewmodel
 
-class SuperUser_Delete(Delete_ViewModel):
+class SuperUser_Delete(Delete_View):
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, cronjob):
         
         super().__init__(site_user, title, modelstate, modelsuccess_bool, cronjob)
@@ -219,6 +251,6 @@ class SuperUser_Delete(Delete_ViewModel):
 
         cronjob = CronJob.get_item_by_id(CronJob, cronjob_id)
 
-        viewmodel = Delete_ViewModel(site_user, title, modelstate, modelsuccess_bool, cronjob).viewmodel
+        viewmodel = SuperUser_Delete(site_user, title, modelstate, modelsuccess_bool, cronjob).viewmodel
 
         return viewmodel

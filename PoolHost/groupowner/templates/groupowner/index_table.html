@@ -1,6 +1,4 @@
-﻿{% load tags_groupowner%}
-
-<table class="table">
+﻿<table class="table">
     <tr>
         <th>
             {{ header_label_item }}
@@ -13,7 +11,7 @@
     {% for  item in items %}
     <tr>
         <td>
-            <a href="{% url item_url  item.id 1 %}">{{item.name}}</a>
+            <a href="{% url item_url item.id 1 %}">{{item.name}}</a>
         </td>
 
         <td>

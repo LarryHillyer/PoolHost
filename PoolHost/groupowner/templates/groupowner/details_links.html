@@ -1,3 +1,6 @@
-﻿            <a href="{% url transfer_url groupowner_id filter %}">Transfer</a>
-            <span>  |  </span>
-            <a href="{% url index_url filter %}">Index</a>
+﻿{% url transfer_url groupowner_id filter as transfer_url %}
+{% url index_url filter as index_url %}
+
+<a href="{{ transfer_url }}">Transfer</a>
+<span>  |  </span>
+<a href="{{ index_url }}">Index</a>

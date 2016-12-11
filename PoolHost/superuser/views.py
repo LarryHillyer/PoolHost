@@ -16,7 +16,7 @@ from superuser.forms import SuperUserForm_Create
 
 class index(View):
 
-    template_name = 'app/shared_index.html'
+    template_name = 'app/shared_index_view.html'
     title = 'Super User - Index'
     
     def get(self, request, modelstate = None):
@@ -36,7 +36,7 @@ class index(View):
         
 class create(View):
 
-    template_name = 'app/shared_create.html'
+    template_name = 'app/shared_form_view.html'
     title = 'Super User - Create'
 
     def get(self, request, modelstate = None):
@@ -95,7 +95,7 @@ class create(View):
 class details(View):
 
     title = 'Super User - Details'
-    template_name = 'app/shared_details.html'
+    template_name = 'app/shared_details_view.html'
 
     def get(self, request, superuser_id = 0, modelstate = None):
         site_user = None
@@ -119,7 +119,7 @@ class details(View):
 class delete(View):
 
     title = 'Super User - Delete'
-    template_name = 'app/shared_delete.html'
+    template_name = 'app/shared_delete_view.html'
 
     def get(self, request, superuser_id = 0, modelstate = None):
         site_user = None

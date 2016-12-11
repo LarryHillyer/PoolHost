@@ -16,7 +16,7 @@ from cronjob.forms import CronJobForm_Create, CronJobForm_Edit
 
 class index(View):
 
-    template_name = 'app/shared_index.html'
+    template_name = 'app/shared_index_view.html'
     title = 'Cron Job - Index'
     
     def get(self, request, modelstate = None):
@@ -36,7 +36,7 @@ class index(View):
         
 class create(View):
 
-    template_name = 'app/shared_create.html'
+    template_name = 'app/shared_form_view.html'
     title = 'Cron Job - Create'
 
     def get(self, request, modelstate = None):
@@ -85,7 +85,7 @@ class create(View):
 
 class edit(View):
     title = 'Cron Job - Edit'
-    template_name = 'app/shared_create.html'
+    template_name = 'app/shared_form_view.html'
 
     def get(self, request, cronjob_id = 0, modelstate = None):
 
@@ -177,7 +177,7 @@ class edit(View):
 class details(View):
 
     title = 'Cron Job - Details'
-    template_name = 'app/shared_details.html'
+    template_name = 'app/shared_details_view.html'
 
     def get(self, request, cronjob_id = 0, modelstate = None):
         site_user = None
@@ -201,7 +201,7 @@ class details(View):
 class delete(View):
 
     title = 'Cron Job - Delete'
-    template_name = 'app/shared_delete.html'
+    template_name = 'app/shared_delete_view.html'
 
     def get(self, request, cronjob_id = 0, modelstate = None):
         site_user = None

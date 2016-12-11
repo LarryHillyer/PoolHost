@@ -1,6 +1,2 @@
-﻿        <form action="{% url form_url  filter %}" method="post">
-            {% csrf_token %}
-            <div class="col-lg-12">
-                {% include form_html %}
-            </div>
-        </form>
+﻿{% url form_url filter as create_url %}
+{% include form_create_html %}

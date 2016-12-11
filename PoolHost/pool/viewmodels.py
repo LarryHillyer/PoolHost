@@ -9,110 +9,30 @@ from app.mixins import HelperMixins
 
 from pool.forms import PoolForm_Create, PoolForm_Edit, PoolForm_Transfer
 
-class BaseViewModel(object):
+class Layout_View(object):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool,):
+    def __init__(self, site_user, title):
 
         self.viewmodel = {'site_user':site_user, # app/layout.html params
                             'title': title,
-                            'year': datetime.now().year,
-                            'modelsuccess_bool': modelsuccess_bool,
-                            'modelstate': modelstate,
-                            'modelstate_html': 'app/modelstatus.html' }
+                            'year': datetime.now().year,}
 
+class Index_Body_View(Layout_View):
 
-class Table_ViewModel(BaseViewModel):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, poolowners, 
+        poolgroups, groupowners, filter, poolowner_id, poolgroup_id, groupowner_id):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, pools, filter,
-        poolowner_id, poolgroup_id, groupowner_id):
+        super().__init__(site_user, title)
 
-        super().__init__(site_user, title, modelstate, modelsuccess_bool)
-     
-        self.viewmodel['partial_view_id'] = 'pool-id' # app/shared_index_pagination.html params
+        self.viewmodel['partial_view_id'] = 'pool-id'
 
         self.viewmodel['poolowner_id'] = poolowner_id
         self.viewmodel['poolgroup_id'] = poolgroup_id
         self.viewmodel['groupowner_id'] = groupowner_id
         self.viewmodel['filter' ] = filter
 
-        self.viewmodel['create_url'] = 'pool:create'
-        self.viewmodel['create_link_name'] = 'Create Pool'
-        self.viewmodel['create_link_html'] =  'pool/create_link.html' 
-
-        self.viewmodel['index_table_html'] = 'pool/index_table.html' 
- 
-        self.viewmodel['items'] = pools # pool/index_table.html params
-        self.viewmodel['header_label_item'] = 'Pool'
-        self.viewmodel['header_label_groupowner'] = 'Group Owner'
-        self.viewmodel['header_label_cronjob'] = 'CronJob'
-        self.viewmodel['header_label_poolowner'] = 'Pool Owner'
-        self.viewmodel['header_label_poolgroup'] = 'Pool Group'
-        self.viewmodel['item_url'] = 'pool:index'
-        self.viewmodel['transfer_url'] = 'pool:transfer'
-        self.viewmodel['edit_url'] = 'pool:edit' 
-        self.viewmodel['details_url'] = 'pool:details' 
-        self.viewmodel['delete_url'] = 'pool:delete' 
-
-        self.viewmodel['scripts'] = ['app/scripts/Client/TableStripping.js']
-                        
-class Form_ViewModel(BaseViewModel):
-
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter,
-        poolowner_id, poolgroup_id, groupowner_id, submit_label):
-
-        super().__init__(site_user, title, modelstate, modelsuccess_bool)
-        
-        self.viewmodel['partial_view_id'] = 'pool-id' 
-
-        self.viewmodel['poolowner_id'] = poolowner_id
-        self.viewmodel['poolgroup_id'] = poolgroup_id
-        self.viewmodel['groupowner_id'] = groupowner_id
-        self.viewmodel['filter'] = filter
-
-        self.viewmodel['form'] = form 
-        self.viewmodel['form_label_submit'] = submit_label
-
-        self.viewmodel['index_url'] = 'pool:index'
-        self.viewmodel['index_link_html'] = 'pool/index_link.html'
-
-        self.viewmodel['scripts'] = ['app/scripts/jquery.validate.js', 'app/scripts/Client/GOwner_PGroup_POwner_CDD.js']
-
-class DescriptiveList_ViewModel(BaseViewModel):
-
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
-            pool, filter, poolowner_id, poolgroup_id, groupowner_id):
-
-        super().__init__(site_user, title, modelstate, modelsuccess_bool)
-
-        self.viewmodel['partial_view_id'] = 'superuser-id' 
-
-        self.viewmodel['pool_id'] = pool.id
-        self.viewmodel['poolowner_id'] = poolowner_id
-        self.viewmodel['poolgroup_id'] = poolgroup_id
-        self.viewmodel['groupowner_id'] = groupowner_id
-        self.viewmodel['filter'] = filter
-
-        self.viewmodel['descriptive_list'] = 'pool/descriptive_list.html' 
-
-        self.viewmodel['item'] = pool 
-        self.viewmodel['item_label_name'] = 'Pool'
-        self.viewmodel['item_label_poolowner'] = 'Pool Owner'
-        self.viewmodel['item_label_cronjob'] = 'Cron Job'
-        self.viewmodel['item_label_pooltype'] = 'Pool Type'
-        self.viewmodel['item_label_poolgroup'] = 'Pool Group'
-        self.viewmodel['item_label_groupowner'] = 'Group Owner'
-
         self.viewmodel['index_url'] = 'pool:index'
 
-
-class Pagination_Routing_ViewModel(Table_ViewModel):
-
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, pools, poolowners, poolgroups, groupowners, filter,
-        poolowner_id, poolgroup_id, groupowner_id):
-
-        super().__init__(site_user, title, modelstate, modelsuccess_bool, pools, filter,
-            poolowner_id, poolgroup_id, groupowner_id)
- 
         self.viewmodel['pagination_routing_html'] = 'app/pagination_routing.html'  
 
         self.viewmodel['superuser_pagination_list_html'] = 'pool/superuser_pagination_list.html' 
@@ -126,23 +46,39 @@ class Pagination_Routing_ViewModel(Table_ViewModel):
         self.viewmodel['poolgroup_pagination_link_html'] = 'pool/poolgroup_pagination_link.html'
         self.viewmodel['poolowner_pagination_link_html'] = 'pool/poolowner_pagination_link.html'
 
-
-        self.viewmodel['index_url'] = 'pool:index'
-
         self.viewmodel['poolowners'] = poolowners                             
         self.viewmodel['poolgroups'] = poolgroups 
         self.viewmodel['groupowners'] = groupowners
 
-class Create_ViewModel(Form_ViewModel):
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter,
-        poolowner_id, poolgroup_id, groupowner_id, submit_label):
+        self.viewmodel['modelsuccess_bool'] = modelsuccess_bool
+        self.viewmodel['modelstate'] = modelstate
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
 
-        super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter,
-            poolowner_id, poolgroup_id, groupowner_id, submit_label)
+        self.viewmodel['index_table_html'] = 'pool/index_table.html' 
+
+        self.viewmodel['create_url'] = 'pool:create'
+        self.viewmodel['create_link_name'] = 'Create Pool'
+        self.viewmodel['create_link_html'] =  'pool/create_link.html' 
+        self.viewmodel['shared_create_link_html'] = 'app/shared_create_link.html'
+ 
+        self.viewmodel['scripts'] = ['app/scripts/Client/TableStripping.js']
+
+class Form_Body_View(Layout_View):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter,
+        poolowner_id, poolgroup_id, groupowner_id):
+
+        super().__init__(site_user, title)
         
-        self.viewmodel['form_template_html'] = 'pool/create_form.html'
+        self.viewmodel['partial_view_id'] = 'pool-id' 
+
+        self.viewmodel['poolowner_id'] = poolowner_id
+        self.viewmodel['poolgroup_id'] = poolgroup_id
+        self.viewmodel['groupowner_id'] = groupowner_id
+        self.viewmodel['filter'] = filter
+
+        self.viewmodel['form'] = form
         self.viewmodel['form_html'] = 'pool/pool_form.html'
-        self.viewmodel['form_url'] = 'pool:create'
 
         self.viewmodel['form_label_name'] = 'Pool'
         self.viewmodel['form_label_cronjob'] = 'Cron Job'
@@ -151,37 +87,120 @@ class Create_ViewModel(Form_ViewModel):
         self.viewmodel['form_label_poolgroup'] = 'Pool Group'
         self.viewmodel['form_label_poolowner'] = 'Pool Owner'
 
-class Edit_ViewModel(Form_ViewModel):
+        self.viewmodel['modelsuccess_bool'] = modelsuccess_bool
+        self.viewmodel['modelstate'] = modelstate
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
+
+        self.viewmodel['index_url'] = 'pool:index'
+        self.viewmodel['index_link_html'] = 'pool/index_link.html'
+        self.viewmodel['shared_index_link_html'] = 'app/shared_index_link.html'
+
+        self.viewmodel['scripts'] = ['app/scripts/jquery.validate.js', 'app/scripts/Client/GOwner_PGroup_POwner_CDD.js']
+
+class Details_Delete_Body_View(Layout_View):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
+            pool, filter, poolowner_id, poolgroup_id, groupowner_id):
+
+        super().__init__(site_user, title)
+
+
+        self.viewmodel['partial_view_id'] = 'superuser-id' 
+
+        self.viewmodel['pool_id'] = pool.id
+        self.viewmodel['poolowner_id'] = poolowner_id
+        self.viewmodel['poolgroup_id'] = poolgroup_id
+        self.viewmodel['groupowner_id'] = groupowner_id
+        self.viewmodel['filter'] = filter
+
+        self.viewmodel['modelsuccess_bool'] = modelsuccess_bool
+        self.viewmodel['modelstate'] = modelstate
+        self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
+
+        self.viewmodel['descriptive_list'] = 'pool/descriptive_list.html' 
+
+        self.viewmodel['index_url'] = 'pool:index'
+
+               
+class Table_View(Index_Body_View):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, pools, poolowners, 
+        poolgroups, groupowners, filter, poolowner_id, poolgroup_id, groupowner_id):
+
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, poolowners, 
+            poolgroups, groupowners, filter, poolowner_id, poolgroup_id, groupowner_id)
+     
+ 
+        self.viewmodel['items'] = pools # pool/index_table.html params
+        self.viewmodel['header_label_item'] = 'Pool'
+        self.viewmodel['header_label_groupowner'] = 'Group Owner'
+        self.viewmodel['header_label_cronjob'] = 'CronJob'
+        self.viewmodel['header_label_poolowner'] = 'Pool Owner'
+        self.viewmodel['header_label_poolgroup'] = 'Pool Group'
+        self.viewmodel['item_url'] = 'pool:index'
+        self.viewmodel['transfer_url'] = 'pool:transfer'
+        self.viewmodel['edit_url'] = 'pool:edit' 
+        self.viewmodel['details_url'] = 'pool:details' 
+        self.viewmodel['delete_url'] = 'pool:delete' 
+                        
+class DescriptiveList_View(Details_Delete_Body_View):
+
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
+        pool, filter, poolowner_id, poolgroup_id, groupowner_id):
+
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, 
+            pool, filter, poolowner_id, poolgroup_id, groupowner_id)
+
+
+        self.viewmodel['item'] = pool 
+        self.viewmodel['item_label_name'] = 'Pool'
+        self.viewmodel['item_label_poolowner'] = 'Pool Owner'
+        self.viewmodel['item_label_cronjob'] = 'Cron Job'
+        self.viewmodel['item_label_pooltype'] = 'Pool Type'
+        self.viewmodel['item_label_poolgroup'] = 'Pool Group'
+        self.viewmodel['item_label_groupowner'] = 'Group Owner'
+
+
+class Create_View(Form_Body_View):
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter,
-        pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label):
+        poolowner_id, poolgroup_id, groupowner_id):
 
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter,
-            poolowner_id, poolgroup_id, groupowner_id, submit_label)
+            poolowner_id, poolgroup_id, groupowner_id)
+ 
+        self.viewmodel['form_template_html'] = 'pool/create_form.html'
+        self.viewmodel['form_create_html'] = 'app/shared_create_form.html'
+        self.viewmodel['form_url'] = 'pool:create'       
+
+        self.viewmodel['form_label_submit'] = 'Create'
+
+class Edit_View(Form_Body_View):
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter,
+        pool_id, poolowner_id, poolgroup_id, groupowner_id):
+
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter,
+            poolowner_id, poolgroup_id, groupowner_id)
         
         self.viewmodel['pool_id'] = pool_id
 
         self.viewmodel['form_template_html'] = 'pool/edit_form.html'
-        self.viewmodel['form_html'] = 'pool/pool_form.html'
+        self.viewmodel['form_edit_html'] = 'app/shared_edit_form.html'
         self.viewmodel['form_url'] = 'pool:edit'
 
-        self.viewmodel['form_label_name'] = 'Pool'
-        self.viewmodel['form_label_cronjob'] = 'Cron Job'
-        self.viewmodel['form_label_pooltype'] = 'Pool Type'
-        self.viewmodel['form_label_groupowner'] = 'Group Owner'
-        self.viewmodel['form_label_poolgroup'] = 'Pool Group'
-        self.viewmodel['form_label_poolowner'] = 'Pool Owner'
+        self.viewmodel['form_label_submit'] = 'Edit'
 
-class Transfer_ViewModel(Form_ViewModel):
+class Transfer_View(Form_Body_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter, pool,
-        poolowner_id, poolgroup_id, groupowner_id, submit_label):
+        poolowner_id, poolgroup_id, groupowner_id):
 
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter,
-            poolowner_id, poolgroup_id, groupowner_id, submit_label)
+            poolowner_id, poolgroup_id, groupowner_id)
         
         self.viewmodel['pool_id'] = pool.id
 
-        self.viewmodel['form_template_html'] = 'pool/transfer_form.html' 
+        self.viewmodel['form_template_html'] = 'pool/transfer_form.html'
+        self.viewmodel['form_transfer_html'] = 'app/shared_transfer_form.html' 
         self.viewmodel['form_url'] = 'pool:transfer'
         self.viewmodel['form_html'] = 'pool/transfer_ownership_form.html'
 
@@ -189,7 +208,9 @@ class Transfer_ViewModel(Form_ViewModel):
         self.viewmodel['form_label_poolgroup'] = 'Pool Group'
         self.viewmodel['form_label_new_pool'] = 'New Pool Owner'
 
-class Details_ViewModel(DescriptiveList_ViewModel):
+        self.viewmodel['form_label_submit'] = 'Transfer'
+
+class Details_View(DescriptiveList_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
             pool, filter, poolowner_id, poolgroup_id, groupowner_id):
@@ -201,7 +222,7 @@ class Details_ViewModel(DescriptiveList_ViewModel):
         self.viewmodel['transfer_url'] = 'pool:transfer'
         self.viewmodel['edit_url'] = 'pool:edit' 
 
-class Delete_ViewModel(DescriptiveList_ViewModel):
+class Delete_View(DescriptiveList_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
             pool, filter, poolowner_id, poolgroup_id, groupowner_id):
@@ -211,9 +232,10 @@ class Delete_ViewModel(DescriptiveList_ViewModel):
 
         self.viewmodel['delete_form'] = 'pool/delete_form.html'
         self.viewmodel['delete_url'] = 'pool:delete'
+        self.viewmodel['shared_delete_form_html'] = 'app/shared_delete_form.html'
 
 
-class SuperUser_Index(Pagination_Routing_ViewModel):
+class SuperUser_Index(Table_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, pools, poolowners, poolgroups, groupowners, filter,
         poolowner_id, poolgroup_id, groupowner_id):
@@ -222,8 +244,8 @@ class SuperUser_Index(Pagination_Routing_ViewModel):
             poolowner_id, poolgroup_id, groupowner_id) 
 
         self.viewmodel['use_pagination'] = True            
-        
-
+        self.viewmodel['user_has_transfer_privileges'] = True
+       
     @classmethod
     def get_index_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, 
             poolgroup_id, groupowner_id):
@@ -352,13 +374,13 @@ class SuperUser_Index(Pagination_Routing_ViewModel):
 
         return groupowner_id, poolgroup_id, poolowner_id, pools
 
-class SuperUser_Create(Create_ViewModel):
+class SuperUser_Create(Create_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter,
-        poolowner_id, poolgroup_id, groupowner_id, submit_label):
+        poolowner_id, poolgroup_id, groupowner_id):
 
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter,
-            poolowner_id, poolgroup_id, groupowner_id, submit_label)
+            poolowner_id, poolgroup_id, groupowner_id)
         
     @classmethod
     def get_create_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form):
@@ -405,19 +427,17 @@ class SuperUser_Create(Create_ViewModel):
                                             'poolowner_id' : poolowner_id,
                                             'filter' : filter})
 
-        submit_label = 'Create'
-
         viewmodel = SuperUser_Create(site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            poolowner_id, poolgroup_id, groupowner_id, submit_label).viewmodel
+            poolowner_id, poolgroup_id, groupowner_id).viewmodel
         
         return viewmodel
 
-class SuperUser_Edit(Edit_ViewModel):
+class SuperUser_Edit(Edit_View):
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter,
-        pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label):
+        pool_id, poolowner_id, poolgroup_id, groupowner_id):
 
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter,
-            pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label)
+            pool_id, poolowner_id, poolgroup_id, groupowner_id)
 
 
     @classmethod
@@ -461,19 +481,18 @@ class SuperUser_Edit(Edit_ViewModel):
                                                 'poolowner_id' : poolowner_id,
                                                 'filter' : filter})
 
-        submit_label = 'Edit'
         viewmodel = SuperUser_Edit(site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label).viewmodel
+            pool_id, poolowner_id, poolgroup_id, groupowner_id).viewmodel
         
         return viewmodel
 
-class SuperUser_Transfer(Transfer_ViewModel):
+class SuperUser_Transfer(Transfer_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter,
-        pool, poolowner_id, poolgroup_id, groupowner_id, submit_label):
+        pool, poolowner_id, poolgroup_id, groupowner_id):
 
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter,
-            pool, poolowner_id, poolgroup_id, groupowner_id, submit_label)
+            pool, poolowner_id, poolgroup_id, groupowner_id)
         
     @classmethod
     def get_transfer_viewmodel(cls, site_user, title, modelstate, filter, pool_id, poolowner_id, 
@@ -496,13 +515,12 @@ class SuperUser_Transfer(Transfer_ViewModel):
                                                 'poolgroup_name': pool.poolgroup.name,
                                                 'filter' : filter})
 
-        submit_label = 'Transfer'
         viewmodel = SuperUser_Transfer(site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            pool, poolowner_id, poolgroup_id, groupowner_id, submit_label).viewmodel
+            pool, poolowner_id, poolgroup_id, groupowner_id).viewmodel
         
         return viewmodel
 
-class SuperUser_Details(Details_ViewModel):
+class SuperUser_Details(Details_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
             pool, filter, poolowner_id, poolgroup_id, groupowner_id):
@@ -524,7 +542,7 @@ class SuperUser_Details(Details_ViewModel):
         return viewmodel
 
 
-class GroupOwner_Index(Pagination_Routing_ViewModel):
+class GroupOwner_Index(Table_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, pools, poolowners, poolgroups, groupowners, 
         filter, poolowner_id, poolgroup_id, groupowner_id):
@@ -533,6 +551,7 @@ class GroupOwner_Index(Pagination_Routing_ViewModel):
             filter, poolowner_id, poolgroup_id, groupowner_id) 
 
         self.viewmodel['use_pagination'] = True  # app/shared_index_pagination.html          
+        self.viewmodel['user_has_transfer_privileges'] = True
 
     @classmethod
     def get_index_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id):
@@ -606,13 +625,13 @@ class GroupOwner_Index(Pagination_Routing_ViewModel):
 
         return poolgroup_id, poolowner_id, pools
         
-class GroupOwner_Create(Create_ViewModel):
+class GroupOwner_Create(Create_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            poolowner_id, poolgroup_id, groupowner_id, submit_label):
+            poolowner_id, poolgroup_id, groupowner_id):
 
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            poolowner_id, poolgroup_id, groupowner_id, submit_label) 
+            poolowner_id, poolgroup_id, groupowner_id) 
 
     @classmethod
     def get_create_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id, form):
@@ -656,19 +675,18 @@ class GroupOwner_Create(Create_ViewModel):
 
         form.fields['groupowner_id'].widget.attrs['disabled'] = 'disabled'
 
-        submit_label = 'Create'
         viewmodel = GroupOwner_Create(site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            poolowner_id, poolgroup_id, groupowner_id, submit_label).viewmodel
+            poolowner_id, poolgroup_id, groupowner_id).viewmodel
         
         return viewmodel
 
-class GroupOwner_Edit(Edit_ViewModel):
+class GroupOwner_Edit(Edit_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter,
-        pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label):
+        pool_id, poolowner_id, poolgroup_id, groupowner_id):
 
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter,
-            pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label)
+            pool_id, poolowner_id, poolgroup_id, groupowner_id)
 
     @classmethod
     def get_edit_viewmodel(cls, site_user, title, modelstate, filter, pool_id, 
@@ -706,19 +724,18 @@ class GroupOwner_Edit(Edit_ViewModel):
         
         form.fields['groupowner_id'].widget.attrs['disabled'] = 'disabled'
 
-        submit_label = 'Edit'
         viewmodel = GroupOwner_Edit(site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label).viewmodel
+            pool_id, poolowner_id, poolgroup_id, groupowner_id).viewmodel
         
         return viewmodel
 
-class GroupOwner_Transfer(Transfer_ViewModel):
+class GroupOwner_Transfer(Transfer_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter,
-        pool, poolowner_id, poolgroup_id, groupowner_id, submit_label):
+        pool, poolowner_id, poolgroup_id, groupowner_id):
 
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter,
-            pool, poolowner_id, poolgroup_id, groupowner_id, submit_label)
+            pool, poolowner_id, poolgroup_id, groupowner_id)
         
     @classmethod
     def get_transfer_viewmodel(cls, site_user, title, modelstate, filter, pool_id,
@@ -741,13 +758,12 @@ class GroupOwner_Transfer(Transfer_ViewModel):
                                                 'poolgroup_name': pool.poolgroup.name,
                                                 'filter' : filter})
 
-        submit_label = 'Transfer'
         viewmodel = SuperUser_Transfer(site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            pool, poolowner_id, poolgroup_id, groupowner_id, submit_label).viewmodel
+            pool, poolowner_id, poolgroup_id, groupowner_id).viewmodel
         
         return viewmodel
 
-class GroupOwner_Details(Details_ViewModel):
+class GroupOwner_Details(Details_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
             pool, filter, poolowner_id, poolgroup_id, groupowner_id):
@@ -769,7 +785,7 @@ class GroupOwner_Details(Details_ViewModel):
         return viewmodel
 
 
-class PoolOwner_Index(Pagination_Routing_ViewModel):
+class PoolOwner_Index(Table_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, pools, poolowners, poolgroups, groupowners, 
         filter, poolowner_id, poolgroup_id, groupowner_id):
@@ -777,7 +793,8 @@ class PoolOwner_Index(Pagination_Routing_ViewModel):
         super().__init__(site_user, title, modelstate, modelsuccess_bool, pools, poolowners, poolgroups, groupowners, 
             filter, poolowner_id, poolgroup_id, groupowner_id) 
 
-        self.viewmodel['use_pagination'] = False  # app/shared_index_pagination.html          
+        self.viewmodel['use_pagination'] = False            
+        self.viewmodel['user_has_transfer_privileges'] = False
 
     @classmethod
     def get_index_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id):
@@ -797,13 +814,13 @@ class PoolOwner_Index(Pagination_Routing_ViewModel):
         
         return viewmodel
         
-class PoolOwner_Create(Create_ViewModel):
+class PoolOwner_Create(Create_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            poolowner_id, poolgroup_id, groupowner_id, submit_label):
+            poolowner_id, poolgroup_id, groupowner_id):
 
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            poolowner_id, poolgroup_id, groupowner_id, submit_label) 
+            poolowner_id, poolgroup_id, groupowner_id) 
 
     @classmethod
     def get_create_viewmodel(cls, site_user, title, modelstate, filter, poolowner_id, poolgroup_id, groupowner_id):
@@ -840,19 +857,18 @@ class PoolOwner_Create(Create_ViewModel):
 
         form.fields['poolowner_id'].widget.attrs['disabled'] = 'disabled'
 
-        submit_label = 'Create'
         viewmodel = PoolOwner_Create(site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            poolowner.id, poolgroup_id, groupowner_id, submit_label).viewmodel
+            poolowner.id, poolgroup_id, groupowner_id).viewmodel
         
         return viewmodel
 
-class PoolOwner_Edit(Edit_ViewModel):
+class PoolOwner_Edit(Edit_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, form, filter,
-        pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label):
+        pool_id, poolowner_id, poolgroup_id, groupowner_id):
 
         super().__init__(site_user, title, modelstate, modelsuccess_bool, form, filter,
-            pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label)
+            pool_id, poolowner_id, poolgroup_id, groupowner_id)
 
     @classmethod
     def get_edit_viewmodel(cls, site_user, title, modelstate, filter, pool_id, 
@@ -895,13 +911,12 @@ class PoolOwner_Edit(Edit_ViewModel):
 
         form.fields['poolowner_id'].widget.attrs['disabled'] = 'disabled'
 
-        submit_label = 'Edit'
         viewmodel = PoolOwner_Edit(site_user, title, modelstate, modelsuccess_bool, form, filter, 
-            pool_id, poolowner_id, poolgroup_id, groupowner_id, submit_label).viewmodel
+            pool_id, poolowner_id, poolgroup_id, groupowner_id).viewmodel
         
         return viewmodel
 
-class PoolOwner_Details(Details_ViewModel):
+class PoolOwner_Details(Details_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
             pool, filter, poolowner_id, poolgroup_id, groupowner_id):
@@ -923,7 +938,7 @@ class PoolOwner_Details(Details_ViewModel):
         return viewmodel
 
 
-class User_Delete(Delete_ViewModel):
+class User_Delete(Delete_View):
 
     def __init__(self, site_user, title, modelstate, modelsuccess_bool, 
             pool, filter, poolowner_id, poolgroup_id, groupowner_id):

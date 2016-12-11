@@ -1,8 +1,3 @@
-﻿<form action="{% url delete_url item.id poolgroup_id groupowner_id filter %}" method="post">                          
-    {% csrf_token %}
-    <div class="form-actions no-color">
-        <input type="submit" value="Delete" class="btn btn-danger" />
-        <span>  |  </span>
-        <a href="{% url index_url poolgroup_id groupowner_id filter %}">Index</a>
-    </div>
-</form>
+﻿{% url delete_url item.id poolgroup_id groupowner_id filter as delete_url %}
+{% url index_url poolgroup_id groupowner_id filter as index_url %}
+{% include shared_delete_form_html%}

@@ -1,7 +1,11 @@
-﻿            {% if site_user.is_superuser %}
-            <a href="{% url transfer_url poolgroup_id groupowner_id filter %}">Transfer</a>
-            <span>  |  </span>
-            {% endif %}
-            <a href="{% url edit_url poolgroup_id groupowner_id filter %}">Edit</a>
-            <span>  |  </span>
-            <a href="{% url index_url groupowner_id filter %}">Index</a>
+﻿{% url transfer_url poolgroup_id groupowner_id filter as transfer_url %}
+{% url edit_url poolgroup_id groupowner_id filter as edit_url %}
+{% url index_url groupowner_id filter as index_url %}
+
+{% if user_has_transfer_privileges %}
+<a href="{{ transfer_url }}">Transfer</a>
+<span>  |  </span>
+{% endif %}
+<a href="{{ edit_url}}">Edit</a>
+<span>  |  </span>
+<a href="{{ index_url }}">Index</a>
