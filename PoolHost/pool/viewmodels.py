@@ -4,7 +4,7 @@ from django.db import models
 
 from app.models import SiteUser, Pool, PoolOwner, PoolGroup, GroupOwner, SuperUser 
 from app.models import GroupOwner_Choices, PoolGroup_Choices, PoolOwner_Choices
-from app.models import CronJob_Choices, PoolType_Choices
+from app.models import CronJob, CronJob_Choices, PoolType, PoolType_Choices
 from app.mixins import HelperMixins
 
 from pool.forms import PoolForm_Create, PoolForm_Edit, PoolForm_Transfer
@@ -287,8 +287,14 @@ class SuperUser_Index(Table_View):
         elif filter == 1:
 
             groupowners = GroupOwner.get_all_items(GroupOwner)
+
+            if groupowners.count() == 0:
+                pools = []               
+                return groupowner_id, poolgroup_id, poolowner_id, pools
+
             if groupowner_id == 0:     
-                groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)                       
+                groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
+                       
             groupowners = GroupOwner.get_items_by_id(GroupOwner, groupowner_id)
 
             pools = Pool.get_pools_by_groupowners(groupowners)
@@ -296,6 +302,11 @@ class SuperUser_Index(Table_View):
         elif filter == 2:
 
             poolgroups = PoolGroup.get_all_items(PoolGroup)
+
+            if poolgroups.count() == 0:
+                pools = []               
+                return groupowner_id, poolgroup_id, poolowner_id, pools
+
             if poolgroup_id == 0:
                 poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
             poolgroups = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
@@ -308,6 +319,11 @@ class SuperUser_Index(Table_View):
                 groupowner_id = PoolGroup.get_item_by_id(PoolGroup,poolgroup_id).groupowner_id
 
             poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
+
+            if poolgroups.count() == 0:
+                pools = []               
+                return groupowner_id, poolgroup_id, poolowner_id, pools
+
             if poolgroup_id == 0:
                 poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
             poolgroups = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
@@ -316,14 +332,20 @@ class SuperUser_Index(Table_View):
 
         elif filter == 4:
 
-            poolowners = PoolOwner.get_all_items(PoolOwner)        
+            poolowners = PoolOwner.get_all_items(PoolOwner)
+
+            if poolowners.count() == 0:
+                pools = []               
+                return groupowner_id, poolgroup_id, poolowner_id, pools
+       
             if poolowner_id == 0:
                 poolowner_id = PoolOwner.get_poolowner_id_if_needed_and_possible(poolowners, poolowner_id)
+
             poolowner_name = PoolOwner.get_item_by_id(PoolOwner, poolowner_id).name
             poolowners = PoolOwner.get_items_by_name(PoolOwner, poolowner_name)
 
             pools = Pool.get_pools_by_poolowners(poolowners)
-            pools = Pool.filter_pools(pools, groupowner_id, poolgroup_id, poolowners)
+            pools = Pool.filter_pools(pools, groupowner_id, poolgroup_id, poolowner_id)
 
         elif filter == 5:
 
@@ -331,13 +353,19 @@ class SuperUser_Index(Table_View):
                 groupowner_id = PoolOwner.get_item_by_id(PoolOwner, poolowner_id).poolgroup.groupowner_id                      
 
             poolowners = PoolOwner.get_items_by_groupowner_id(PoolOwner,groupowner_id)
+
+            if poolowners == []:
+                pools = []               
+                return groupowner_id, poolgroup_id, poolowner_id, pools
+
             if poolowner_id == 0:
                 poolowner_id = PoolOwner.get_poolowner_id_if_needed_and_possible(poolowners, poolowner_id)
+
             poolowner_name = PoolOwner.get_item_by_id(PoolOwner, poolowner_id).name
             poolowners = PoolOwner.get_items_by_name(PoolOwner, poolowner_name)
 
             pools = Pool.get_pools_by_poolowners(poolowners)
-            pools = Pool.filter_pools(pools, groupowner_id, poolgroup_id, poolowners)
+            pools = Pool.filter_pools(pools, groupowner_id, poolgroup_id, poolowner_id)
 
         elif filter == 6:
 
@@ -345,8 +373,14 @@ class SuperUser_Index(Table_View):
                 poolgroup_id = PoolOwner.get_item_by_id(PoolOwner, poolowner_id).poolgroup_id                      
 
             poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner,poolgroup_id)
+
+            if poolowners.count() == 0:
+                pools = []               
+                return groupowner_id, poolgroup_id, poolowner_id, pools
+
             if poolowner_id == 0:
                 poolowner_id = PoolOwner.get_poolowner_id_if_needed_and_possible(poolowners, poolowner_id)
+
             poolowner_name = PoolOwner.get_item_by_id(PoolOwner, poolowner_id).name
             poolowners = PoolOwner.get_items_by_name(PoolOwner, poolowner_name)
 
@@ -359,13 +393,25 @@ class SuperUser_Index(Table_View):
                 groupowner_id = PoolOwner.get_item_by_id(PoolOwner, poolowner_id).poolgroup.groupowner_id                      
 
             poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
+
+            if poolgroups.count() == 0:
+                pools = []               
+                return groupowner_id, poolgroup_id, poolowner_id, pools
+
             if poolgroup_id == 0:
                 poolgroup_id = PoolOwner.get_item_by_id(PoolOwner, poolowner_id).poolgroup_id
+
             poolgroups = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
 
             poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
+
+            if poolowners.count() == 0:
+                pools = []               
+                return groupowner_id, poolgroup_id, poolowner_id, pools
+
             if poolowner_id == 0:
                 poolowner_id = PoolOwner.get_poolowner_id_if_needed_and_possible(poolowners, poolowner_id)
+
             poolowner_name = PoolOwner.get_item_by_id(PoolOwner, poolowner_id).name
             poolowners = PoolOwner.get_items_by_name(PoolOwner, poolowner_name)
 
@@ -413,10 +459,12 @@ class SuperUser_Create(Create_View):
         poolowner_id = PoolOwner.get_poolowner_id_if_needed_and_possible(poolowners, poolowner_id)
         PoolOwner_Choices.get_choices_by_poolowners(poolowners)
 
-        CronJob_Choices.get_cronjob_choices()
+        cronjobs = CronJob.get_all_items(CronJob)
+        CronJob_Choices.get_cronjob_choices(cronjobs)
         cronjob_id = CronJob_Choices.get_all_items(CronJob_Choices)[0].cronjob_id
 
-        PoolType_Choices.get_pooltype_choices()
+        pooltypes = PoolType.get_all_items(PoolType)
+        PoolType_Choices.get_pooltype_choices(pooltypes)
         pooltype_id = PoolType_Choices.get_all_items(PoolType_Choices)[0].pooltype_id
 
         if form == None:        
@@ -465,10 +513,12 @@ class SuperUser_Edit(Edit_View):
 
         poolowner_id = pool.poolowner_id
 
-        CronJob_Choices.get_cronjob_choices()
+        cronjobs = CronJob.get_all_items(CronJob)
+        CronJob_Choices.get_cronjob_choices(cronjobs)
         cronjob_id = pool.cronjob_id
 
-        PoolType_Choices.get_pooltype_choices()
+        pooltypes = PoolType.get_all_items(PoolType)
+        PoolType_Choices.get_pooltype_choices(pooltypes)
         pooltype_id = pool.pooltype_id
 
         if form == None:        
@@ -591,18 +641,29 @@ class GroupOwner_Index(Table_View):
         elif filter == 1:
 
             poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
+
+            if poolgroups.count() == 0:
+                pools = []               
+                return poolgroup_id, poolowner_id, pools
+
             if poolgroup_id == 0:
                 poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
             poolgroups = PoolGroup.get_items_by_id(PoolGroup, poolgroup_id)
 
             pools = Pool.get_pools_by_poolgroups(poolgroups)            
-            #pools = Pool.filter_pools(pools, groupowner_id, poolgroup_id, poolowner_id)
+
 
         elif filter == 2:
 
             poolowners = PoolOwner.get_items_by_groupowner_id(PoolOwner, groupowner_id)
+
+            if poolowners == []:
+                pools = []               
+                return poolgroup_id, poolowner_id, pools
+
             if poolowner_id == 0:
                 poolowner_id = PoolOwner.get_poolowner_id_if_needed_and_possible(poolowners, poolowner_id)
+
             poolowner_name = PoolOwner.get_item_by_id(PoolOwner, poolowner_id).name
             poolowners = PoolOwner.get_items_by_name(PoolOwner, poolowner_name)
 
@@ -615,6 +676,11 @@ class GroupOwner_Index(Table_View):
                 poolgroup_id = PoolOwner.get_item_by_id(PoolOwner, poolowner_id).poolgroup_id
 
             poolowners = PoolOwner.get_items_by_poolgroup_id(PoolOwner, poolgroup_id)
+
+            if poolowners.count() == 0:
+                pools = []               
+                return poolgroup_id, poolowner_id, pools
+
             if poolowner_id == 0:
                 poolowner_id = PoolOwner.get_poolowner_id_if_needed_and_possible(poolowners, poolowner_id)
             poolowner_name = PoolOwner.get_item_by_id(PoolOwner, poolowner_id).name
@@ -659,10 +725,12 @@ class GroupOwner_Create(Create_View):
         poolowner_id = PoolOwner.get_poolowner_id_if_needed_and_possible(poolowners, poolowner_id)
         PoolOwner_Choices.get_choices_by_poolowners(poolowners)
 
-        CronJob_Choices.get_cronjob_choices()
+        cronjobs = CronJob.get_all_items(CronJob)
+        CronJob_Choices.get_cronjob_choices(cronjobs)
         cronjob_id = CronJob_Choices.get_all_items(CronJob_Choices)[0].cronjob_id
 
-        PoolType_Choices.get_pooltype_choices()
+        pooltypes = PoolType.get_all_items(PoolType)
+        PoolType_Choices.get_pooltype_choices(pooltypes)
         pooltype_id = PoolType_Choices.get_all_items(PoolType_Choices)[0].pooltype_id
 
         if form == None:        
@@ -710,10 +778,12 @@ class GroupOwner_Edit(Edit_View):
         poolowner_id = pool.poolowner_id
         PoolOwner_Choices.get_choices_by_poolowners(poolowners)
 
-        CronJob_Choices.get_cronjob_choices()
+        cronjobs = CronJob.get_all_items(CronJob)
+        CronJob_Choices.get_cronjob_choices(cronjobs)
         cronjob_id = pool.cronjob_id
 
-        PoolType_Choices.get_pooltype_choices()
+        pooltypes = PoolType.get_all_items(PoolType)
+        PoolType_Choices.get_pooltype_choices(pooltypes)
         pooltype_id = pool.pooltype_id
 
         if form == None:        
@@ -840,10 +910,12 @@ class PoolOwner_Create(Create_View):
         poolowners = [poolowner]
         PoolOwner_Choices.get_choices_by_poolowners(poolowners)
 
-        CronJob_Choices.get_cronjob_choices()
+        cronjobs = CronJob.get_all_items(CronJob)
+        CronJob_Choices.get_cronjob_choices(cronjobs)
         cronjob_id = CronJob_Choices.get_all_items(CronJob_Choices)[0].cronjob_id
 
-        PoolType_Choices.get_pooltype_choices()
+        pooltypes = PoolType.get_all_items(PoolType)
+        PoolType_Choices.get_pooltype_choices(pooltypes)
         pooltype_id = PoolType_Choices.get_all_items(PoolType_Choices)[0].pooltype_id
         
         form = PoolForm_Create(initial = {'cronjob_id': cronjob_id,
@@ -890,11 +962,13 @@ class PoolOwner_Edit(Edit_View):
         GroupOwner_Choices.get_choices_by_groupowners(groupowners)
         PoolGroup_Choices.get_choices_by_poolgroups(poolgroups)
         PoolOwner_Choices.get_choices_by_poolowners(poolowners)
-        
-        CronJob_Choices.get_cronjob_choices()
+
+        cronjobs = CronJob.get_all_items(CronJob)        
+        CronJob_Choices.get_cronjob_choices(cronjobs)
         cronjob_id = pool.cronjob_id
 
-        PoolType_Choices.get_pooltype_choices()
+        pooltypes = PoolType.get_all_items(PoolType)
+        PoolType_Choices.get_pooltype_choices(pooltypes)
         pooltype_id = pool.pooltype_id
 
         if form == None:        

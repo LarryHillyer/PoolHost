@@ -20,6 +20,3 @@ urlpatterns = [
     url(r'^(?P<filter>[0-9]+)/(?P<modelstate>.*)$', views.index.as_view(), name ='index'),
     url(r'^(?P<filter>[0-9]+)/$', views.index.as_view(), name ='index'),
 ]
-
-#   url(r'^create/$', views.create.as_view(), name ='create'),
-#   url(r'^$', views.index.as_view(), name ='index'),

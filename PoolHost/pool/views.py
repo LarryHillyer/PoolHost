@@ -422,7 +422,7 @@ class transfer(View):
         else:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        if not site_user.is_superuser and not site_user.is_groupowner != True:
+        if not site_user.is_superuser and not site_user.is_groupowner:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
         if pool_id == 0:

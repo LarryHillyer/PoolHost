@@ -182,11 +182,12 @@ class SuperUser_Create(Create_View):
             form)
 
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, modelstate):
+    def get_create_viewmodel(cls, site_user, title, modelstate, form):
 
         modelstate, modelsuccess_bool = PoolType.get_modelstate(modelstate)
 
-        form = PoolTypeForm_Create()
+        if form == None:
+            form = PoolTypeForm_Create()
 
         viewmodel = SuperUser_Create(site_user, title, modelstate, modelsuccess_bool, form).viewmodel
 
@@ -201,13 +202,14 @@ class SuperUser_Edit(Edit_View):
 
 
     @classmethod
-    def get_edit_viewmodel(cls, site_user, title, modelstate, pooltype_id):
+    def get_edit_viewmodel(cls, site_user, title, modelstate, pooltype_id, form):
 
         modelstate, modelsuccess_bool = PoolType.get_modelstate(modelstate)
 
         pooltype = PoolType.get_item_by_id(PoolType, pooltype_id)
-        
-        form = PoolTypeForm_Edit(instance = pooltype)
+
+        if form == None:        
+            form = PoolTypeForm_Edit(instance = pooltype)
 
         viewmodel = SuperUser_Edit(site_user, title, modelstate, modelsuccess_bool, form, 
             pooltype_id).viewmodel

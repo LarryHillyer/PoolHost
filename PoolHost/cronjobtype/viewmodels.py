@@ -131,7 +131,7 @@ class Edit_View(Form_Body_View):
         self.viewmodel['form_edit_html'] = 'app/shared_edit_form.html'
         self.viewmodel['form_url'] = 'cronjobtype:edit'
 
-        self.viewmodel['form_label_submit'] = 'Create'
+        self.viewmodel['form_label_submit'] = 'Edit'
 
 class Details_View(DescriptiveList_View):
 
@@ -180,11 +180,12 @@ class SuperUser_Create(Create_View):
             form)
 
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, modelstate):
+    def get_create_viewmodel(cls, site_user, title, modelstate, form):
 
         modelstate, modelsuccess_bool = CronJobType.get_modelstate(modelstate)
 
-        form = CronJobTypeForm_Create()
+        if form == None:
+            form = CronJobTypeForm_Create()
 
         viewmodel = SuperUser_Create(site_user, title, modelstate, modelsuccess_bool, form).viewmodel
 
@@ -199,13 +200,14 @@ class SuperUser_Edit(Edit_View):
 
 
     @classmethod
-    def get_edit_viewmodel(cls, site_user, title, modelstate, cronjobtype_id):
+    def get_edit_viewmodel(cls, site_user, title, modelstate, cronjobtype_id, form):
 
         modelstate, modelsuccess_bool = CronJobType.get_modelstate(modelstate)
 
         cronjobtype = CronJobType.get_item_by_id(CronJobType, cronjobtype_id)
-        
-        form = CronJobTypeForm_Edit(instance = cronjobtype)
+
+        if form == None:        
+            form = CronJobTypeForm_Edit(instance = cronjobtype)
 
         viewmodel = SuperUser_Edit(site_user, title, modelstate, modelsuccess_bool, form, 
             cronjobtype_id).viewmodel

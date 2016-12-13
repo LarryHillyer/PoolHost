@@ -41,13 +41,12 @@ urlpatterns = [
         name='logout'),
     url(r'^register$', register.as_view(), name = 'register'),
 
-    # url(r'^app/', include('app.urls')),
-
     url(r'^superuser/', include('superuser.urls')),
     url(r'^groupowner/', include('groupowner.urls')),
     url(r'^pooltype/', include('pooltype.urls')),
     url(r'^cronjobtype/', include('cronjobtype.urls')),
     url(r'^cronjob/', include('cronjob.urls')),
+    url(r'^sport/', include('sport.urls')),
 
     url(r'^poolgroup/', include('poolgroup.urls')),
     url(r'^poolowner/', include('poolowner.urls')),

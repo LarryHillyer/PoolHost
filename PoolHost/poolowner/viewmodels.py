@@ -245,6 +245,11 @@ class SuperUser_Index(Table_View):
         elif filter == 1:
 
             groupowners = GroupOwner.get_all_items(GroupOwner)
+
+            if groupowners.count() == 0:
+                pools = []               
+                return groupowner_id, poolgroup_id, poolowners
+
             if groupowner_id == 0:     
                 groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)
 
@@ -252,6 +257,11 @@ class SuperUser_Index(Table_View):
 
         elif filter == 2:
             poolgroups = PoolGroup.get_all_items(PoolGroup)
+
+            if poolgroups.count() == 0:
+                poolowners = []               
+                return groupowner_id, poolgroup_id, poolowners
+
             if poolgroup_id == 0:
                 poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
 
@@ -263,6 +273,11 @@ class SuperUser_Index(Table_View):
                 groupowner_id = PoolGroup.get_item_by_id(PoolGroup,poolgroup_id).groupowner_id
 
             poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
+
+            if poolgroups.count() == 0:
+                poolowners = []               
+                return groupowner_id, poolgroup_id, poolowners
+
             if poolgroup_id == 0:
                 poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)
 
@@ -408,6 +423,10 @@ class GroupOwner_Index(Table_View):
         elif filter == 1:
 
             poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
+
+            if poolgroups.count() == 0:
+                poolowners = []               
+                return poolgroup_id, poolowners
 
             if poolgroup_id == 0:
                 poolgroup_id = PoolGroup.get_poolgroup_id_if_needed_and_possible(poolgroups, poolgroup_id)

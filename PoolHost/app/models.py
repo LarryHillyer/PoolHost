@@ -17,7 +17,7 @@ class CronJobType (models.Model, HelperMixins):
     def get_exactly_same_cronjobtype(cls, cronjobtype_id, cronjobtype_name):
         exactly_same_cronjobtype = None
         try:
-            exactly_same_cronjobtype = PoolType.objects.filter(id = cronjobtype_id, name=cronjobtype_name)
+            exactly_same_cronjobtype = CronJobType.objects.filter(id = cronjobtype_id, name=cronjobtype_name)
         except:
             pass
         return exactly_same_cronjobtype
@@ -26,7 +26,7 @@ class CronJobType (models.Model, HelperMixins):
     def get_same_cronjobtype_in_database(cls, cronjobtype_name):
         same_cronjobtype = None
         try:
-            same_cronjobtype = PoolType.objects.filter(name=cronjobtype_name)
+            same_cronjobtype = CronJobType.objects.filter(name=cronjobtype_name)
         except:
             pass
         return same_cronjobtype
@@ -37,23 +37,14 @@ class CronJobType_Choices(models.Model, HelperMixins):
     cronjobtype_id = models.IntegerField()
 
     @classmethod
-    def get_cronjobtype_choices(cls, cronjobtype_id = 0):
+    def get_cronjobtype_choices(cls, cronjobtypes):
 
-        try:
-
-            if cronjobtype_id == 0:
-                cronjobtypes = CronJobType.get_all_items(CronJobType)
-            else:
-                cronjobtypes = CronJobType.get_items_by_id(CronJobType, cronjobtype_id)
-
-            cronjobtype_choices = CronJobType_Choices.get_all_items(CronJobType_Choices)
-            if cronjobtype_choices.count() > 0:               
-                cronjobtype_choices.delete()
-            for cronjobtype in cronjobtypes:
-                cronjobtype_choice = CronJobType_Choices(name = cronjobtype.name, cronjobtype_id = cronjobtype.id)
-                CronJobType_Choices.add_item(CronJobType_Choices, cronjobtype_choice)
-        except:
-            pass
+        cronjobtype_choices = CronJobType_Choices.get_all_items(CronJobType_Choices)
+        if cronjobtype_choices.count() > 0:               
+            cronjobtype_choices.delete()
+        for cronjobtype in cronjobtypes:
+            cronjobtype_choice = CronJobType_Choices(name = cronjobtype.name, cronjobtype_id = cronjobtype.id)
+            CronJobType_Choices.add_item(CronJobType_Choices, cronjobtype_choice)
 
 
     @classmethod
@@ -98,27 +89,18 @@ class CronJob_Choices(models.Model, HelperMixins):
     cronjob_id = models.IntegerField()
 
     @classmethod
-    def get_cronjob_choices(cls, cronjob_id = 0):
+    def get_cronjob_choices(cls, cronjobs):
 
-        try:
+        cronjob_choices = CronJob_Choices.get_all_items(CronJob_Choices)
+        if cronjob_choices.count() > 0:               
+            cronjob_choices.delete()
 
-            if cronjob_id == 0:
-                cronjobs = CronJob.get_all_items(CronJob)
-            else:
-                cronjobs = CronJob.get_items_by_id(CronJob, cronjob_id)
-
-            cronjob_choices = CronJob_Choices.get_all_items(CronJob_Choices)
-            if cronjob_choices.count() > 0:               
-                cronjob_choices.delete()
-
-            cronjob_choice = CronJob_Choices(name = 'none', cronjob_id = -1)
-            CronJob_Choices.add_item(CronJob_Choices, cronjob_choice)
+        cronjob_choice = CronJob_Choices(name = 'none', cronjob_id = -1)
+        CronJob_Choices.add_item(CronJob_Choices, cronjob_choice)
             
-            for cronjob in cronjobs:
-                cronjob_choice = CronJob_Choices(name = cronjob.name, cronjob_id = cronjob.id)
-                CronJob_Choices.add_item(CronJob_Choices, cronjob_choice)
-        except:
-            pass
+        for cronjob in cronjobs:
+            cronjob_choice = CronJob_Choices(name = cronjob.name, cronjob_id = cronjob.id)
+            CronJob_Choices.add_item(CronJob_Choices, cronjob_choice)
 
 
     @classmethod
@@ -209,7 +191,7 @@ class GroupOwner(models.Model, HelperMixins):
         elif poolgroup_id != 0:
             poolgroup = PoolGroup.get_item_by_id( PoolGroup, poolgroup_id)
             groupowner_id = poolgroup.groupowner_id
-        else:
+        elif groupowners != []:
             groupowner_id = groupowners[0].id
         return groupowner_id
 
@@ -343,7 +325,7 @@ class PoolGroup (models.Model, HelperMixins):
         elif poolowner_id != 0:
             poolowner = PoolOwner.get_item_by_id( PoolOwner, poolowner_id)
             poolgroup_id = poolowner.poolgroup_id 
-        else:
+        elif poolgroups != []:
             poolgroup_id = poolgroups[0].id
 
         return poolgroup_id
@@ -491,7 +473,7 @@ class PoolOwner (models.Model, HelperMixins):
         elif pool_id != 0:
             pool = Pool.get_item_by_id( Pool, pool_id)
             poolowner_id = pool.poolowner_id 
-        else:
+        elif poolowners != []:
             poolowner_id = poolowners[0].id
 
         return poolowner_id
@@ -618,23 +600,14 @@ class PoolType_Choices(models.Model, HelperMixins):
     pooltype_id = models.IntegerField()
 
     @classmethod
-    def get_pooltype_choices(cls, pooltype_id = 0):
+    def get_pooltype_choices(cls, pooltypes):
 
-        try:
-
-            if pooltype_id == 0:
-                pooltypes = PoolType.get_all_items(PoolType)
-            else:
-                pooltypes = PoolType.get_items_by_id(PoolType, pooltype_id)
-
-            pooltype_choices = PoolType_Choices.get_all_items(PoolType_Choices)
-            if pooltype_choices.count() > 0:               
-                pooltype_choices.delete()
-            for pooltype in pooltypes:
-                pooltype_choice = PoolType_Choices(name = pooltype.name, pooltype_id = pooltype.id)
-                PoolType_Choices.add_item(PoolType_Choices, pooltype_choice)
-        except:
-            pass
+        pooltype_choices = PoolType_Choices.get_all_items(PoolType_Choices)
+        if pooltype_choices.count() > 0:               
+            pooltype_choices.delete()
+        for pooltype in pooltypes:
+            pooltype_choice = PoolType_Choices(name = pooltype.name, pooltype_id = pooltype.id)
+            PoolType_Choices.add_item(PoolType_Choices, pooltype_choice)
 
 
     @classmethod
@@ -773,4 +746,34 @@ class Pool (models.Model, HelperMixins):
         poolowner_pools = Pool.get_items_by_poolowner_id(Pool, poolowner_id)
         for poolowner_pool in poolowner_pools:
             Pool.delete_item(Pool, poolowner_pool)
-        
+
+class Sport(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get_exactly_same_sport(cls, sport_id, sport_name):
+        exactly_same_sport = None
+        try:
+            exactly_same_sport = Sport.objects.filter(id = sport_id, name=sport_name)
+        except:
+            pass
+        return exactly_same_sport
+
+    @classmethod
+    def get_same_sport_in_database(cls, sport_name):
+        same_sport = None
+        try:
+            same_sport = Sport.objects.filter(name=sport_name)
+        except:
+            pass
+        return same_sport
+
+
+class Sport_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    sport_id = models.IntegerField()    

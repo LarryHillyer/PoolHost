@@ -50,11 +50,12 @@ class create(View):
         if site_user.is_superuser != True:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        view_model = SuperUser_Create.get_create_viewmodel(site_user, self.title, modelstate)
+        form = None
+        view_model = SuperUser_Create.get_create_viewmodel(site_user, self.title, modelstate, form)
 
         return render(request, self.template_name, view_model)
     
-    def post(self, request, modelstate = None, **kwargs):
+    def post(self, request, modelstate = None):
 
         site_user = None
         if request.user.is_authenticated():
@@ -65,14 +66,18 @@ class create(View):
         if site_user.is_superuser != True:
             return HttpResponseForbidden('<h1> Bad Request </h1>')
 
-        cronjob = CronJob(name = request.POST['name'], cronjobtype_id = request.POST['cronjobtype_id'])
         form = CronJobForm_Create(request.POST)
         if form.is_valid():
 
+            cronjob = CronJob(name = request.POST['name'], cronjobtype_id = request.POST['cronjobtype_id'])
+
             same_cronjob = CronJob.objects.filter(name = cronjob.name)
+
             if same_cronjob.count() > 0:
                 modelstate = 'Error: Cron Job, ' + cronjob.name + ' is already a cronjob!'
-                view_model = SuperUser_Create.get_create_viewmodel(site_user, form, modelstate)
+
+                view_model = SuperUser_Create.get_create_viewmodel(site_user, self.title, modelstate, form)
+
                 return render(request, self.template_name, view_model)
                                 
             modelstate = CronJob.add_item(CronJob, cronjob)
@@ -80,7 +85,8 @@ class create(View):
             return HttpResponseRedirect(reverse('cronjob:index', args=(),
                                             kwargs = {'modelstate':modelstate}))
         else:
-            view_model = SuperUser_Create.get_create_viewmodel(site_user, form, modelstate)
+            modelstate = 'Error: Invalid form!'
+            view_model = SuperUser_Create.get_create_viewmodel(site_user, self.title, modelstate, form)
             return render(request, self.template_name, view_model)
 
 class edit(View):
@@ -102,8 +108,9 @@ class edit(View):
             return HttpResponseForbidden('<h1> Bad Request </h1>')
             
         cronjob_id = int(cronjob_id)
+        form = None
 
-        viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, modelstate, cronjob_id)
+        viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, modelstate, cronjob_id, form)
 
         return render(request, self.template_name, viewmodel)
 
@@ -132,23 +139,19 @@ class edit(View):
                 modelstate = 'Error: No Changes were made during edit, update aborted!'
 
                 viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title,
-                        modelstate, cronjob_id)
+                        modelstate, cronjob_id, form)
 
-                return HttpResponseRedirect(reverse('cronjob:edit', args = (),
-                                                        kwargs = {'modelstate': modelstate,
-                                                                    'cronjob_id': cronjob_id}))
+                return render(request, self.template_name, viewmodel)
    
             same_cronjob = CronJob.get_same_cronjob_in_database(form.data['name']) 
 
             if same_cronjob.count() > 0:
-                modelstate = 'Error: Poolgroup is already in the database, update aborted!'    
+                modelstate = 'Error: Cron Job is already in the database, update aborted!'    
 
                 viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, modelstate, 
-                    cronjob_id)
+                    cronjob_id, form)
 
-                return HttpResponseRedirect(reverse('cronjob:edit', args = (),
-                                                    kwargs = {'modelstate': modelstate,
-                                                                'cronjob_id': cronjob_id}))
+                return render(request, self.template_name, viewmodel)
 
             cronjob = CronJob.get_item_by_id(CronJob, form.data['id'])
             cronjob.name = form.data['name']
@@ -157,9 +160,10 @@ class edit(View):
 
             if modelstate.split(':')[0] != 'Success':
 
-                return HttpResponseRedirect(reverse('cronjob:edit', args = (),
-                                                    kwargs = {'modelstate': modelstate,
-                                                                'cronjob_id': cronjob_id}))
+                viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, modelstate, 
+                    cronjob_id, form)
+
+                return render(request, self.template_name, viewmodel)
 
             return HttpResponseRedirect(reverse('cronjob:index', args = (),
                                                 kwargs = {'modelstate': modelstate}))
@@ -170,9 +174,7 @@ class edit(View):
             viewmodel = SuperUser_Edit.get_edit_viewmodel(site_user, self.title, modelstate, 
                 cronjob_id)
 
-            return HttpResponseRedirect(reverse('cronjob:edit', args = (),
-                                                kwargs = {'modelstate': modelstate,
-                                                            'cronjob_id': cronjob_id}))
+            return render(request, self.template_name, viewmodel)
 
 class details(View):
 
@@ -180,6 +182,7 @@ class details(View):
     template_name = 'app/shared_details_view.html'
 
     def get(self, request, cronjob_id = 0, modelstate = None):
+
         site_user = None
         if request.user.is_authenticated():
             site_user = SiteUser.get_items_by_userid(SiteUser, request.user.id)[0]

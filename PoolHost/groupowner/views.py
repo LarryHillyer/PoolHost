@@ -79,8 +79,12 @@ class create(View):
 
             same_groupowner = GroupOwner.get_items_by_name(GroupOwner, groupowner.name)
             if same_groupowner.count() > 0:
+
                 modelstate = 'Error: groupowner, ' + groupowner.name + ' is already a groupowner!'
-                viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, filter, modelstate, form)
+
+                viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, filter, 
+                    modelstate, form)
+
                 return render(request, self.template_name, viewmodel)
                                 
             site_user = SiteUser.get_item_by_name(SiteUser, groupowner.name)          
@@ -91,7 +95,10 @@ class create(View):
                 modelstate = GroupOwner.add_item(GroupOwner, groupowner)
 
                 if modelstate.split(':')[0] != 'Success':
-                    viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, filter, modelstate, form)
+
+                    viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, 
+                        filter, modelstate, form)
+
                     return render(request, self.template_name, viewmodel)
                 
                 return HttpResponseRedirect(reverse('groupowner:index', args=(),
@@ -99,11 +106,17 @@ class create(View):
                                                                 'filter': filter}))
             else:
                 modelstate = 'Error: groupowner, ' + groupowner.name + ' is not in database!'
-                viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, filter, modelstate, form)
+
+                viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, filter, 
+                    modelstate, form)
+
                 return render(request, self.template_name, viewmodel)
         else:
             modelstate = 'Error: Nonvalid form!!'
-            viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, filter, modelstate, form)
+
+            viewmodel = SuperUser_Create.get_create_viewmodel(site_user, self.title, filter, 
+                modelstate, form)
+
             return render(request, self.template_name, viewmodel)
 
 class transfer(View):
@@ -127,7 +140,8 @@ class transfer(View):
         filter = int(filter)
 
         form = None
-        viewmodel = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, groupowner_id, filter, modelstate, form)
+        viewmodel = SuperUser_Transfer.get_transfer_viewmodel(site_user, self.title, groupowner_id, filter, 
+            modelstate, form)
 
         if viewmodel['modelstate'] != None and viewmodel['modelstate'] != "":
             if viewmodel['modelstate'].split(':')[0] != 'Success':
@@ -225,7 +239,8 @@ class delete(View):
         groupowner_id = int(groupowner_id)
         filter = int(filter)
 
-        viewmodel = SuperUser_Delete.get_delete_viewmodel(site_user, self.title, groupowner_id, filter, modelstate)
+        viewmodel = SuperUser_Delete.get_delete_viewmodel(site_user, self.title, 
+            groupowner_id, filter, modelstate)
 
         return render(request, self.template_name, viewmodel)
 

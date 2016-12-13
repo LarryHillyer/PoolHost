@@ -117,6 +117,7 @@ class Table_View(Index_Body_View):
       
         self.viewmodel['items'] = poolgroups 
         self.viewmodel['header_label_item'] = 'Pool Group'
+        self.viewmodel['header_label_groupowner'] = 'Group Owner' 
         self.viewmodel['item_url'] = 'poolowner:index'
         self.viewmodel['transfer_url'] = 'poolgroup:transfer' 
         self.viewmodel['edit_url'] = 'poolgroup:edit'
@@ -221,7 +222,6 @@ class SuperUser_Index(Table_View):
 
         self.viewmodel['use_pagination'] = True            
 
-        self.viewmodel['header_label_groupowner'] = 'Group Owner' 
         self.viewmodel['user_has_transfer_privileges'] = True
 
     @classmethod
@@ -247,6 +247,11 @@ class SuperUser_Index(Table_View):
         elif filter == 1:
 
             groupowners = GroupOwner.get_all_items(GroupOwner)
+
+            if groupowners.count() == 0:
+                poolgroups = []               
+                return groupowner_id, poolgroups
+
             if groupowner_id == 0:
                 groupowner_id = GroupOwner.get_groupowner_id_if_needed_and_possible(groupowners, groupowner_id)       
                
@@ -372,10 +377,10 @@ class SuperUser_Details(Details_View):
 
 class GroupOwner_Index(Table_View):
 
-    def __init__(self, site_user, title, modelstate, modelsuccess_bool, poolgroups, filter,
+    def __init__(self, site_user, title, modelstate, modelsuccess_bool, poolgroups, groupowners, filter,
         groupowner_id):
 
-        super().__init__(site_user, title, modelstate, modelsuccess_bool, poolgroups, filter,
+        super().__init__(site_user, title, modelstate, modelsuccess_bool, poolgroups, groupowners, filter,
             groupowner_id) 
 
         self.viewmodel['use_pagination'] = False           
@@ -387,10 +392,11 @@ class GroupOwner_Index(Table_View):
         modelstate, modelsuccess_bool = PoolGroup.get_modelstate(modelstate)
 
         groupowner_id = GroupOwner.get_item_by_userid(GroupOwner, site_user.user_id).id
+        groupowners = GroupOwner.get_items_by_id(GroupOwner, groupowner_id)
 
         poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, groupowner_id)
 
-        viewmodel = GroupOwner_Index(site_user, title, modelstate, modelsuccess_bool, poolgroups, filter, groupowner_id).viewmodel
+        viewmodel = GroupOwner_Index(site_user, title, modelstate, modelsuccess_bool, poolgroups, groupowners, filter, groupowner_id).viewmodel
         
         return viewmodel
        

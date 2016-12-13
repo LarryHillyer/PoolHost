@@ -7,6 +7,7 @@ from app.mixins import HelperMixins
 
 from cronjob.forms import CronJobForm_Create, CronJobForm_Edit
 
+
 class Layout_View(object):
 
     def __init__(self, site_user, title):
@@ -183,18 +184,20 @@ class SuperUser_Create(Create_View):
             form)
 
     @classmethod
-    def get_create_viewmodel(cls, site_user, title, modelstate):
+    def get_create_viewmodel(cls, site_user, title, modelstate, form):
 
         modelstate, modelsuccess_bool = CronJob.get_modelstate(modelstate)
+
         cronjobtypes = CronJobType.get_all_items(CronJobType)
         if cronjobtypes.count() == 0:
-            viewmodel = {'modelstate':'Error: Create a Group Owner First!'}
+            viewmodel = {'modelstate':'Error: Create a Cron Job Type First!'}
             return viewmodel
 
         cronjobtype_id = cronjobtypes[0].id
-        CronJobType_Choices.get_cronjobtype_choices()
+        CronJobType_Choices.get_cronjobtype_choices(cronjobtypes)
 
-        form = CronJobForm_Create(initial = {'conjobtype_id':cronjobtype_id})
+        if form == None:
+            form = CronJobForm_Create(initial = {'cronjobtype_id':cronjobtype_id})
 
         viewmodel = SuperUser_Create(site_user, title, modelstate, modelsuccess_bool, form).viewmodel
 
@@ -209,14 +212,17 @@ class SuperUser_Edit(Edit_View):
 
 
     @classmethod
-    def get_edit_viewmodel(cls, site_user, title, modelstate, cronjob_id):
+    def get_edit_viewmodel(cls, site_user, title, modelstate, cronjob_id, form):
 
         modelstate, modelsuccess_bool = CronJob.get_modelstate(modelstate)
 
         cronjob = CronJob.get_item_by_id(CronJob, cronjob_id)
-        CronJobType_Choices.get_cronjobtype_choices()
+        cronjobtypes = CronJobType.get_all_items(CronJobType)        
+        CronJobType_Choices.get_cronjobtype_choices(cronjobtypes)
 
-        form = CronJobForm_Edit(instance = cronjob, initial = {'cronjobtype_id':cronjob.cronjobtype_id})
+        if form == None:
+            form = CronJobForm_Edit(instance = cronjob,  
+                                    initial = {'cronjobtype_id':cronjob.cronjobtype_id})
 
         viewmodel = SuperUser_Edit(site_user, title, modelstate, modelsuccess_bool, form, 
             cronjob_id).viewmodel

@@ -6,7 +6,6 @@ app_name = 'poolowner'
 urlpatterns = [
     url(r'^transfer/(?P<poolowner_id>[0-9]+)/(?P<poolgroup_id>[0-9]+)/(?P<groupowner_id>[0-9]+)/(?P<filter>[0-9]+)/(?P<modelstate>.*)/$', views.transfer.as_view(), name = 'transfer'),
     url(r'^transfer/(?P<poolowner_id>[0-9]+)/(?P<poolgroup_id>[0-9]+)/(?P<groupowner_id>[0-9]+)/(?P<filter>[0-9]+)/$', views.transfer.as_view(), name = 'transfer'),
-    url(r'^transfer/(?P<poolowner_id>[0-9]+)/(?P<groupowner_id>[0-9]+)/(?P<filter>[0-9]+)/$', views.transfer.as_view(), name = 'transfer'),
 
     url(r'^delete/(?P<poolowner_id>[0-9]+)/(?P<poolgroup_id>[0-9]+)/(?P<groupowner_id>[0-9]+)/(?P<filter>[0-9]+)/(?P<modelstate>.*)/$', views.delete.as_view(), name = 'delete'),
     url(r'^delete/(?P<poolowner_id>[0-9]+)/(?P<poolgroup_id>[0-9]+)/(?P<groupowner_id>[0-9]+)/(?P<filter>[0-9]+)/$', views.delete.as_view(), name = 'delete'),
