@@ -47,6 +47,9 @@ urlpatterns = [
     url(r'^cronjobtype/', include('cronjobtype.urls')),
     url(r'^cronjob/', include('cronjob.urls')),
     url(r'^sport/', include('sport.urls')),
+    url(r'^league/', include('league.urls')),
+    url(r'^nfl/', include('nfl.urls')),
+
 
     url(r'^poolgroup/', include('poolgroup.urls')),
     url(r'^poolowner/', include('poolowner.urls')),

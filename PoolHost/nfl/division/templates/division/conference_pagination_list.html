@@ -1,0 +1,11 @@
+﻿<ul class="pagination pagination-sm custom-page">
+
+    {% if filter == 0 %}
+        <li class="active"><a href="{% url index_url 0 0 %}">No Filter</a></li>
+        <li><a href="{% url index_url conference_id 1 %}">Conference</a></li>
+    {% elif filter == 1 %}
+        <li><a href="{% url index_url 0 0 %}">No Filter</a></li>
+        <li class="active"><a href="{% url index_url 0 0 %}">Conference</a></li>
+    {% endif %}
+
+</ul>

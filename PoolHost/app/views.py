@@ -31,7 +31,8 @@ def home(request):
     view_model = {
                     'title':'Pool Host - Home',
                     'year':datetime.now().year,
-                    'site_user': site_user,   
+                    'site_user': site_user,
+                    'home_url': 'home'   
                  }
 
     return render(request, template_name, view_model)

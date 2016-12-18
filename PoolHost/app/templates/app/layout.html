@@ -49,9 +49,13 @@
                                 {% include 'app/poolowner_options.html' %}
                             </li>
                     {% endif %}
-
                 {% endif %}
 
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" role="button" 
+                        aria-haspopup="true" aria-expanded="false">Leagues <span class="caret"></span></a>
+                    {% include 'app/league_options.html' %}
+                </li>
                 </ul>
                 {% include 'app/loginpartial.html' %}
             </div>

@@ -1,0 +1,13 @@
+﻿<nav aria-label="Sports Navigation">
+
+    {% include conference_pagination_list_html %}
+    
+    {% if filter == 0 %}
+
+    {% elif filter == 1 %}
+        {% include shared_conference_pagination_list_html %}   
+    {% elif filter == 2 or filter == 3 %}
+        {% include shared_division_pagination_list_html %}              
+    {% endif %}
+    
+</nav>

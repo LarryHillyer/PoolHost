@@ -43,6 +43,11 @@ INSTALLED_APPS = [
     'cronjobtype',
     'cronjob',
     'sport',
+    'league',
+    'nfl',
+    'nfl.conference',
+    'nfl.division',
+
     # Add your apps here to enable them
     'django.contrib.admin',
     'django.contrib.auth',

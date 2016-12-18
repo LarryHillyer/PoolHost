@@ -54,12 +54,14 @@ class Index_Body_View(Layout_View):
         self.viewmodel['modelstate'] = modelstate
         self.viewmodel['modelstate_html'] = 'app/modelstatus.html'
 
-        self.viewmodel['index_table_html'] = 'pool/index_table.html' 
-
         self.viewmodel['create_url'] = 'pool:create'
         self.viewmodel['create_link_name'] = 'Create Pool'
         self.viewmodel['create_link_html'] =  'pool/create_link.html' 
         self.viewmodel['shared_create_link_html'] = 'app/shared_create_link.html'
+
+        self.viewmodel['index_table_html'] = 'pool/index_table.html' 
+
+        self.viewmodel['home_url'] = 'home'
  
         self.viewmodel['scripts'] = ['app/scripts/Client/TableStripping.js']
 

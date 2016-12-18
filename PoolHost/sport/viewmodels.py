@@ -40,6 +40,8 @@ class Index_Body_View(Layout_View):
 
         self.viewmodel['index_table_html'] = 'sport/index_table.html' 
 
+        self.viewmodel['home_url'] = 'home'
+
         self.viewmodel['scripts'] = ['app/scripts/Client/TableStripping.js']
 
 class Form_Body_View(Layout_View):
@@ -97,7 +99,7 @@ class Table_View(Index_Body_View):
       
         self.viewmodel['items'] = sports 
         self.viewmodel['header_label_item'] = 'Sport'
-        self.viewmodel['item_url'] = 'sport:index'
+        self.viewmodel['item_url'] = 'league:index'
         self.viewmodel['edit_url'] = 'sport:edit' 
         self.viewmodel['details_url'] = 'sport:details' 
         self.viewmodel['delete_url'] = 'sport:delete'
@@ -112,7 +114,6 @@ class DescriptiveList_View(Details_Delete_Body_View):
 
         self.viewmodel['item'] = sport 
         self.viewmodel['item_label_name'] = 'Sport'
-
 
 
 class Create_View(Form_Body_View):

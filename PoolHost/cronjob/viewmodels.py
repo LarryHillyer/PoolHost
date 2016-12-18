@@ -37,7 +37,9 @@ class Index_Body_View(Layout_View):
         self.viewmodel['create_link_html'] =  'cronjob/create_link.html' 
         self.viewmodel['shared_create_link_html'] = 'app/shared_create_link.html'
 
-        self.viewmodel['index_table_html'] = 'cronjob/index_table.html' 
+        self.viewmodel['index_table_html'] = 'cronjob/index_table.html'
+
+        self.viewmodel['home_url'] = 'home'
 
         self.viewmodel['scripts'] = ['app/scripts/Client/TableStripping.js']
 

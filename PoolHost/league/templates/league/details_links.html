@@ -1,0 +1,6 @@
+﻿{% url edit_url league_id sport_id filter as edit_url %}
+{% url index_url sport_id filter as index_url %}
+
+<a href="{{ edit_url}}">Edit</a>
+<span>  |  </span>
+<a href="{{ index_url }}">Index</a>

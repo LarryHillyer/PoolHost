@@ -1,0 +1,22 @@
+﻿<ul class="pagination pagination-sm custom-page">
+
+    {% if filter == 0 %}
+        <li class="active"><a href="{% url index_url league_id sport_id 0%}">No Filter</a></li>
+        <li><a href="{% url index_url league_id sport_id 1 %}">Sport</a></li>
+        <li><a href="{% url index_url league_id sport_id 2 %}">League</a></li>
+
+    {% elif filter == 1 %}
+        <li><a href="{% url index_url league_id sport_id 0 %}">No Filter</a></li>
+        <li class="active"><a href="{% url index_url league_id sport_id 0 %}">Sport</a></li>
+        <li><a href="{% url index_url league_id sport_id 3 %}">League</a></li>
+    {% elif filter == 2 %}
+        <li><a href="{% url index_url league_id sport_id 0 %}">No Filter</a></li>
+        <li><a href="{% url index_url league_id sport_id 3 %}">Sport</a></li>
+        <li class="active"><a href="{% url index_url league_id sport_id 0 %}">League</a></li>
+    {% elif filter == 3 %}
+        <li><a href="{% url index_url league_id sport_id 0 %}">No Filter</a></li>
+        <li class="active"><a href="{% url index_url league_id sport_id 2 %}">Sport</a></li>
+        <li class="active"><a href="{% url index_url league_id sport_id 1 %}">League</a></li>
+    {% endif %}
+
+</ul>

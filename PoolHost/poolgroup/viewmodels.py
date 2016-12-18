@@ -55,6 +55,8 @@ class Index_Body_View(Layout_View):
 
         self.viewmodel['index_table_html'] = 'poolgroup/index_table.html' 
 
+        self.viewmodel['home_url'] = 'home'
+
         self.viewmodel['scripts'] = ['app/scripts/Client/TableStripping.js']
 
 class Form_Body_View(Layout_View):

@@ -1,0 +1,11 @@
+﻿<nav aria-label="Sports Navigation">
+
+    {% include sport_pagination_list_html %}
+    
+    {% if filter == 0 %}
+
+    {% elif filter == 1 %}
+        {% include shared_sport_pagination_list_html %}
+    {% endif %}
+    
+</nav>

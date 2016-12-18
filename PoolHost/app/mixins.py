@@ -21,6 +21,19 @@ class HelperMixins(object):
         return model_cls.objects.filter(poolowner_id = model_poolowner_id)
 
     @classmethod
+    def get_items_by_sport_id(cls, model_cls, model_sport_id):
+        return model_cls.objects.filter(sport_id = model_sport_id)
+
+    @classmethod
+    def get_items_by_league_id(cls, model_cls, model_league_id):
+        return model_cls.objects.filter(league_id = model_league_id)
+
+    @classmethod
+    def get_items_by_conference_id(cls, model_cls, model_conference_id):
+        return model_cls.objects.filter(conference_id = model_conference_id)
+
+
+    @classmethod
     def get_items_by_name(cls, model_cls, model_name):
         return model_cls.objects.filter(name = model_name)
 

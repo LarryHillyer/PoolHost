@@ -7,6 +7,76 @@ from django.core.serializers import serialize
 
 from app.mixins import HelperMixins
 
+
+class SiteUser(models.Model, HelperMixins):
+    
+    name = models.CharField(max_length = 100)
+    user_permissions = models.CharField(max_length = 12)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    is_superuser = models.BooleanField(default = False)
+    is_groupowner = models.BooleanField(default = False)
+    is_poolowner = models.BooleanField(default = False)
+    
+    
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def make_siteuser_superuser(self, site_user):
+        site_user.is_superuser = True
+        site_user.save()
+        return site_user
+
+    @classmethod
+    def make_siteuser_groupowner(self, site_user):
+        site_user.is_groupowner = True
+        site_user.save()
+        return site_user
+
+    @classmethod
+    def make_siteuser_poolowner(self, site_user):
+        site_user.is_poolowner = True
+        site_user.save()
+        return site_user
+   
+    @classmethod
+    def delete_siteuser_groupowner(self, groupowner):
+        site_user = SiteUser.objects.get(user_id = groupowner.user_id)
+        site_user.is_groupowner = False
+        site_user.save()
+
+    @classmethod
+    def delete_siteuser_superuser(self, superuser):
+        site_user = SiteUser.objects.get(user_id = superuser.user_id)
+        site_user.is_superuser = False
+        site_user.save()
+
+    @classmethod
+    def delete_siteuser_poolowner(self, poolowner):
+        site_user = SiteUser.objects.get(user_id = poolowner.user_id)
+        site_user.is_poolowner = False
+        site_user.save()
+
+
+class SuperUser(models.Model, HelperMixins):
+    
+    name = models.CharField(max_length = 50)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def delete_item(cls, superuser):
+        try:
+            SiteUser.delete_siteuser_superuser(superuser)
+            superuser.delete()
+            modelstate = 'Success: Superuser, ' + superuser.name + ' has been deleted!'
+        except:
+            modelstate = 'Error: Database Error!!! Superuser, ' + superuser.name + ' was not deleted!'
+        return modelstate
+
+
 class CronJobType (models.Model, HelperMixins):
     name = models.CharField(max_length = 50)
 
@@ -54,6 +124,7 @@ class CronJobType_Choices(models.Model, HelperMixins):
         for cronjobtype_choice in cronjobtype_choices_1:
             cronjobtype_choices.append((cronjobtype_choice.cronjobtype_id, cronjobtype_choice.name))
         return cronjobtype_choices
+
 
 class CronJob (models.Model, HelperMixins):
 
@@ -111,54 +182,6 @@ class CronJob_Choices(models.Model, HelperMixins):
             cronjob_choices.append((cronjob_choice.cronjob_id, cronjob_choice.name))
         return cronjob_choices
 
-class SiteUser(models.Model, HelperMixins):
-    
-    name = models.CharField(max_length = 100)
-    user_permissions = models.CharField(max_length = 12)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    is_superuser = models.BooleanField(default = False)
-    is_groupowner = models.BooleanField(default = False)
-    is_poolowner = models.BooleanField(default = False)
-    
-    
-    def __str__(self):
-        return self.name
-
-    @classmethod
-    def make_siteuser_superuser(self, site_user):
-        site_user.is_superuser = True
-        site_user.save()
-        return site_user
-
-    @classmethod
-    def make_siteuser_groupowner(self, site_user):
-        site_user.is_groupowner = True
-        site_user.save()
-        return site_user
-
-    @classmethod
-    def make_siteuser_poolowner(self, site_user):
-        site_user.is_poolowner = True
-        site_user.save()
-        return site_user
-   
-    @classmethod
-    def delete_siteuser_groupowner(self, groupowner):
-        site_user = SiteUser.objects.get(user_id = groupowner.user_id)
-        site_user.is_groupowner = False
-        site_user.save()
-
-    @classmethod
-    def delete_siteuser_superuser(self, superuser):
-        site_user = SiteUser.objects.get(user_id = superuser.user_id)
-        site_user.is_superuser = False
-        site_user.save()
-
-    @classmethod
-    def delete_siteuser_poolowner(self, poolowner):
-        site_user = SiteUser.objects.get(user_id = poolowner.user_id)
-        site_user.is_poolowner = False
-        site_user.save()
 
 class GroupOwner(models.Model, HelperMixins):
 
@@ -256,23 +279,6 @@ class GroupOwner_Choices(models.Model, HelperMixins):
             groupowner_choices.append((groupowner_choice.groupowner_id, groupowner_choice.name))
         return groupowner_choices
 
-class SuperUser(models.Model, HelperMixins):
-    
-    name = models.CharField(max_length = 50)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-    @classmethod
-    def delete_item(cls, superuser):
-        try:
-            SiteUser.delete_siteuser_superuser(superuser)
-            superuser.delete()
-            modelstate = 'Success: Superuser, ' + superuser.name + ' has been deleted!'
-        except:
-            modelstate = 'Error: Database Error!!! Superuser, ' + superuser.name + ' was not deleted!'
-        return modelstate
 
 class PoolGroup (models.Model, HelperMixins):
     name = models.CharField(max_length = 50)
@@ -434,6 +440,7 @@ class PoolGroup_Choices(models.Model, HelperMixins):
             poolgroup_choices.append((poolgroup_choice.poolgroup_id, poolgroup_choice.name))
         return poolgroup_choices
 
+
 class PoolOwner (models.Model, HelperMixins):
     name = models.CharField(max_length = 50)
     poolgroup = models.ForeignKey(PoolGroup, on_delete=models.CASCADE)
@@ -569,6 +576,7 @@ class PoolOwner_Choices(models.Model, HelperMixins):
             poolowner_choices.append((poolowner_choice.poolowner_id, poolowner_choice.name))
         return poolowner_choices
 
+
 class PoolType (models.Model, HelperMixins):
 
     name = models.CharField(max_length = 50)
@@ -617,6 +625,7 @@ class PoolType_Choices(models.Model, HelperMixins):
         for pooltype_choice in pooltype_choices_1:
             pooltype_choices.append((pooltype_choice.pooltype_id, pooltype_choice.name))
         return pooltype_choices
+
 
 class Pool (models.Model, HelperMixins):
 
@@ -747,6 +756,7 @@ class Pool (models.Model, HelperMixins):
         for poolowner_pool in poolowner_pools:
             Pool.delete_item(Pool, poolowner_pool)
 
+
 class Sport(models.Model, HelperMixins):
 
     name = models.CharField(max_length = 50)
@@ -772,8 +782,264 @@ class Sport(models.Model, HelperMixins):
             pass
         return same_sport
 
+    @classmethod
+    def get_sport_id_if_needed_and_possible(cls, sports, sport_id, 
+        league_id = 0, nfl_conference_id = 0):
+
+        if sport_id != 0:
+            pass
+
+        elif nfl_conference_id != 0:
+            nfl_conference = NFL_Conference.get_item_by_id( NFL_Conference, poolowner_id)
+            sport_id = nfl_conference.league.sport_id
+
+        elif league_id != 0:
+            league = PoolGroup.get_item_by_id( PoolGroup, league_id)
+            sport_id = league.sport_id
+        elif sports != []:
+            sport_id = sports[0].id
+        return sport_id
+
+    @classmethod
+    def get_sports_by_leagues(cls, leagues):
+        sports = []
+        for league in leagues:
+            sport = Sport.get_item_by_id(Sport, league.sport_id)
+            sports.append(sport)
+        return sports
+
+    @classmethod
+    def get_sports_with_leagues(cls, sports):
+        sports_with_leagues = []
+        for sport in sports:
+            sport_leagues = League.get_items_by_sport_id(League, sport.id)
+            if sport_leagues.count() > 0:
+                sports_with_leagues.append(sport)
+        return sports_with_leagues
+
 
 class Sport_Choices(models.Model, HelperMixins):
 
     name = models.CharField(max_length = 50)
-    sport_id = models.IntegerField()    
+    sport_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_sports(cls, sports):
+            sport_choices = Sport_Choices.get_all_items(Sport_Choices)
+            if sport_choices.count() > 0:               
+                sport_choices.delete()
+            for sport in sports:
+                sport_choice = Sport_Choices(name = sport.name, sport_id = sport.id)
+                Sport_Choices.add_item(Sport_Choices, sport_choice)
+
+    @classmethod
+    def make_sport_choices(cls):
+        sport_choices_1 = Sport_Choices.get_all_items(Sport_Choices)
+        sport_choices = []
+        for sport_choice in sport_choices_1:
+            sport_choices.append((sport_choice.sport_id, sport_choice.name))
+        return sport_choices
+
+
+class League(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    league_icon_path = models.CharField(max_length = 250)
+    league_label_path = models.CharField(max_length = 250)
+    sport = models.ForeignKey(Sport, on_delete = models.CASCADE)
+
+    class Meta:
+        ordering = ['sport']
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get_exactly_same_league(cls, league_id, league_name, league_sport_id):
+        exactly_same_league = None
+        try:
+            exactly_same_league = League.objects.filter(id = league_id, name=league_name, 
+                sport_id = league_sport_id)
+        except:
+            pass
+        return exactly_same_league
+
+    @classmethod
+    def get_same_league_in_database(cls, league_name, league_sport_id):
+        same_league = None
+        try:
+            same_league = League.objects.filter(name=league_name, sport_id = league_sport_id)
+        except:
+            pass
+        return same_league
+
+    @classmethod
+    def delete_item(cls, league):
+        try:
+            #League.delete_league_conferences(league.id)
+            modelstate = League.delete(league)
+            modelstate = 'Success: ' + league.name + ' has been deleted!'
+        except:
+            modelstate = 'Error: Database Error!!! ' + league.name + ' was not deleted!'
+        return modelstate
+
+    @classmethod
+    def get_league_id_if_needed_and_possible(cls, leagues, league_id, 
+        conference_id = 0):
+
+        if league_id != 0:
+            pass
+        elif conference_id != 0:
+            conference = NFL_Conference.get_item_by_id(NFL_Conference, conference_id)
+            league_id = conference.league_id 
+        elif leagues != []:
+            league_id = leagues[0].id
+
+        return league_id
+
+class League_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    league_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_leagues(cls, leagues):
+
+        league_choices = League_Choices.get_all_items(League_Choices)
+        if league_choices.count() > 0:               
+            league_choices.delete()
+        for league in leagues:
+            league_choice = League_Choices(name = league.name, league_id = league.id)
+            League_Choices.add_item(League_Choices, league_choice)
+
+    @classmethod
+    def make_league_choices(cls):
+        league_choices_1 = League_Choices.get_all_items(League_Choices)
+        league_choices = []
+        for league_choice in league_choices_1:
+            league_choices.append((league_choice.league_id, league_choice.name))
+        return league_choices
+
+
+class NFL_Conference(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    league = models.ForeignKey(League, on_delete = models.CASCADE)
+
+    class Meta:
+        ordering = ['league']
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get_exactly_same_conference(cls, conference_id, conference_name, conference_league_id):
+        return NFL_Conference.objects.filter(id = conference_id, name=conference_name, 
+                league_id = conference_league_id)
+
+    @classmethod
+    def get_same_conference_in_database(cls, conference_name, conference_league_id):
+        return NFL_Conference.objects.filter(name=conference_name, 
+            league_id = conference_league_id)
+
+    @classmethod
+    def delete_item(cls, conference):
+        try:
+            #League.delete_conference_divisions(conference.id)
+            modelstate = League.delete(conference)
+            modelstate = 'Success: ' + conference.name + ' has been deleted!'
+        except:
+            modelstate = 'Error: Database Error!!! ' + conference.name + ' was not deleted!'
+        return modelstate
+
+    @classmethod
+    def get_conference_id_if_needed_and_possible(cls, conferences, conference_id, 
+        division_id = 0):
+
+        if conference_id != 0:
+            pass
+        elif division_id != 0:
+            division = NFL_Division.get_item_by_id(NFL_Division, division_id)
+            conference_id = division.conference_id 
+        elif conferences != []:
+            conference_id = conferences[0].id
+
+        return conference_id
+
+class NFL_Conference_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    conference_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_conferences(cls, conferences):
+
+        conference_choices = NFL_Conference_Choices.get_all_items(NFL_Conference_Choices)
+        if conference_choices.count() > 0:               
+            conference_choices.delete()
+        for conference in conferences:
+            conference_choice = NFL_Conference_Choices(name = conference.name, conference_id = conference.id)
+            NFL_Conference_Choices.add_item(NFL_Conference_Choices, conference_choice)
+
+    @classmethod
+    def make_conference_choices(cls):
+        conference_choices_1 = NFL_Conference_Choices.get_all_items(NFL_Conference_Choices)
+        conference_choices = []
+        for conference_choice in conference_choices_1:
+            conference_choices.append((conference_choice.conference_id, conference_choice.name))
+        return conference_choices
+
+
+class NFL_Division(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    conference = models.ForeignKey(NFL_Conference, on_delete = models.CASCADE)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get_exactly_same_division(cls, division_id, division_name, division_conference_id):
+        return NFL_Division.objects.filter(id = division_id, name=division_name, 
+                conference_id = division_conference_id)
+
+    @classmethod
+    def get_same_division_in_database(cls, division_name, division_conference_id):
+        return NFL_Division.objects.filter(name=division_name, 
+            conference_id = division_conference_id)
+
+    @classmethod
+    def delete_item(cls, division):
+        try:
+            #League.delete_division_divisions(division.id)
+            modelstate = League.delete(division)
+            modelstate = 'Success: ' + division.name + ' has been deleted!'
+        except:
+            modelstate = 'Error: Database Error!!! ' + division.name + ' was not deleted!'
+        return modelstate
+
+class NFL_Division_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    division_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_divisions(cls, divisions):
+
+        division_choices = NFL_Division_Choices.get_all_items(NFL_Division_Choices)
+        if division_choices.count() > 0:               
+            division_choices.delete()
+        for division in divisions:
+            division_choice = NFL_Division_Choices(name = division.name, division_id = division.id)
+            NFL_Division_Choices.add_item(NFL_Division_Choices, division_choice)
+
+    @classmethod
+    def make_division_choices(cls):
+        division_choices_1 = NFL_Division_Choices.get_all_items(NFL_Division_Choices)
+        division_choices = []
+        for division_choice in division_choices_1:
+            division_choices.append((division_choice.division_id, division_choice.name))
+        return division_choices

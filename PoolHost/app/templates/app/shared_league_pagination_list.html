@@ -1,0 +1,15 @@
+﻿    <ul class="pagination pagination-sm custom-page-2" id="league_id">
+        {% if league_id != 0 %}
+            {% for league in leagues %}
+                {% if league.id == league_id %}
+                    <li class="active">
+                        {% include league_pagination_link_html %}
+                    </li>
+                {% else %}
+                    <li>
+                        {% include league_pagination_link_html %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </ul>
