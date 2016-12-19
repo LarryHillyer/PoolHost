@@ -95,7 +95,7 @@ WSGI_APPLICATION = 'PoolHost.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sportspoolhost',
+        'NAME': 'poolhost',
         'USER': 'sportpool',
         'PASSWORD': 'Boatin_123',
         'HOST': 'localhost',

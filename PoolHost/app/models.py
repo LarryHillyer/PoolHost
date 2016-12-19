@@ -11,7 +11,6 @@ from app.mixins import HelperMixins
 class SiteUser(models.Model, HelperMixins):
     
     name = models.CharField(max_length = 100)
-    user_permissions = models.CharField(max_length = 12)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_superuser = models.BooleanField(default = False)
     is_groupowner = models.BooleanField(default = False)
@@ -124,63 +123,6 @@ class CronJobType_Choices(models.Model, HelperMixins):
         for cronjobtype_choice in cronjobtype_choices_1:
             cronjobtype_choices.append((cronjobtype_choice.cronjobtype_id, cronjobtype_choice.name))
         return cronjobtype_choices
-
-
-class CronJob (models.Model, HelperMixins):
-
-    name = models.CharField(max_length = 50)
-    cronjobtype = models.ForeignKey(CronJobType, on_delete=models.CASCADE)
-    status = models.CharField(max_length = 50)
-
-    def __str__(self):
-        return self.name
-
-    @classmethod
-    def get_exactly_same_cronjob(cls, cronjob_id, cronjob_name, cronjob_cronjobtype_id):
-        exactly_same_cronjob = None
-        try:
-            exactly_same_cronjob = CronJob.objects.filter(id = cronjob_id, name=cronjob_name, 
-                cronjobtype_id = cronjob_cronjobtype_id)
-        except:
-            pass
-        return exactly_same_cronjob
-
-    @classmethod
-    def get_same_cronjob_in_database(cls, cronjob_name):
-        same_cronjob = None
-        try:
-            same_cronjob = CronJob.objects.filter(name=cronjob_name)
-        except:
-            pass
-        return same_cronjob
-
-class CronJob_Choices(models.Model, HelperMixins):
-
-    name = models.CharField(max_length = 50)
-    cronjob_id = models.IntegerField()
-
-    @classmethod
-    def get_cronjob_choices(cls, cronjobs):
-
-        cronjob_choices = CronJob_Choices.get_all_items(CronJob_Choices)
-        if cronjob_choices.count() > 0:               
-            cronjob_choices.delete()
-
-        cronjob_choice = CronJob_Choices(name = 'none', cronjob_id = -1)
-        CronJob_Choices.add_item(CronJob_Choices, cronjob_choice)
-            
-        for cronjob in cronjobs:
-            cronjob_choice = CronJob_Choices(name = cronjob.name, cronjob_id = cronjob.id)
-            CronJob_Choices.add_item(CronJob_Choices, cronjob_choice)
-
-
-    @classmethod
-    def make_cronjob_choices(cls):
-        cronjob_choices_1 = CronJob_Choices.get_all_items(CronJob_Choices)
-        cronjob_choices = []
-        for cronjob_choice in cronjob_choices_1:
-            cronjob_choices.append((cronjob_choice.cronjob_id, cronjob_choice.name))
-        return cronjob_choices
 
 
 class GroupOwner(models.Model, HelperMixins):
@@ -627,136 +569,6 @@ class PoolType_Choices(models.Model, HelperMixins):
         return pooltype_choices
 
 
-class Pool (models.Model, HelperMixins):
-
-    name = models.CharField(max_length = 50)
-
-    poolgroup = models.ForeignKey(PoolGroup, on_delete = models.CASCADE)
-    poolowner = models.ForeignKey(PoolOwner, on_delete = models.DO_NOTHING)
-    pooltype = models.ForeignKey(PoolType, on_delete = models.DO_NOTHING)
-    cronjob = models.ForeignKey(CronJob, on_delete = models.DO_NOTHING, null = True)
-
-    def __str__(self):
-        return self.name
-
-    @classmethod
-    def get_items_by_groupowner_id(cls, model_cls, model_groupowner_id):
-        pools = []
-        poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, model_groupowner_id)
-        for poolgroup in poolgroups:
-            poolgroup_pools = Pool.get_items_by_poolgroup_id(Pool, poolgroup.id)
-            for pool in poolgroup_pools:
-                pools.append(pool)
-        return pools
-
-    @classmethod
-    def get_same_pool_in_database(cls, pool_name, pool_id = 0):
-        same_pool = None
-        try:
-            same_pool = Pool.objects.get(name=pool_name)
-        except:
-            pass
-        if same_pool != None:
-            if same_pool.id == pool_id and pool_id != 0:
-                same_pool = None
-        return same_pool
-
-    @classmethod
-    def get_exactly_same_pool(cls, id, name, cronjob_id, pooltype_id, poolgroup_id, poolowner_id):
-        exactly_same_pool = None
-        try:
-            exactly_same_pool = Pool.objects.filter(id = id, name = name, cronjob_id = cronjob_id, 
-                pooltype_id = pooltype_id, poolgroup_id = poolgroup_id, poolowner_id = poolowner_id)
-        except:
-            pass
-        return exactly_same_pool
-
-    @classmethod
-    def filter_pools(cls, pools, groupowner_id = 0, poolgroup_id = 0, poolowner_id = 0):
-
-        filtered_pools = []
-
-        if poolowner_id != 0:
-            for pool in pools:
-                if pool.poolowner_id == poolowner_id:
-                    filtered_pools.append(pool)
-        '''
-        elif poolgroup_id != 0:
-            for pool in pools:
-                if pool.poolgroup_id == poolgroup_id:
-                    filtered_pools.append(pool)
-        elif groupowner_id != 0:
-            for pool in pools:
-                if pool.poolgroup.groupowner_id == groupowner_id:
-                    filtered_pools.append(pool)
-        '''
-        return filtered_pools
-
-    @classmethod
-    def get_pools_by_poolowners(cls, poolowners):
-
-        pools = []
-        for poolowner in poolowners:
-            poolowner_pools = Pool.get_items_by_poolowner_id(Pool, poolowner.id)
-            for poolowner_pool in poolowner_pools:
-                pools.append(poolowner_pool)
-        return pools
-
-    @classmethod
-    def get_pools_by_poolgroups(cls, poolgroups):
-
-        pools = []
-        for poolgroup in poolgroups:
-            poolgroup_pools = Pool.get_items_by_poolgroup_id(Pool, poolgroup.id)
-            for poolgroup_pool in poolgroup_pools:
-                pools.append(poolgroup_pool)
-        return pools
-
-    @classmethod
-    def get_pools_by_groupowners(cls, groupowners):
-
-        pools = []
-        for groupowner in groupowners:
-            groupowner_pools = Pool.get_items_by_groupowner_id(Pool, groupowner.id)
-            for groupowner_pool in groupowner_pools:
-                pools.append(groupowner_pool)
-        return pools
-
-    @classmethod
-    def transfer_pool_ownership(cls, pools, new_poolowner_id, modelstate):
-        error = None
-        for pool in pools:
-            pool.poolowner_id = new_poolowner_id
-            modelstate = PoolGroup.edit_item(Pool, pool)
-            if modelstate.split(':')[0] != 'Success':
-                error = 'Error'
-        if error == None:
-            return 'Success: Pool ownership was transfered'
-        else:
-            return 'Error: Database Error must be investigated'
-
-    @classmethod
-    def transfer_pool_ownership_2(cls, pool, new_poolowner_id, modelstate):
-        error = None
-
-        pool.poolowner_id = new_poolowner_id
-        modelstate = PoolGroup.edit_item(Pool, pool)
-        if modelstate.split(':')[0] != 'Success':
-            error = 'Error'
-
-        if error == None:
-            return 'Success: Pool ownership was transfered'
-        else:
-            return 'Error: Database Error must be investigated'
-
-    @classmethod
-    def delete_poolowner_pools(cls, poolowner_id):
-        
-        poolowner_pools = Pool.get_items_by_poolowner_id(Pool, poolowner_id)
-        for poolowner_pool in poolowner_pools:
-            Pool.delete_item(Pool, poolowner_pool)
-
-
 class Sport(models.Model, HelperMixins):
 
     name = models.CharField(max_length = 50)
@@ -816,7 +628,6 @@ class Sport(models.Model, HelperMixins):
             if sport_leagues.count() > 0:
                 sports_with_leagues.append(sport)
         return sports_with_leagues
-
 
 class Sport_Choices(models.Model, HelperMixins):
 
@@ -1043,3 +854,485 @@ class NFL_Division_Choices(models.Model, HelperMixins):
         for division_choice in division_choices_1:
             division_choices.append((division_choice.division_id, division_choice.name))
         return division_choices
+
+
+class NFL_TeamCode(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 20)
+
+
+class Years(models.Model, HelperMixins):
+
+    year = models.IntegerField()
+
+class Years_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    years_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_yearss(cls, yearss):
+
+        years_choices = Years_Choices.get_all_items(Years_Choices)
+        if years_choices.count() > 0:               
+            years_choices.delete()
+        for years in yearss:
+            years_choice = Years_Choices(name = years.name, years_id = years.id)
+            Years_Choices.add_item(Years_Choices, years_choice)
+
+    @classmethod
+    def make_years_choices(cls):
+        years_choices_1 = Years_Choices.get_all_items(Years_Choices)
+        years_choices = []
+        for years_choice in years_choices_1:
+            years_choices.append((years_choice.years_id, years_choice.name))
+        return years_choices
+
+
+class NFL_Team(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    location = models.CharField(max_length = 50)
+    team_abbrv = models.CharField(max_length = 10)
+    label_filename = models.CharField(max_length = 50)
+    icon_filename = models.CharField(max_length = 50)
+
+    start_year = models.ForeignKey(Years, on_delete = models.DO_NOTHING, related_name = 'start_year')
+    end_year = models.ForeignKey(Years, on_delete = models.DO_NOTHING, null = True, related_name = 'end_year')
+    division = models.ForeignKey(NFL_Division, on_delete = models.CASCADE)
+    code = models.ForeignKey(NFL_TeamCode, on_delete = models.DO_NOTHING)
+
+    class Meta:
+        ordering = ['division']
+
+    def __str__(self):
+        return self.name
+
+class NFL_Team_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    nfl_team_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_nfl_teams(cls, nfl_teams):
+
+        nfl_team_choices = NFL_Team_Choices.get_all_items(NFL_Team_Choices)
+        if nfl_team_choices.count() > 0:               
+            nfl_team_choices.delete()
+        for nfl_team in nfl_teams:
+            nfl_team_choice = NFL_Team_Choices(name = nfl_team.name, nfl_team_id = nfl_team.id)
+            NFL_Team_Choices.add_item(NFL_Team_Choices, nfl_team_choice)
+
+    @classmethod
+    def make_nfl_team_choices(cls):
+        nfl_team_choices_1 = NFL_Team_Choices.get_all_items(NFL_Team_Choices)
+        nfl_team_choices = []
+        for nfl_team_choice in nfl_team_choices_1:
+            nfl_team_choices.append((nfl_team_choice.nfl_team_id, nfl_team_choice.name))
+        return nfl_team_choices
+
+
+class NFL_Season(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    league = models.ForeignKey(League, on_delete = models.CASCADE)
+    year = models.ForeignKey(Years, on_delete = models.DO_NOTHING)
+
+    class Meta:
+        ordering = ['-year']
+
+    def __str__(self):
+        return self.name
+
+class NFL_Season_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    nfl_season_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_nfl_seasons(cls, nfl_seasons):
+
+        nfl_season_choices = NFL_Season_Choices.get_all_items(NFL_Season_Choices)
+        if nfl_season_choices.count() > 0:               
+            nfl_season_choices.delete()
+        for nfl_season in nfl_seasons:
+            nfl_season_choice = NFL_Season_Choices(name = nfl_season.name, nfl_season_id = nfl_season.id)
+            NFL_Season_Choices.add_item(NFL_Season_Choices, nfl_season_choice)
+
+    @classmethod
+    def make_nfl_season_choices(cls):
+        nfl_season_choices_1 = NFL_Season_Choices.get_all_items(NFL_Season_Choices)
+        nfl_season_choices = []
+        for nfl_season_choice in nfl_season_choices_1:
+            nfl_season_choices.append((nfl_season_choice.nfl_season_id, nfl_season_choice.name))
+        return nfl_season_choices
+
+
+class NFL_SeasonType(models.Model, HelperMixins):
+  
+    name = models.CharField(max_length = 50)
+    league = models.ForeignKey(League, on_delete = models.DO_NOTHING)
+
+class NFL_SeasonType_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    nfl_seasontype_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_nfl_seasontypes(cls, nfl_seasontypes):
+
+        nfl_seasontype_choices = NFL_SeasonType_Choices.get_all_items(NFL_SeasonType_Choices)
+        if nfl_seasontype_choices.count() > 0:               
+            nfl_seasontype_choices.delete()
+        for nfl_seasontype in nfl_seasontypes:
+            nfl_seasontype_choice = NFL_SeasonType_Choices(name = nfl_seasontype.name, nfl_seasontype_id = nfl_seasontype.id)
+            NFL_SeasonType_Choices.add_item(NFL_SeasonType_Choices, nfl_seasontype_choice)
+
+    @classmethod
+    def make_nfl_seasontype_choices(cls):
+        nfl_seasontype_choices_1 = NFL_SeasonType_Choices.get_all_items(NFL_SeasonType_Choices)
+        nfl_seasontype_choices = []
+        for nfl_seasontype_choice in nfl_seasontype_choices_1:
+            nfl_seasontype_choices.append((nfl_seasontype_choice.nfl_seasontype_id, nfl_seasontype_choice.name))
+        return nfl_seasontype_choices
+
+
+class NFL_Schedule(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    is_custom = models.BooleanField(default = False)
+
+    season = models.ForeignKey(NFL_Season, on_delete = models.CASCADE)
+    schedule_type = models.ForeignKey(NFL_SeasonType, on_delete = models.DO_NOTHING)
+    cronjob_id = models.IntegerField(null = True)
+
+    class Meta:
+        ordering = ['-season']
+
+    def __str__(self):
+        return self.name
+
+class NFL_Schedule_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    nfl_schedule_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_nfl_schedules(cls, nfl_schedules):
+
+        nfl_schedule_choices = NFL_Schedule_Choices.get_all_items(NFL_Schedule_Choices)
+        if nfl_schedule_choices.count() > 0:               
+            nfl_schedule_choices.delete()
+        for nfl_schedule in nfl_schedules:
+            nfl_schedule_choice = NFL_Schedule_Choices(name = nfl_schedule.name, nfl_schedule_id = nfl_schedule.id)
+            NFL_Schedule_Choices.add_item(NFL_Schedule_Choices, nfl_schedule_choice)
+
+    @classmethod
+    def make_nfl_schedule_choices(cls):
+        nfl_schedule_choices_1 = NFL_Schedule_Choices.get_all_items(NFL_Schedule_Choices)
+        nfl_schedule_choices = []
+        for nfl_schedule_choice in nfl_schedule_choices_1:
+            nfl_schedule_choices.append((nfl_schedule_choice.nfl_schedule_id, nfl_schedule_choice.name))
+        return nfl_schedule_choices
+
+
+class CronJob (models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    cronjobtype = models.ForeignKey(CronJobType, on_delete=models.CASCADE)
+    nfl_schedule = models.ForeignKey(NFL_Schedule, on_delete = models.DO_NOTHING, null = True)
+    status = models.CharField(max_length = 50)
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get_exactly_same_cronjob(cls, cronjob_id, cronjob_name, cronjob_cronjobtype_id):
+        exactly_same_cronjob = None
+        try:
+            exactly_same_cronjob = CronJob.objects.filter(id = cronjob_id, name=cronjob_name, 
+                cronjobtype_id = cronjob_cronjobtype_id)
+        except:
+            pass
+        return exactly_same_cronjob
+
+    @classmethod
+    def get_same_cronjob_in_database(cls, cronjob_name):
+        same_cronjob = None
+        try:
+            same_cronjob = CronJob.objects.filter(name=cronjob_name)
+        except:
+            pass
+        return same_cronjob
+
+class CronJob_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    cronjob_id = models.IntegerField()
+
+    @classmethod
+    def get_cronjob_choices(cls, cronjobs):
+
+        cronjob_choices = CronJob_Choices.get_all_items(CronJob_Choices)
+        if cronjob_choices.count() > 0:               
+            cronjob_choices.delete()
+
+        cronjob_choice = CronJob_Choices(name = 'none', cronjob_id = -1)
+        CronJob_Choices.add_item(CronJob_Choices, cronjob_choice)
+            
+        for cronjob in cronjobs:
+            cronjob_choice = CronJob_Choices(name = cronjob.name, cronjob_id = cronjob.id)
+            CronJob_Choices.add_item(CronJob_Choices, cronjob_choice)
+
+
+    @classmethod
+    def make_cronjob_choices(cls):
+        cronjob_choices_1 = CronJob_Choices.get_all_items(CronJob_Choices)
+        cronjob_choices = []
+        for cronjob_choice in cronjob_choices_1:
+            cronjob_choices.append((cronjob_choice.cronjob_id, cronjob_choice.name))
+        return cronjob_choices
+
+
+class Pool (models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+
+    poolgroup = models.ForeignKey(PoolGroup, on_delete = models.CASCADE)
+    poolowner = models.ForeignKey(PoolOwner, on_delete = models.DO_NOTHING)
+    pooltype = models.ForeignKey(PoolType, on_delete = models.DO_NOTHING)
+    cronjob = models.ForeignKey(CronJob, on_delete = models.DO_NOTHING, null = True)
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get_items_by_groupowner_id(cls, model_cls, model_groupowner_id):
+        pools = []
+        poolgroups = PoolGroup.get_items_by_groupowner_id(PoolGroup, model_groupowner_id)
+        for poolgroup in poolgroups:
+            poolgroup_pools = Pool.get_items_by_poolgroup_id(Pool, poolgroup.id)
+            for pool in poolgroup_pools:
+                pools.append(pool)
+        return pools
+
+    @classmethod
+    def get_same_pool_in_database(cls, pool_name, pool_id = 0):
+        same_pool = None
+        try:
+            same_pool = Pool.objects.get(name=pool_name)
+        except:
+            pass
+        if same_pool != None:
+            if same_pool.id == pool_id and pool_id != 0:
+                same_pool = None
+        return same_pool
+
+    @classmethod
+    def get_exactly_same_pool(cls, id, name, cronjob_id, pooltype_id, poolgroup_id, poolowner_id):
+        exactly_same_pool = None
+        try:
+            exactly_same_pool = Pool.objects.filter(id = id, name = name, cronjob_id = cronjob_id, 
+                pooltype_id = pooltype_id, poolgroup_id = poolgroup_id, poolowner_id = poolowner_id)
+        except:
+            pass
+        return exactly_same_pool
+
+    @classmethod
+    def filter_pools(cls, pools, groupowner_id = 0, poolgroup_id = 0, poolowner_id = 0):
+
+        filtered_pools = []
+
+        if poolowner_id != 0:
+            for pool in pools:
+                if pool.poolowner_id == poolowner_id:
+                    filtered_pools.append(pool)
+        '''
+        elif poolgroup_id != 0:
+            for pool in pools:
+                if pool.poolgroup_id == poolgroup_id:
+                    filtered_pools.append(pool)
+        elif groupowner_id != 0:
+            for pool in pools:
+                if pool.poolgroup.groupowner_id == groupowner_id:
+                    filtered_pools.append(pool)
+        '''
+        return filtered_pools
+
+    @classmethod
+    def get_pools_by_poolowners(cls, poolowners):
+
+        pools = []
+        for poolowner in poolowners:
+            poolowner_pools = Pool.get_items_by_poolowner_id(Pool, poolowner.id)
+            for poolowner_pool in poolowner_pools:
+                pools.append(poolowner_pool)
+        return pools
+
+    @classmethod
+    def get_pools_by_poolgroups(cls, poolgroups):
+
+        pools = []
+        for poolgroup in poolgroups:
+            poolgroup_pools = Pool.get_items_by_poolgroup_id(Pool, poolgroup.id)
+            for poolgroup_pool in poolgroup_pools:
+                pools.append(poolgroup_pool)
+        return pools
+
+    @classmethod
+    def get_pools_by_groupowners(cls, groupowners):
+
+        pools = []
+        for groupowner in groupowners:
+            groupowner_pools = Pool.get_items_by_groupowner_id(Pool, groupowner.id)
+            for groupowner_pool in groupowner_pools:
+                pools.append(groupowner_pool)
+        return pools
+
+    @classmethod
+    def transfer_pool_ownership(cls, pools, new_poolowner_id, modelstate):
+        error = None
+        for pool in pools:
+            pool.poolowner_id = new_poolowner_id
+            modelstate = PoolGroup.edit_item(Pool, pool)
+            if modelstate.split(':')[0] != 'Success':
+                error = 'Error'
+        if error == None:
+            return 'Success: Pool ownership was transfered'
+        else:
+            return 'Error: Database Error must be investigated'
+
+    @classmethod
+    def transfer_pool_ownership_2(cls, pool, new_poolowner_id, modelstate):
+        error = None
+
+        pool.poolowner_id = new_poolowner_id
+        modelstate = PoolGroup.edit_item(Pool, pool)
+        if modelstate.split(':')[0] != 'Success':
+            error = 'Error'
+
+        if error == None:
+            return 'Success: Pool ownership was transfered'
+        else:
+            return 'Error: Database Error must be investigated'
+
+    @classmethod
+    def delete_poolowner_pools(cls, poolowner_id):
+        
+        poolowner_pools = Pool.get_items_by_poolowner_id(Pool, poolowner_id)
+        for poolowner_pool in poolowner_pools:
+            Pool.delete_item(Pool, poolowner_pool)
+
+class Pool_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    pool_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_pools(cls, pools):
+
+        pool_choices = Pool_Choices.get_all_items(Pool_Choices)
+        if pool_choices.count() > 0:               
+            pool_choices.delete()
+        for pool in pools:
+            pool_choice = Pool_Choices(name = pool.name, pool_id = pool.id)
+            Pool_Choices.add_item(Pool_Choices, pool_choice)
+
+    @classmethod
+    def make_pool_choices(cls):
+        pool_choices_1 = Pool_Choices.get_all_items(Pool_Choices)
+        pool_choices = []
+        for pool_choice in pool_choices_1:
+            pool_choices.append((pool_choice.pool_id, pool_choice.name))
+        return pool_choices
+
+
+class NFL_TimePeriod(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 10)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    schedule = models.ForeignKey(NFL_Schedule, on_delete = models.CASCADE)
+
+    class Meta:
+        ordering = ['schedule']
+
+    def __str__(self):
+        return self.name
+
+class NFL_TimePeriod_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    nfl_timeperiod_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_nfl_timeperiods(cls, nfl_timeperiods):
+
+        nfl_timeperiod_choices = NFL_TimePeriod_Choices.get_all_items(NFL_TimePeriod_Choices)
+        if nfl_timeperiod_choices.count() > 0:               
+            nfl_timeperiod_choices.delete()
+        for nfl_timeperiod in nfl_timeperiods:
+            nfl_timeperiod_choice = NFL_TimePeriod_Choices(name = nfl_timeperiod.name, nfl_timeperiod_id = nfl_timeperiod.id)
+            NFL_TimePeriod_Choices.add_item(NFL_TimePeriod_Choices, nfl_timeperiod_choice)
+
+    @classmethod
+    def make_nfl_timeperiod_choices(cls):
+        nfl_timeperiod_choices_1 = NFL_TimePeriod_Choices.get_all_items(NFL_TimePeriod_Choices)
+        nfl_timeperiod_choices = []
+        for nfl_timeperiod_choice in nfl_timeperiod_choices_1:
+            nfl_timeperiod_choices.append((nfl_timeperiod_choice.nfl_timeperiod_id, nfl_timeperiod_choice.name))
+        return nfl_timeperiod_choices
+
+
+class NFL_Game(models.Model, HelperMixins):
+
+    nfl_gamekey = models.CharField(max_length = 15)
+    nfl_eid = models.CharField(max_length = 15)
+    nfl_wknum = models.IntegerField()
+    nfl_seasontype = models.CharField(max_length = 10)
+    nfl_hometeam = models.ForeignKey(NFL_Team, on_delete = models.DO_NOTHING, null = True, related_name = 'nfl_hometeam')
+    nfl_hometeam_abbrv = models.CharField(max_length = 10)
+    nfl_awayteam = models.ForeignKey(NFL_Team, on_delete = models.DO_NOTHING, null = True, related_name = 'nfl_awayteam')
+    nfl_awayteam_abbrv = models.CharField(max_length = 10)
+    nfl_merdian = models.CharField(max_length = 10)
+    nfl_year = models.IntegerField()
+    nfl_month = models.IntegerField()
+    nfl_day = models.IntegerField()
+    nfl_wkday = models.CharField(max_length = 10)
+    nfl_time = models.CharField(max_length = 10)
+    start_time = models.DateTimeField()
+    timeperiod = models.ForeignKey(NFL_TimePeriod, on_delete = models.DO_NOTHING, null = True)
+    data_error = models.CharField(max_length = 10, null = True)
+
+    class Meta:
+        ordering = ['nfl_gamekey']
+
+    def __str__(self):
+        return self.name
+
+class NFL_Game_Choices(models.Model, HelperMixins):
+
+    name = models.CharField(max_length = 50)
+    nfl_game_id = models.IntegerField()
+
+    @classmethod
+    def get_choices_by_nfl_games(cls, nfl_games):
+
+        nfl_game_choices = NFL_Game_Choices.get_all_items(NFL_Game_Choices)
+        if nfl_game_choices.count() > 0:               
+            nfl_game_choices.delete()
+        for nfl_game in nfl_games:
+            nfl_game_choice = NFL_Game_Choices(name = nfl_game.name, nfl_game_id = nfl_game.id)
+            NFL_Game_Choices.add_item(NFL_Game_Choices, nfl_game_choice)
+
+    @classmethod
+    def make_nfl_game_choices(cls):
+        nfl_game_choices_1 = NFL_Game_Choices.get_all_items(NFL_Game_Choices)
+        nfl_game_choices = []
+        for nfl_game_choice in nfl_game_choices_1:
+            nfl_game_choices.append((nfl_game_choice.nfl_game_id, nfl_game_choice.name))
+        return nfl_game_choices

@@ -26,24 +26,7 @@
 
                 <div class="collapse navbar-collapse" id="nfl-navbar">
                     <ul class="nav navbar-nav">
-                        {% if link_id == 0 %}
-                        <li><a href="{% url 'nfl:home' 1 %}">NFL </a></li>
-                        <li><a href="{% url 'nfl:home' 2 %}">Schedule </a></li>
-                        <li><a href="{% url 'nfl:home' 3 %}">Standings </a></li>
-                        {% elif link_id == 1 %}
-                        <li class="active"><a href="{% url 'nfl:home' 0 %}">NFL <span class="sr-only">(current)</span></a></li>
-                        <li><a href="{% url 'nfl:home' 2 %}">Schedule </a></li>
-                        <li><a href="{% url 'nfl:home' 3 %}">Standings </a></li>
-                        {% elif link_id == 2 %}
-                        <li><a href="{% url 'nfl:home' 1 %}">NFL </a></li>
-                        <li class="active"><a href="{% url 'nfl:home' 0%}">Schedule <span class="sr-only">(current)</span></a></li>
-                        <li><a href="{% url 'nfl:home' 3 %}">Standings </a></li>
-                        {% else %}
-                        <li><a href="{% url 'nfl:home' 1%}">NFL </a></li>
-                        <li><a href="{% url 'nfl:home' 2%}">Schedule </a></li>
-                        <li class="active"><a href="{% url 'nfl:home' 0%}">Standings <span class="sr-only">(current)</span></a></li>
-                        {% endif %}
-
+                        {% include navbar_links_html %}
                         {% if site_user.is_superuser %}
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" role="button" 
@@ -53,7 +36,6 @@
                         {% endif %}
                     </ul>
                 </div>
-
             </nav>
         </div>
     </div>

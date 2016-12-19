@@ -35,7 +35,8 @@ class home(View):
                         'title':'NFL - Home',
                         'year':datetime.now().year,
                         'site_user': site_user,
-                        'link_id' : link_id,   
+                        'link_id' : link_id,
+                        'navbar_links_html' : 'nfl/navbar_links.html',   
                      }
         
         return render(request, self.template_name, viewmodel)
